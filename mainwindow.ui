@@ -20,7 +20,7 @@
      <height>16777215</height>
     </size>
    </property>
-   <widget class="QStackedWidget" name="mainStack">
+   <widget class="QStackedWidget" name="m_mainStack">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -33,9 +33,9 @@
      <enum>QFrame::NoFrame</enum>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>0</number>
     </property>
-    <widget class="QWidget" name="page_encrypt">
+    <widget class="QWidget" name="m_encryptPage">
      <widget class="QWidget" name="verticalLayoutWidget_6">
       <property name="geometry">
        <rect>
@@ -45,9 +45,9 @@
         <height>337</height>
        </rect>
       </property>
-      <layout class="QVBoxLayout" name="verticalLayout_6">
+      <layout class="QVBoxLayout" name="m_encryptVL">
        <item>
-        <widget class="QPlainTextEdit" name="plainTextEdit_12">
+        <widget class="QPlainTextEdit" name="m_encryptIntro">
          <property name="autoFillBackground">
           <bool>false</bool>
          </property>
@@ -80,7 +80,7 @@ Select file(s) to Encrypt.
         </widget>
        </item>
        <item>
-        <widget class="QPlainTextEdit" name="plainTextEdit_15">
+        <widget class="QPlainTextEdit" name="m_encryptKeyLoaded">
          <property name="autoFillBackground">
           <bool>false</bool>
          </property>
@@ -111,14 +111,14 @@ Select file(s) to Encrypt.
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="btn_selectFilesToEncrypt">
+        <widget class="QPushButton" name="m_encryptSelectFBtn">
          <property name="text">
           <string>Select file(s)</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QPlainTextEdit" name="plainTextEdit_13">
+        <widget class="QPlainTextEdit" name="m_encryptSelectedF">
          <property name="autoFillBackground">
           <bool>false</bool>
          </property>
@@ -149,7 +149,7 @@ Select file(s) to Encrypt.
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="btn_encrypt">
+        <widget class="QPushButton" name="m_encryptBtn">
          <property name="text">
           <string>Encrypt</string>
          </property>
@@ -158,7 +158,7 @@ Select file(s) to Encrypt.
       </layout>
      </widget>
     </widget>
-    <widget class="QWidget" name="page_keyManager">
+    <widget class="QWidget" name="m_keyMPage">
      <widget class="QWidget" name="verticalLayoutWidget">
       <property name="geometry">
        <rect>
@@ -168,9 +168,9 @@ Select file(s) to Encrypt.
         <height>291</height>
        </rect>
       </property>
-      <layout class="QVBoxLayout" name="verticalLayout">
+      <layout class="QVBoxLayout" name="m_keyMVL">
        <item>
-        <widget class="QPlainTextEdit" name="plainTextEdit_2">
+        <widget class="QPlainTextEdit" name="m_keyMIntro">
          <property name="autoFillBackground">
           <bool>false</bool>
          </property>
@@ -203,14 +203,14 @@ Import key or generate one from selected algorithm.
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="btn_importKey">
+        <widget class="QPushButton" name="m_keyMImportBtn">
          <property name="text">
           <string>Import key</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QPlainTextEdit" name="plainTextEdit">
+        <widget class="QPlainTextEdit" name="m_keyMKeyLoaded">
          <property name="autoFillBackground">
           <bool>false</bool>
          </property>
@@ -241,7 +241,7 @@ Import key or generate one from selected algorithm.
         </widget>
        </item>
        <item>
-        <widget class="QLabel" name="label">
+        <widget class="QLabel" name="m_keyMSelctAlg">
          <property name="text">
           <string>Select Algorithm</string>
          </property>
@@ -262,7 +262,7 @@ Import key or generate one from selected algorithm.
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="btn_generateKey">
+        <widget class="QPushButton" name="m_keyMGenerateBtn">
          <property name="text">
           <string>Generate key</string>
          </property>
@@ -271,7 +271,7 @@ Import key or generate one from selected algorithm.
       </layout>
      </widget>
     </widget>
-    <widget class="QWidget" name="page_decrypt">
+    <widget class="QWidget" name="m_decryptPage">
      <widget class="QWidget" name="verticalLayoutWidget_5">
       <property name="geometry">
        <rect>
@@ -281,9 +281,9 @@ Import key or generate one from selected algorithm.
         <height>337</height>
        </rect>
       </property>
-      <layout class="QVBoxLayout" name="verticalLayout_5">
+      <layout class="QVBoxLayout" name="m_decryptVL">
        <item>
-        <widget class="QPlainTextEdit" name="plainTextEdit_10">
+        <widget class="QPlainTextEdit" name="m_decryptIntro">
          <property name="autoFillBackground">
           <bool>false</bool>
          </property>
@@ -316,7 +316,7 @@ Select file(s) to Decrypt.
         </widget>
        </item>
        <item>
-        <widget class="QPlainTextEdit" name="plainTextEdit_14">
+        <widget class="QPlainTextEdit" name="m_decryptLoadedKey">
          <property name="autoFillBackground">
           <bool>false</bool>
          </property>
@@ -347,14 +347,14 @@ Select file(s) to Decrypt.
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="btn_selectFilesToDecrypt">
+        <widget class="QPushButton" name="m_decryptSelectFBtn">
          <property name="text">
           <string>Select file(s)</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QPlainTextEdit" name="plainTextEdit_11">
+        <widget class="QPlainTextEdit" name="m_decryptSelectedF">
          <property name="autoFillBackground">
           <bool>false</bool>
          </property>
@@ -385,7 +385,7 @@ Select file(s) to Decrypt.
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="btn_decrypt">
+        <widget class="QPushButton" name="m_decryptBtn">
          <property name="text">
           <string>Decrypt</string>
          </property>
@@ -403,7 +403,7 @@ Select file(s) to Decrypt.
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>25</height>
+     <height>22</height>
     </rect>
    </property>
   </widget>

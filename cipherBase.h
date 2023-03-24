@@ -17,6 +17,7 @@ protected:
 public:
     // constructors
     CipherBase(std::string label);
+    virtual ~CipherBase();
 
     // methods
     virtual void generateKey() = 0;
