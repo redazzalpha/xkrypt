@@ -17,7 +17,7 @@ CXX           = g++
 DEFINES       = -DQT_QML_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB
 CFLAGS        = -pipe -g -Wall -Wextra -fPIC -D_REENTRANT $(DEFINES)
 CXXFLAGS      = -pipe -g -std=gnu++1z -Wall -Wextra -fPIC -D_REENTRANT $(DEFINES)
-INCPATH       = -I../../xKrypt -I. -I../../../../Qt/6.4.3/gcc_64/include -I../../../../Qt/6.4.3/gcc_64/include/QtWidgets -I../../../../Qt/6.4.3/gcc_64/include/QtGui -I../../../../Qt/6.4.3/gcc_64/include/QtCore -I. -I. -I../../../../Qt/6.4.3/gcc_64/mkspecs/linux-g++
+INCPATH       = -I../../xKrypt -I. -I/usr/local/include/cryptopp -I../../../../Qt/6.4.3/gcc_64/include -I../../../../Qt/6.4.3/gcc_64/include/QtWidgets -I../../../../Qt/6.4.3/gcc_64/include/QtGui -I../../../../Qt/6.4.3/gcc_64/include/QtCore -I. -I. -I../../../../Qt/6.4.3/gcc_64/mkspecs/linux-g++
 QMAKE         = /home/kyzer/Qt/6.4.3/gcc_64/bin/qmake
 DEL_FILE      = rm -f
 CHK_DIR_EXISTS= test -d
@@ -40,7 +40,7 @@ DISTNAME      = xKrypt1.0.0
 DISTDIR = /home/kyzer/workspace/qt/xKrypt/build-xKrypt-Desktop_Qt_6_4_3_GCC_64bit-Debug/.tmp/xKrypt1.0.0
 LINK          = g++
 LFLAGS        = -Wl,-rpath,/home/kyzer/Qt/6.4.3/gcc_64/lib -Wl,-rpath-link,/home/kyzer/Qt/6.4.3/gcc_64/lib
-LIBS          = $(SUBLIBS) /home/kyzer/Qt/6.4.3/gcc_64/lib/libQt6Widgets.so /home/kyzer/Qt/6.4.3/gcc_64/lib/libQt6Gui.so /home/kyzer/Qt/6.4.3/gcc_64/lib/libQt6Core.so -lpthread -lGL   
+LIBS          = $(SUBLIBS) -L /usr/local/lib/ -l:libcryptopp.a /home/kyzer/Qt/6.4.3/gcc_64/lib/libQt6Widgets.so /home/kyzer/Qt/6.4.3/gcc_64/lib/libQt6Gui.so /home/kyzer/Qt/6.4.3/gcc_64/lib/libQt6Core.so -lpthread -lGL   
 AR            = ar cqs
 RANLIB        = 
 SED           = sed
@@ -736,7 +736,7 @@ moc_cipherBase.cpp: ../cipherBase.h \
 		../../../../Qt/6.4.3/gcc_64/include/QtCore/qbindingstorage.h \
 		moc_predefs.h \
 		../../../../Qt/6.4.3/gcc_64/libexec/moc
-	/home/kyzer/Qt/6.4.3/gcc_64/libexec/moc $(DEFINES) --include /home/kyzer/workspace/qt/xKrypt/build-xKrypt-Desktop_Qt_6_4_3_GCC_64bit-Debug/moc_predefs.h -I/home/kyzer/Qt/6.4.3/gcc_64/mkspecs/linux-g++ -I/home/kyzer/workspace/qt/xKrypt -I/home/kyzer/Qt/6.4.3/gcc_64/include -I/home/kyzer/Qt/6.4.3/gcc_64/include/QtWidgets -I/home/kyzer/Qt/6.4.3/gcc_64/include/QtGui -I/home/kyzer/Qt/6.4.3/gcc_64/include/QtCore -I. -I/usr/include/c++/11 -I/usr/include/x86_64-linux-gnu/c++/11 -I/usr/include/c++/11/backward -I/usr/lib/gcc/x86_64-linux-gnu/11/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include ../cipherBase.h -o moc_cipherBase.cpp
+	/home/kyzer/Qt/6.4.3/gcc_64/libexec/moc $(DEFINES) --include /home/kyzer/workspace/qt/xKrypt/build-xKrypt-Desktop_Qt_6_4_3_GCC_64bit-Debug/moc_predefs.h -I/home/kyzer/Qt/6.4.3/gcc_64/mkspecs/linux-g++ -I/home/kyzer/workspace/qt/xKrypt -I/usr/local/include/cryptopp -I/home/kyzer/Qt/6.4.3/gcc_64/include -I/home/kyzer/Qt/6.4.3/gcc_64/include/QtWidgets -I/home/kyzer/Qt/6.4.3/gcc_64/include/QtGui -I/home/kyzer/Qt/6.4.3/gcc_64/include/QtCore -I. -I/usr/include/c++/11 -I/usr/include/x86_64-linux-gnu/c++/11 -I/usr/include/c++/11/backward -I/usr/lib/gcc/x86_64-linux-gnu/11/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include ../cipherBase.h -o moc_cipherBase.cpp
 
 moc_kActionBase.cpp: ../kActionBase.h \
 		../enums.h \
@@ -880,7 +880,7 @@ moc_kActionBase.cpp: ../kActionBase.h \
 		../../../../Qt/6.4.3/gcc_64/include/QtWidgets/qtabwidget.h \
 		moc_predefs.h \
 		../../../../Qt/6.4.3/gcc_64/libexec/moc
-	/home/kyzer/Qt/6.4.3/gcc_64/libexec/moc $(DEFINES) --include /home/kyzer/workspace/qt/xKrypt/build-xKrypt-Desktop_Qt_6_4_3_GCC_64bit-Debug/moc_predefs.h -I/home/kyzer/Qt/6.4.3/gcc_64/mkspecs/linux-g++ -I/home/kyzer/workspace/qt/xKrypt -I/home/kyzer/Qt/6.4.3/gcc_64/include -I/home/kyzer/Qt/6.4.3/gcc_64/include/QtWidgets -I/home/kyzer/Qt/6.4.3/gcc_64/include/QtGui -I/home/kyzer/Qt/6.4.3/gcc_64/include/QtCore -I. -I/usr/include/c++/11 -I/usr/include/x86_64-linux-gnu/c++/11 -I/usr/include/c++/11/backward -I/usr/lib/gcc/x86_64-linux-gnu/11/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include ../kActionBase.h -o moc_kActionBase.cpp
+	/home/kyzer/Qt/6.4.3/gcc_64/libexec/moc $(DEFINES) --include /home/kyzer/workspace/qt/xKrypt/build-xKrypt-Desktop_Qt_6_4_3_GCC_64bit-Debug/moc_predefs.h -I/home/kyzer/Qt/6.4.3/gcc_64/mkspecs/linux-g++ -I/home/kyzer/workspace/qt/xKrypt -I/usr/local/include/cryptopp -I/home/kyzer/Qt/6.4.3/gcc_64/include -I/home/kyzer/Qt/6.4.3/gcc_64/include/QtWidgets -I/home/kyzer/Qt/6.4.3/gcc_64/include/QtGui -I/home/kyzer/Qt/6.4.3/gcc_64/include/QtCore -I. -I/usr/include/c++/11 -I/usr/include/x86_64-linux-gnu/c++/11 -I/usr/include/c++/11/backward -I/usr/lib/gcc/x86_64-linux-gnu/11/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include ../kActionBase.h -o moc_kActionBase.cpp
 
 moc_mainwindow.cpp: ../mainwindow.h \
 		../kActionBase.h \
@@ -1047,7 +1047,7 @@ moc_mainwindow.cpp: ../mainwindow.h \
 		../../../../Qt/6.4.3/gcc_64/include/QtGui/QPixmap \
 		moc_predefs.h \
 		../../../../Qt/6.4.3/gcc_64/libexec/moc
-	/home/kyzer/Qt/6.4.3/gcc_64/libexec/moc $(DEFINES) --include /home/kyzer/workspace/qt/xKrypt/build-xKrypt-Desktop_Qt_6_4_3_GCC_64bit-Debug/moc_predefs.h -I/home/kyzer/Qt/6.4.3/gcc_64/mkspecs/linux-g++ -I/home/kyzer/workspace/qt/xKrypt -I/home/kyzer/Qt/6.4.3/gcc_64/include -I/home/kyzer/Qt/6.4.3/gcc_64/include/QtWidgets -I/home/kyzer/Qt/6.4.3/gcc_64/include/QtGui -I/home/kyzer/Qt/6.4.3/gcc_64/include/QtCore -I. -I/usr/include/c++/11 -I/usr/include/x86_64-linux-gnu/c++/11 -I/usr/include/c++/11/backward -I/usr/lib/gcc/x86_64-linux-gnu/11/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include ../mainwindow.h -o moc_mainwindow.cpp
+	/home/kyzer/Qt/6.4.3/gcc_64/libexec/moc $(DEFINES) --include /home/kyzer/workspace/qt/xKrypt/build-xKrypt-Desktop_Qt_6_4_3_GCC_64bit-Debug/moc_predefs.h -I/home/kyzer/Qt/6.4.3/gcc_64/mkspecs/linux-g++ -I/home/kyzer/workspace/qt/xKrypt -I/usr/local/include/cryptopp -I/home/kyzer/Qt/6.4.3/gcc_64/include -I/home/kyzer/Qt/6.4.3/gcc_64/include/QtWidgets -I/home/kyzer/Qt/6.4.3/gcc_64/include/QtGui -I/home/kyzer/Qt/6.4.3/gcc_64/include/QtCore -I. -I/usr/include/c++/11 -I/usr/include/x86_64-linux-gnu/c++/11 -I/usr/include/c++/11/backward -I/usr/lib/gcc/x86_64-linux-gnu/11/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include ../mainwindow.h -o moc_mainwindow.cpp
 
 compiler_moc_objc_header_make_all:
 compiler_moc_objc_header_clean:

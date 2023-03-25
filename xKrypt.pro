@@ -40,6 +40,15 @@ HEADERS += \
 FORMS += \
     mainwindow.ui
 
+INCLUDEPATH += \
+    /usr/local/include/cryptopp/
+
+LIBS += \
+    -L /usr/local/lib/ -l:libcryptopp.a
+
+
+
+
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
