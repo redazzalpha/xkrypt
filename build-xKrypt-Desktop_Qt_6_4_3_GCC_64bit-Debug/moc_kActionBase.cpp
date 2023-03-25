@@ -26,12 +26,13 @@ QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 namespace {
 struct qt_meta_stringdata_KActionBase_t {
-    uint offsetsAndSizes[10];
+    uint offsetsAndSizes[12];
     char stringdata0[12];
     char stringdata1[13];
     char stringdata2[1];
     char stringdata3[5];
-    char stringdata4[14];
+    char stringdata4[5];
+    char stringdata5[14];
 };
 #define QT_MOC_LITERAL(ofs, len) \
     uint(sizeof(qt_meta_stringdata_KActionBase_t::offsetsAndSizes) + ofs), len 
@@ -41,12 +42,14 @@ Q_CONSTINIT static const qt_meta_stringdata_KActionBase_t qt_meta_stringdata_KAc
         QT_MOC_LITERAL(12, 12),  // "setStackPage"
         QT_MOC_LITERAL(25, 0),  // ""
         QT_MOC_LITERAL(26, 4),  // "page"
-        QT_MOC_LITERAL(31, 13)   // "onActionClick"
+        QT_MOC_LITERAL(31, 4),  // "quit"
+        QT_MOC_LITERAL(36, 13)   // "onActionClick"
     },
     "KActionBase",
     "setStackPage",
     "",
     "page",
+    "quit",
     "onActionClick"
 };
 #undef QT_MOC_LITERAL
@@ -58,21 +61,23 @@ Q_CONSTINIT static const uint qt_meta_data_KActionBase[] = {
       10,       // revision
        0,       // classname
        0,    0, // classinfo
-       2,   14, // methods
+       3,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
        0,       // flags
-       1,       // signalCount
+       2,       // signalCount
 
  // signals: name, argc, parameters, tag, flags, initial metatype offsets
-       1,    1,   26,    2, 0x06,    1 /* Public */,
+       1,    1,   32,    2, 0x06,    1 /* Public */,
+       4,    0,   35,    2, 0x06,    3 /* Public */,
 
  // slots: name, argc, parameters, tag, flags, initial metatype offsets
-       4,    0,   29,    2, 0x0a,    3 /* Public */,
+       5,    0,   36,    2, 0x0a,    4 /* Public */,
 
  // signals: parameters
     QMetaType::Void, QMetaType::Int,    3,
+    QMetaType::Void,
 
  // slots: parameters
     QMetaType::Void,
@@ -92,6 +97,8 @@ Q_CONSTINIT const QMetaObject KActionBase::staticMetaObject = { {
         // method 'setStackPage'
         QtPrivate::TypeAndForceComplete<void, std::false_type>,
         QtPrivate::TypeAndForceComplete<int, std::false_type>,
+        // method 'quit'
+        QtPrivate::TypeAndForceComplete<void, std::false_type>,
         // method 'onActionClick'
         QtPrivate::TypeAndForceComplete<void, std::false_type>
     >,
@@ -105,7 +112,8 @@ void KActionBase::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id,
         (void)_t;
         switch (_id) {
         case 0: _t->setStackPage((*reinterpret_cast< std::add_pointer_t<int>>(_a[1]))); break;
-        case 1: _t->onActionClick(); break;
+        case 1: _t->quit(); break;
+        case 2: _t->onActionClick(); break;
         default: ;
         }
     } else if (_c == QMetaObject::IndexOfMethod) {
@@ -114,6 +122,13 @@ void KActionBase::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id,
             using _t = void (KActionBase::*)(int );
             if (_t _q_method = &KActionBase::setStackPage; *reinterpret_cast<_t *>(_a[1]) == _q_method) {
                 *result = 0;
+                return;
+            }
+        }
+        {
+            using _t = void (KActionBase::*)();
+            if (_t _q_method = &KActionBase::quit; *reinterpret_cast<_t *>(_a[1]) == _q_method) {
+                *result = 1;
                 return;
             }
         }
@@ -139,13 +154,13 @@ int KActionBase::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 2)
+        if (_id < 3)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 2;
+        _id -= 3;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 2)
+        if (_id < 3)
             *reinterpret_cast<QMetaType *>(_a[0]) = QMetaType();
-        _id -= 2;
+        _id -= 3;
     }
     return _id;
 }
@@ -155,6 +170,12 @@ void KActionBase::setStackPage(int _t1)
 {
     void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t1))) };
     QMetaObject::activate(this, &staticMetaObject, 0, _a);
+}
+
+// SIGNAL 1
+void KActionBase::quit()
+{
+    QMetaObject::activate(this, &staticMetaObject, 1, nullptr);
 }
 QT_WARNING_POP
 QT_END_MOC_NAMESPACE

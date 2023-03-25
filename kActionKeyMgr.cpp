@@ -1,7 +1,10 @@
 #include "kActionKeyMgr.h"
 
 // constructors
-KActionKeyMgr::KActionKeyMgr(): KActionBase("key manager", ":/assets/keyManager.png") {}
+KActionKeyMgr::KActionKeyMgr(): KActionBase("key manager", ":/assets/key.png") {}
+
+// destructor
+KActionKeyMgr::~KActionKeyMgr(){}
 
 // slots
-void KActionKeyMgr::onActionClick() { emit setStackPage(1); }
+void KActionKeyMgr::onActionClick() { emit setStackPage(Page::generate); }

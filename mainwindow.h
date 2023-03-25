@@ -3,7 +3,7 @@
 
 #include "kActionBase.h"
 #include "cipherBase.h"
-#include "kDialog.h"
+#include "kMessage.h"
 #include <QMainWindow>
 
 
@@ -19,7 +19,7 @@ private:
     Ui::MainWindow *ui;
     QList<KActionBase*> m_actions = QList<KActionBase*>();
     CipherBase* m_cipher = nullptr;
-    KDialog* m_dialog = new KDialog(this);
+    KMessage* m_message = new KMessage(this);
 
 public:
     // constructors
@@ -30,7 +30,7 @@ public:
 
 private:
     void initToolBar();
-    void initDialog();
+    void initMessage();
     void connectItems();
 
 private slots:

@@ -14,6 +14,9 @@ public:
     // constructors
     KActionKeyMgr();
 
+    // destructor
+    virtual ~KActionKeyMgr();
+
 public slots:
     virtual void onActionClick();
 };

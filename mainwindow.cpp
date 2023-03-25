@@ -4,6 +4,7 @@
 #include "kActionKeyMgr.h"
 #include "kActionEncrypt.h"
 #include "kActionDecrypt.h"
+#include "kActionQuit.h"
 #include "cipherAes.h"
 #include "cipherRsa.h"
 #include <QToolButton>
@@ -21,7 +22,6 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
     initToolBar();
-    initDialog();
     connectItems();
 }
 
@@ -40,18 +40,16 @@ void MainWindow::initToolBar()
     m_actions.append(new KActionKeyMgr());
     m_actions.append(new KActionEncrypt());
     m_actions.append(new KActionDecrypt());
+    m_actions.append(new KActionQuit());
 
     foreach (KActionBase* action, m_actions) {
         ui->m_toolBar->addAction(action);
         QObject::connect(action, &QAction::triggered, action, &KActionBase::onActionClick);
+        QObject::connect(action, &KActionBase::quit, this, &QMainWindow::close);
         QObject::connect(action, &KActionBase::setStackPage, ui->m_mainStack, &QStackedWidget::setCurrentIndex);
     }
 
-    setIconSize(QSize(40, 40));
-}
-void MainWindow::initDialog() {
-    m_dialog->setModal(true);
-
+    setIconSize(QSize(35, 35));
 }
 void MainWindow::connectItems() {
     QObject::connect(ui->m_keyMAlg, &QComboBox::activated, this, &MainWindow::selectCipher);
@@ -63,7 +61,8 @@ void MainWindow::on_m_encryptBtn_clicked()
 {
     if(m_cipher && m_cipher->isKeyLoaded()) m_cipher->encrypt();
     else {
-        m_dialog->exec();
+        m_message->setMessage("No key has not been loaded! \n Please load key or generate one and retry.");
+        m_message->exec();
     }
 }
 void MainWindow::on_m_decryptBtn_clicked()

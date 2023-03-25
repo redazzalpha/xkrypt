@@ -2,6 +2,7 @@
 #define KACTIONBASE_H
 
 #include <QAction>
+#include <QMainWindow>
 
 /**
  * KActionBase class is abstract and represent QAction object
@@ -10,6 +11,8 @@
  * This class is used to remplace QAction object
  * with all needed.
  */
+
+enum Page {encrypt , generate, decrypt};
 
 class KActionBase: public QAction {
 
@@ -31,6 +34,7 @@ public slots:
 
 signals:
     void setStackPage(int page);
+    void quit();
 };
 
 #endif // KACTIONBASE_H

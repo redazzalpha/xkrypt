@@ -16,13 +16,13 @@ SOURCES += \
     kActionDecrypt.cpp \
     kActionEncrypt.cpp \
     kActionKeyMgr.cpp \
-    kDialog.cpp \
+    kActionQuit.cpp \
+    kDialogBase.cpp \
+    kMessage.cpp \
     main.cpp \
-    mainwindow.cpp \
-    man.cpp
+    mainwindow.cpp
 
 HEADERS += \
-    .h \
     cipherAes.h \
     cipherBase.h \
     cipherRsa.h \
@@ -30,9 +30,10 @@ HEADERS += \
     kActionDecrypt.h \
     kActionEncrypt.h \
     kActionKeyMgr.h \
-    kDialog.h \
-    mainwindow.h \
-    man.h
+    kActionQuit.h \
+    kDialogBase.h \
+    kMessage.h \
+    mainwindow.h
 
 FORMS += \
     mainwindow.ui

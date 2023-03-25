@@ -14,6 +14,9 @@ public:
     // constructors
     KActionDecrypt();
 
+    // destructor
+    virtual ~KActionDecrypt();
+
 public slots:
     virtual void onActionClick();
 };
