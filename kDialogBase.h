@@ -7,6 +7,11 @@
 #include <QHBoxLayout>
 #include <QLabel>
 
+/**
+ * KDialogBase class is abstract and represents QDialog object
+ * This class is used to remplace QDialog object
+ */
+
 class KDialogBase : public QDialog {
 protected:
     QLabel* m_message = new QLabel("No message set!");
@@ -29,8 +34,8 @@ public :
 
 protected:
     void hideBtnAccept();
-    void showBtnAccept();
     void hideBtnReject();
+    void showBtnAccept();
     void showBtnReject();
 
 private:

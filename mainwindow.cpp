@@ -5,8 +5,8 @@
 #include "kActionEncrypt.h"
 #include "kActionDecrypt.h"
 #include "kActionQuit.h"
-#include "cipherAes.h"
 #include "cipherRsa.h"
+#include "defines.h"
 #include <QToolButton>
 #include <QPushButton>
 #include <QLabel>
@@ -55,19 +55,19 @@ void MainWindow::connectItems() {
     QObject::connect(ui->m_keyMAlg, &QComboBox::activated, this, &MainWindow::selectCipher);
 
 }
+void MainWindow::showMessage(std::string message) {
+    m_message->setMessage(message);
+    m_message->exec();
+}
 
 // slots
 void MainWindow::on_m_encryptBtn_clicked()
 {
-    if(m_cipher && m_cipher->isKeyLoaded()) m_cipher->encrypt();
-    else {
-        m_message->setMessage("No key has not been loaded! \n Please load key or generate one and retry.");
-        m_message->exec();
-    }
+    m_cipher->isKeyLoaded()? m_cipher->encrypt() : showMessage(NO_KEY_MSG("encrypt"));
 }
 void MainWindow::on_m_decryptBtn_clicked()
 {
-    m_cipher->decrypt();
+    m_cipher->isKeyLoaded()? m_cipher->decrypt() : showMessage(NO_KEY_MSG("decrypt"));
 }
 void MainWindow::on_m_encryptSelectFBtn_clicked()
 {
@@ -85,11 +85,11 @@ void MainWindow::on_m_keyMImportBtn_clicked()
 {
     QString fileName = QFileDialog::getOpenFileName(this,"Import key", "", "All Files (*)");
 }
-void MainWindow::selectCipher(int index) {
+void MainWindow::selectCipher(int alg) {
     if(m_cipher) delete m_cipher;
-    switch(index) {
-    case 0: m_cipher = new CipherAes; break;
-    case 1: m_cipher = new CipherRsa; break;
+    switch(alg) {
+    case Algorithm::aes: m_cipher = new CipherAes; break;
+    case Algorithm::rsa: m_cipher = new CipherRsa; break;
     default: m_cipher = nullptr; break;
     }
 }

@@ -3,6 +3,12 @@
 
 #include "cipherBase.h"
 
+/**
+ * CipherAes class represents Aes algorithms
+ * inherits from CipherBase and
+ * encrypts decrypts and generates keys
+ */
+
 class CipherAes : public CipherBase {
 public:
     // constructors

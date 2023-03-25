@@ -4,8 +4,9 @@
 #include "kActionBase.h"
 
 /**
- * KActionDecrypt class represent QAction object
- * inherits from KActionBase
+ * KActionDecrypt class represents QAction object
+ * inherits from KActionBase and handles decrypt
+ * manager visibility
  */
 
 class KActionDecrypt : public KActionBase {

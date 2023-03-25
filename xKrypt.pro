@@ -26,6 +26,8 @@ HEADERS += \
     cipherAes.h \
     cipherBase.h \
     cipherRsa.h \
+    defines.h \
+    enums.h \
     kActionBase.h \
     kActionDecrypt.h \
     kActionEncrypt.h \

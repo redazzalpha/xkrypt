@@ -30,14 +30,6 @@ class Ui_MainWindow
 public:
     QWidget *centralwidget;
     QStackedWidget *m_mainStack;
-    QWidget *m_encryptPage;
-    QWidget *verticalLayoutWidget_6;
-    QVBoxLayout *m_encryptVL;
-    QPlainTextEdit *m_encryptIntro;
-    QPlainTextEdit *m_encryptKeyLoaded;
-    QPushButton *m_encryptSelectFBtn;
-    QPlainTextEdit *m_encryptSelectedF;
-    QPushButton *m_encryptBtn;
     QWidget *m_keyMPage;
     QWidget *verticalLayoutWidget;
     QVBoxLayout *m_keyMVL;
@@ -47,6 +39,14 @@ public:
     QLabel *m_keyMSelctAlg;
     QComboBox *m_keyMAlg;
     QPushButton *m_keyMGenerateBtn;
+    QWidget *m_encryptPage;
+    QWidget *verticalLayoutWidget_6;
+    QVBoxLayout *m_encryptVL;
+    QPlainTextEdit *m_encryptIntro;
+    QPlainTextEdit *m_encryptKeyLoaded;
+    QPushButton *m_encryptSelectFBtn;
+    QPlainTextEdit *m_encryptSelectedF;
+    QPushButton *m_encryptBtn;
     QWidget *m_decryptPage;
     QWidget *verticalLayoutWidget_5;
     QVBoxLayout *m_decryptVL;
@@ -71,6 +71,63 @@ public:
         m_mainStack->setObjectName("m_mainStack");
         m_mainStack->setGeometry(QRect(10, 9, 781, 521));
         m_mainStack->setFrameShape(QFrame::NoFrame);
+        m_keyMPage = new QWidget();
+        m_keyMPage->setObjectName("m_keyMPage");
+        verticalLayoutWidget = new QWidget(m_keyMPage);
+        verticalLayoutWidget->setObjectName("verticalLayoutWidget");
+        verticalLayoutWidget->setGeometry(QRect(0, 0, 391, 291));
+        m_keyMVL = new QVBoxLayout(verticalLayoutWidget);
+        m_keyMVL->setObjectName("m_keyMVL");
+        m_keyMVL->setContentsMargins(0, 0, 0, 0);
+        m_keyMIntro = new QPlainTextEdit(verticalLayoutWidget);
+        m_keyMIntro->setObjectName("m_keyMIntro");
+        m_keyMIntro->setAutoFillBackground(false);
+        m_keyMIntro->setStyleSheet(QString::fromUtf8("background-color: rgba(0, 0, 0, 0);"));
+        m_keyMIntro->setFrameShape(QFrame::NoFrame);
+        m_keyMIntro->setFrameShadow(QFrame::Plain);
+        m_keyMIntro->setTabChangesFocus(false);
+        m_keyMIntro->setReadOnly(true);
+        m_keyMIntro->setTextInteractionFlags(Qt::NoTextInteraction);
+        m_keyMIntro->setBackgroundVisible(false);
+
+        m_keyMVL->addWidget(m_keyMIntro);
+
+        m_keyMImportBtn = new QPushButton(verticalLayoutWidget);
+        m_keyMImportBtn->setObjectName("m_keyMImportBtn");
+
+        m_keyMVL->addWidget(m_keyMImportBtn);
+
+        m_keyMKeyLoaded = new QPlainTextEdit(verticalLayoutWidget);
+        m_keyMKeyLoaded->setObjectName("m_keyMKeyLoaded");
+        m_keyMKeyLoaded->setAutoFillBackground(false);
+        m_keyMKeyLoaded->setStyleSheet(QString::fromUtf8("background-color: rgba(0, 0, 0, 0);"));
+        m_keyMKeyLoaded->setFrameShape(QFrame::NoFrame);
+        m_keyMKeyLoaded->setFrameShadow(QFrame::Plain);
+        m_keyMKeyLoaded->setTabChangesFocus(false);
+        m_keyMKeyLoaded->setReadOnly(true);
+        m_keyMKeyLoaded->setTextInteractionFlags(Qt::NoTextInteraction);
+        m_keyMKeyLoaded->setBackgroundVisible(false);
+
+        m_keyMVL->addWidget(m_keyMKeyLoaded);
+
+        m_keyMSelctAlg = new QLabel(verticalLayoutWidget);
+        m_keyMSelctAlg->setObjectName("m_keyMSelctAlg");
+
+        m_keyMVL->addWidget(m_keyMSelctAlg);
+
+        m_keyMAlg = new QComboBox(verticalLayoutWidget);
+        m_keyMAlg->addItem(QString());
+        m_keyMAlg->addItem(QString());
+        m_keyMAlg->setObjectName("m_keyMAlg");
+
+        m_keyMVL->addWidget(m_keyMAlg);
+
+        m_keyMGenerateBtn = new QPushButton(verticalLayoutWidget);
+        m_keyMGenerateBtn->setObjectName("m_keyMGenerateBtn");
+
+        m_keyMVL->addWidget(m_keyMGenerateBtn);
+
+        m_mainStack->addWidget(m_keyMPage);
         m_encryptPage = new QWidget();
         m_encryptPage->setObjectName("m_encryptPage");
         verticalLayoutWidget_6 = new QWidget(m_encryptPage);
@@ -129,63 +186,6 @@ public:
         m_encryptVL->addWidget(m_encryptBtn);
 
         m_mainStack->addWidget(m_encryptPage);
-        m_keyMPage = new QWidget();
-        m_keyMPage->setObjectName("m_keyMPage");
-        verticalLayoutWidget = new QWidget(m_keyMPage);
-        verticalLayoutWidget->setObjectName("verticalLayoutWidget");
-        verticalLayoutWidget->setGeometry(QRect(0, 0, 391, 291));
-        m_keyMVL = new QVBoxLayout(verticalLayoutWidget);
-        m_keyMVL->setObjectName("m_keyMVL");
-        m_keyMVL->setContentsMargins(0, 0, 0, 0);
-        m_keyMIntro = new QPlainTextEdit(verticalLayoutWidget);
-        m_keyMIntro->setObjectName("m_keyMIntro");
-        m_keyMIntro->setAutoFillBackground(false);
-        m_keyMIntro->setStyleSheet(QString::fromUtf8("background-color: rgba(0, 0, 0, 0);"));
-        m_keyMIntro->setFrameShape(QFrame::NoFrame);
-        m_keyMIntro->setFrameShadow(QFrame::Plain);
-        m_keyMIntro->setTabChangesFocus(false);
-        m_keyMIntro->setReadOnly(true);
-        m_keyMIntro->setTextInteractionFlags(Qt::NoTextInteraction);
-        m_keyMIntro->setBackgroundVisible(false);
-
-        m_keyMVL->addWidget(m_keyMIntro);
-
-        m_keyMImportBtn = new QPushButton(verticalLayoutWidget);
-        m_keyMImportBtn->setObjectName("m_keyMImportBtn");
-
-        m_keyMVL->addWidget(m_keyMImportBtn);
-
-        m_keyMKeyLoaded = new QPlainTextEdit(verticalLayoutWidget);
-        m_keyMKeyLoaded->setObjectName("m_keyMKeyLoaded");
-        m_keyMKeyLoaded->setAutoFillBackground(false);
-        m_keyMKeyLoaded->setStyleSheet(QString::fromUtf8("background-color: rgba(0, 0, 0, 0);"));
-        m_keyMKeyLoaded->setFrameShape(QFrame::NoFrame);
-        m_keyMKeyLoaded->setFrameShadow(QFrame::Plain);
-        m_keyMKeyLoaded->setTabChangesFocus(false);
-        m_keyMKeyLoaded->setReadOnly(true);
-        m_keyMKeyLoaded->setTextInteractionFlags(Qt::NoTextInteraction);
-        m_keyMKeyLoaded->setBackgroundVisible(false);
-
-        m_keyMVL->addWidget(m_keyMKeyLoaded);
-
-        m_keyMSelctAlg = new QLabel(verticalLayoutWidget);
-        m_keyMSelctAlg->setObjectName("m_keyMSelctAlg");
-
-        m_keyMVL->addWidget(m_keyMSelctAlg);
-
-        m_keyMAlg = new QComboBox(verticalLayoutWidget);
-        m_keyMAlg->addItem(QString());
-        m_keyMAlg->addItem(QString());
-        m_keyMAlg->setObjectName("m_keyMAlg");
-
-        m_keyMVL->addWidget(m_keyMAlg);
-
-        m_keyMGenerateBtn = new QPushButton(verticalLayoutWidget);
-        m_keyMGenerateBtn->setObjectName("m_keyMGenerateBtn");
-
-        m_keyMVL->addWidget(m_keyMGenerateBtn);
-
-        m_mainStack->addWidget(m_keyMPage);
         m_decryptPage = new QWidget();
         m_decryptPage->setObjectName("m_decryptPage");
         verticalLayoutWidget_5 = new QWidget(m_decryptPage);
@@ -258,7 +258,7 @@ public:
 
         retranslateUi(MainWindow);
 
-        m_mainStack->setCurrentIndex(2);
+        m_mainStack->setCurrentIndex(0);
 
 
         QMetaObject::connectSlotsByName(MainWindow);
@@ -267,13 +267,6 @@ public:
     void retranslateUi(QMainWindow *MainWindow)
     {
         MainWindow->setWindowTitle(QCoreApplication::translate("MainWindow", "xKrypt", nullptr));
-        m_encryptIntro->setPlainText(QCoreApplication::translate("MainWindow", "Encrypt manager section.\n"
-"Select file(s) to Encrypt.\n"
-"", nullptr));
-        m_encryptKeyLoaded->setPlainText(QCoreApplication::translate("MainWindow", "no key loaded", nullptr));
-        m_encryptSelectFBtn->setText(QCoreApplication::translate("MainWindow", "Select file(s)", nullptr));
-        m_encryptSelectedF->setPlainText(QCoreApplication::translate("MainWindow", "no file(s) selected", nullptr));
-        m_encryptBtn->setText(QCoreApplication::translate("MainWindow", "Encrypt", nullptr));
         m_keyMIntro->setPlainText(QCoreApplication::translate("MainWindow", "Key manager section.\n"
 "Import key or generate one from selected algorithm.\n"
 "", nullptr));
@@ -284,6 +277,13 @@ public:
         m_keyMAlg->setItemText(1, QCoreApplication::translate("MainWindow", "Asymmetric - Rsa", nullptr));
 
         m_keyMGenerateBtn->setText(QCoreApplication::translate("MainWindow", "Generate key", nullptr));
+        m_encryptIntro->setPlainText(QCoreApplication::translate("MainWindow", "Encrypt manager section.\n"
+"Select file(s) to Encrypt.\n"
+"", nullptr));
+        m_encryptKeyLoaded->setPlainText(QCoreApplication::translate("MainWindow", "no key loaded", nullptr));
+        m_encryptSelectFBtn->setText(QCoreApplication::translate("MainWindow", "Select file(s)", nullptr));
+        m_encryptSelectedF->setPlainText(QCoreApplication::translate("MainWindow", "no file(s) selected", nullptr));
+        m_encryptBtn->setText(QCoreApplication::translate("MainWindow", "Encrypt", nullptr));
         m_decryptIntro->setPlainText(QCoreApplication::translate("MainWindow", "Decrypt manager section.\n"
 "Select file(s) to Decrypt.\n"
 "", nullptr));

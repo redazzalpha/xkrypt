@@ -4,8 +4,9 @@
 #include "kActionBase.h"
 
 /**
- * KActionKeyMgr class represent QAction object
- * inherits from KActionBase
+ * KActionKeyMgr class represents QAction object
+ * inherits from KActionBase and handles key
+ * manager visibility
  */
 
 class KActionKeyMgr : public KActionBase {

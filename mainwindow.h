@@ -3,7 +3,9 @@
 
 #include "kActionBase.h"
 #include "cipherBase.h"
+#include "cipherAes.h"
 #include "kMessage.h"
+#include "enums.h"
 #include <QMainWindow>
 
 
@@ -18,7 +20,7 @@ class MainWindow : public QMainWindow
 private:
     Ui::MainWindow *ui;
     QList<KActionBase*> m_actions = QList<KActionBase*>();
-    CipherBase* m_cipher = nullptr;
+    CipherBase* m_cipher = new CipherAes;
     KMessage* m_message = new KMessage(this);
 
 public:
@@ -32,6 +34,8 @@ private:
     void initToolBar();
     void initMessage();
     void connectItems();
+    void showMessage(std::string message);
+
 
 private slots:
     void on_m_encryptBtn_clicked();
@@ -40,6 +44,6 @@ private slots:
     void on_m_decryptSelectFBtn_clicked();
     void on_m_keyMGenerateBtn_clicked();
     void on_m_keyMImportBtn_clicked();
-    void selectCipher(int);
+    void selectCipher(int alg);
 };
 #endif // MAINWINDOW_H

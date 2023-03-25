@@ -8,6 +8,11 @@
 #include <QHBoxLayout>
 #include <QLabel>
 
+/**
+ * KMessage class represents QDialog object
+ * inherits from KDialogBase and handles messages
+ * to user from GUI
+ */
 
 class KMessage : public KDialogBase {
 private:

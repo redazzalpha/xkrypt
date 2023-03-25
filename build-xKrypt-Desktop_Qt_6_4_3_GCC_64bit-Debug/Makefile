@@ -238,6 +238,8 @@ DIST          = /home/Qt/6.4.3/gcc_64/mkspecs/features/spec_pre.prf \
 		../../xKrypt.pro ../cipherAes.h \
 		../cipherBase.h \
 		../cipherRsa.h \
+		../defines.h \
+		../enums.h \
 		../kActionBase.h \
 		../kActionDecrypt.h \
 		../kActionEncrypt.h \
@@ -599,7 +601,7 @@ distdir: FORCE
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents ../ressources.qrc $(DISTDIR)/
 	$(COPY_FILE) --parents ../../../../Qt/6.4.3/gcc_64/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents ../cipherAes.h ../cipherBase.h ../cipherRsa.h ../kActionBase.h ../kActionDecrypt.h ../kActionEncrypt.h ../kActionKeyMgr.h ../kActionQuit.h ../kDialogBase.h ../kMessage.h ../mainwindow.h $(DISTDIR)/
+	$(COPY_FILE) --parents ../cipherAes.h ../cipherBase.h ../cipherRsa.h ../defines.h ../enums.h ../kActionBase.h ../kActionDecrypt.h ../kActionEncrypt.h ../kActionKeyMgr.h ../kActionQuit.h ../kDialogBase.h ../kMessage.h ../mainwindow.h $(DISTDIR)/
 	$(COPY_FILE) --parents ../cipherAes.cpp ../cipherBase.cpp ../cipherRsa.cpp ../kActionBase.cpp ../kActionDecrypt.cpp ../kActionEncrypt.cpp ../kActionKeyMgr.cpp ../kActionQuit.cpp ../kDialogBase.cpp ../kMessage.cpp ../main.cpp ../mainwindow.cpp $(DISTDIR)/
 	$(COPY_FILE) --parents ../mainwindow.ui $(DISTDIR)/
 
@@ -737,6 +739,7 @@ moc_cipherBase.cpp: ../cipherBase.h \
 	/home/kyzer/Qt/6.4.3/gcc_64/libexec/moc $(DEFINES) --include /home/kyzer/workspace/qt/xKrypt/build-xKrypt-Desktop_Qt_6_4_3_GCC_64bit-Debug/moc_predefs.h -I/home/kyzer/Qt/6.4.3/gcc_64/mkspecs/linux-g++ -I/home/kyzer/workspace/qt/xKrypt -I/home/kyzer/Qt/6.4.3/gcc_64/include -I/home/kyzer/Qt/6.4.3/gcc_64/include/QtWidgets -I/home/kyzer/Qt/6.4.3/gcc_64/include/QtGui -I/home/kyzer/Qt/6.4.3/gcc_64/include/QtCore -I. -I/usr/include/c++/11 -I/usr/include/x86_64-linux-gnu/c++/11 -I/usr/include/c++/11/backward -I/usr/lib/gcc/x86_64-linux-gnu/11/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include ../cipherBase.h -o moc_cipherBase.cpp
 
 moc_kActionBase.cpp: ../kActionBase.h \
+		../enums.h \
 		../../../../Qt/6.4.3/gcc_64/include/QtGui/QAction \
 		../../../../Qt/6.4.3/gcc_64/include/QtGui/qaction.h \
 		../../../../Qt/6.4.3/gcc_64/include/QtGui/qtguiglobal.h \
@@ -881,6 +884,7 @@ moc_kActionBase.cpp: ../kActionBase.h \
 
 moc_mainwindow.cpp: ../mainwindow.h \
 		../kActionBase.h \
+		../enums.h \
 		../../../../Qt/6.4.3/gcc_64/include/QtGui/QAction \
 		../../../../Qt/6.4.3/gcc_64/include/QtGui/qaction.h \
 		../../../../Qt/6.4.3/gcc_64/include/QtGui/qtguiglobal.h \
@@ -1020,6 +1024,7 @@ moc_mainwindow.cpp: ../mainwindow.h \
 		../../../../Qt/6.4.3/gcc_64/include/QtCore/qnativeinterface.h \
 		../../../../Qt/6.4.3/gcc_64/include/QtWidgets/qtabwidget.h \
 		../cipherBase.h \
+		../cipherAes.h \
 		../kMessage.h \
 		../kDialogBase.h \
 		../../../../Qt/6.4.3/gcc_64/include/QtWidgets/QDialog \
@@ -1285,6 +1290,7 @@ cipherRsa.o: ../cipherRsa.cpp ../cipherRsa.h \
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o cipherRsa.o ../cipherRsa.cpp
 
 kActionBase.o: ../kActionBase.cpp ../kActionBase.h \
+		../enums.h \
 		../../../../Qt/6.4.3/gcc_64/include/QtGui/QAction \
 		../../../../Qt/6.4.3/gcc_64/include/QtGui/qaction.h \
 		../../../../Qt/6.4.3/gcc_64/include/QtGui/qtguiglobal.h \
@@ -1427,6 +1433,7 @@ kActionBase.o: ../kActionBase.cpp ../kActionBase.h \
 
 kActionDecrypt.o: ../kActionDecrypt.cpp ../kActionDecrypt.h \
 		../kActionBase.h \
+		../enums.h \
 		../../../../Qt/6.4.3/gcc_64/include/QtGui/QAction \
 		../../../../Qt/6.4.3/gcc_64/include/QtGui/qaction.h \
 		../../../../Qt/6.4.3/gcc_64/include/QtGui/qtguiglobal.h \
@@ -1569,6 +1576,7 @@ kActionDecrypt.o: ../kActionDecrypt.cpp ../kActionDecrypt.h \
 
 kActionEncrypt.o: ../kActionEncrypt.cpp ../kActionEncrypt.h \
 		../kActionBase.h \
+		../enums.h \
 		../../../../Qt/6.4.3/gcc_64/include/QtGui/QAction \
 		../../../../Qt/6.4.3/gcc_64/include/QtGui/qaction.h \
 		../../../../Qt/6.4.3/gcc_64/include/QtGui/qtguiglobal.h \
@@ -1711,6 +1719,7 @@ kActionEncrypt.o: ../kActionEncrypt.cpp ../kActionEncrypt.h \
 
 kActionKeyMgr.o: ../kActionKeyMgr.cpp ../kActionKeyMgr.h \
 		../kActionBase.h \
+		../enums.h \
 		../../../../Qt/6.4.3/gcc_64/include/QtGui/QAction \
 		../../../../Qt/6.4.3/gcc_64/include/QtGui/qaction.h \
 		../../../../Qt/6.4.3/gcc_64/include/QtGui/qtguiglobal.h \
@@ -1853,6 +1862,7 @@ kActionKeyMgr.o: ../kActionKeyMgr.cpp ../kActionKeyMgr.h \
 
 kActionQuit.o: ../kActionQuit.cpp ../kActionQuit.h \
 		../kActionBase.h \
+		../enums.h \
 		../../../../Qt/6.4.3/gcc_64/include/QtGui/QAction \
 		../../../../Qt/6.4.3/gcc_64/include/QtGui/qaction.h \
 		../../../../Qt/6.4.3/gcc_64/include/QtGui/qtguiglobal.h \
@@ -2304,6 +2314,7 @@ kMessage.o: ../kMessage.cpp ../kMessage.h \
 
 main.o: ../main.cpp ../mainwindow.h \
 		../kActionBase.h \
+		../enums.h \
 		../../../../Qt/6.4.3/gcc_64/include/QtGui/QAction \
 		../../../../Qt/6.4.3/gcc_64/include/QtGui/qaction.h \
 		../../../../Qt/6.4.3/gcc_64/include/QtGui/qtguiglobal.h \
@@ -2443,6 +2454,7 @@ main.o: ../main.cpp ../mainwindow.h \
 		../../../../Qt/6.4.3/gcc_64/include/QtCore/qnativeinterface.h \
 		../../../../Qt/6.4.3/gcc_64/include/QtWidgets/qtabwidget.h \
 		../cipherBase.h \
+		../cipherAes.h \
 		../kMessage.h \
 		../kDialogBase.h \
 		../../../../Qt/6.4.3/gcc_64/include/QtWidgets/QDialog \
@@ -2488,6 +2500,7 @@ main.o: ../main.cpp ../mainwindow.h \
 
 mainwindow.o: ../mainwindow.cpp ../mainwindow.h \
 		../kActionBase.h \
+		../enums.h \
 		../../../../Qt/6.4.3/gcc_64/include/QtGui/QAction \
 		../../../../Qt/6.4.3/gcc_64/include/QtGui/qaction.h \
 		../../../../Qt/6.4.3/gcc_64/include/QtGui/qtguiglobal.h \
@@ -2627,6 +2640,7 @@ mainwindow.o: ../mainwindow.cpp ../mainwindow.h \
 		../../../../Qt/6.4.3/gcc_64/include/QtCore/qnativeinterface.h \
 		../../../../Qt/6.4.3/gcc_64/include/QtWidgets/qtabwidget.h \
 		../cipherBase.h \
+		../cipherAes.h \
 		../kMessage.h \
 		../kDialogBase.h \
 		../../../../Qt/6.4.3/gcc_64/include/QtWidgets/QDialog \
@@ -2650,8 +2664,8 @@ mainwindow.o: ../mainwindow.cpp ../mainwindow.h \
 		../kActionEncrypt.h \
 		../kActionDecrypt.h \
 		../kActionQuit.h \
-		../cipherAes.h \
 		../cipherRsa.h \
+		../defines.h \
 		../../../../Qt/6.4.3/gcc_64/include/QtWidgets/QToolButton \
 		../../../../Qt/6.4.3/gcc_64/include/QtWidgets/qtoolbutton.h \
 		../../../../Qt/6.4.3/gcc_64/include/QtWidgets/QGridLayout \

@@ -1,18 +1,14 @@
 #ifndef KACTIONBASE_H
 #define KACTIONBASE_H
 
+#include "enums.h"
 #include <QAction>
 #include <QMainWindow>
 
 /**
- * KActionBase class is abstract and represent QAction object
- * and that contains QPixmap, QIcon objects
- * and set toolTip.
+ * KActionBase class is abstract and represents QAction object
  * This class is used to remplace QAction object
- * with all needed.
  */
-
-enum Page {encrypt , generate, decrypt};
 
 class KActionBase: public QAction {
 
@@ -33,8 +29,9 @@ public slots:
     virtual void onActionClick() = 0;
 
 signals:
-    void setStackPage(int page);
+    void setStackPage(Page page);
     void quit();
+
 };
 
 #endif // KACTIONBASE_H

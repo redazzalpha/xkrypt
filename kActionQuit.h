@@ -4,8 +4,9 @@
 #include "kActionBase.h"
 
 /**
- * KActionDecrypt class represent QAction object
- * inherits from KActionBase
+ * KActionQuit class represents QAction object
+ * inherits from KActionBase and handles
+ * quit application
  */
 
 class KActionQuit : public KActionBase {

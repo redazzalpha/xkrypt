@@ -3,6 +3,12 @@
 
 #include "cipherBase.h"
 
+/**
+ * CipherAes class represents Rsa algorithms
+ * inherits from CipherBase and
+ * encrypts decrypts and generates keys
+ */
+
 class CipherRsa : public CipherBase {
 
 public:
