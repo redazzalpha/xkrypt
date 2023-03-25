@@ -24,6 +24,8 @@ public:
     virtual void generateKey() = 0;
     virtual void decrypt() = 0;
     virtual void encrypt() = 0;
+
+    bool isKeyLoaded();
 };
 
 #endif // CIPHERBASE_H

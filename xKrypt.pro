@@ -16,6 +16,7 @@ SOURCES += \
     kActionDecrypt.cpp \
     kActionEncrypt.cpp \
     kActionKeyMgr.cpp \
+    kDialog.cpp \
     main.cpp \
     mainwindow.cpp \
     man.cpp
@@ -29,6 +30,7 @@ HEADERS += \
     kActionDecrypt.h \
     kActionEncrypt.h \
     kActionKeyMgr.h \
+    kDialog.h \
     mainwindow.h \
     man.h
 

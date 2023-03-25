@@ -21,8 +21,8 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
     initToolBar();
-
-    QObject::connect(ui->m_keyMAlg, &QComboBox::activated, this, &MainWindow::selectCipher);
+    initDialog();
+    connectItems();
 }
 
 // destructor
@@ -49,8 +49,27 @@ void MainWindow::initToolBar()
 
     setIconSize(QSize(40, 40));
 }
+void MainWindow::initDialog() {
+    m_dialog->setModal(true);
+
+}
+void MainWindow::connectItems() {
+    QObject::connect(ui->m_keyMAlg, &QComboBox::activated, this, &MainWindow::selectCipher);
+
+}
 
 // slots
+void MainWindow::on_m_encryptBtn_clicked()
+{
+    if(m_cipher && m_cipher->isKeyLoaded()) m_cipher->encrypt();
+    else {
+        m_dialog->exec();
+    }
+}
+void MainWindow::on_m_decryptBtn_clicked()
+{
+    m_cipher->decrypt();
+}
 void MainWindow::on_m_encryptSelectFBtn_clicked()
 {
     QString fileName = QFileDialog::getOpenFileName(this,"file(s) to encrypt", "", "All Files (*)");
@@ -58,15 +77,6 @@ void MainWindow::on_m_encryptSelectFBtn_clicked()
 void MainWindow::on_m_decryptSelectFBtn_clicked()
 {
     QString fileName = QFileDialog::getOpenFileName(this,"file(s) to decrypt", "", "All Files (*)");
-}
-void MainWindow::on_m_encryptBtn_clicked()
-{
-    m_cipher->encrypt();
-
-}
-void MainWindow::on_m_decryptBtn_clicked()
-{
-    m_cipher->decrypt();
 }
 void MainWindow::on_m_keyMGenerateBtn_clicked()
 {
@@ -81,9 +91,10 @@ void MainWindow::selectCipher(int index) {
     switch(index) {
     case 0: m_cipher = new CipherAes; break;
     case 1: m_cipher = new CipherRsa; break;
-    default: break;
+    default: m_cipher = nullptr; break;
     }
 }
+
 
 
 
