@@ -3,7 +3,19 @@
 
 #include "cipherBase.h"
 
-class CipherRsa {
+class CipherRsa : public CipherBase {
+
+public:
+    // constructors
+    CipherRsa();
+
+    // destructor
+    virtual ~CipherRsa();
+
+    // methods
+    virtual void generateKey();
+    virtual void decrypt();
+    virtual void encrypt();
 
 };
 

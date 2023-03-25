@@ -33,7 +33,7 @@
      <enum>QFrame::NoFrame</enum>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="m_encryptPage">
      <widget class="QWidget" name="verticalLayoutWidget_6">
@@ -248,7 +248,7 @@ Import key or generate one from selected algorithm.
         </widget>
        </item>
        <item>
-        <widget class="QComboBox" name="comboBox">
+        <widget class="QComboBox" name="m_keyMAlg">
          <item>
           <property name="text">
            <string>Symmectric - Aes</string>
@@ -396,8 +396,8 @@ Select file(s) to Decrypt.
     </widget>
    </widget>
   </widget>
-  <widget class="QStatusBar" name="statusbar"/>
-  <widget class="QMenuBar" name="menubar">
+  <widget class="QStatusBar" name="m_statusbar"/>
+  <widget class="QMenuBar" name="m_menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
@@ -407,7 +407,7 @@ Select file(s) to Decrypt.
     </rect>
    </property>
   </widget>
-  <widget class="QToolBar" name="toolBar">
+  <widget class="QToolBar" name="m_toolBar">
    <property name="windowTitle">
     <string>toolBar</string>
    </property>

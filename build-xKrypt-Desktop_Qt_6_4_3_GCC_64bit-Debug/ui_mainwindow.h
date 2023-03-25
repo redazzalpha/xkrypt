@@ -45,7 +45,7 @@ public:
     QPushButton *m_keyMImportBtn;
     QPlainTextEdit *m_keyMKeyLoaded;
     QLabel *m_keyMSelctAlg;
-    QComboBox *comboBox;
+    QComboBox *m_keyMAlg;
     QPushButton *m_keyMGenerateBtn;
     QWidget *m_decryptPage;
     QWidget *verticalLayoutWidget_5;
@@ -55,9 +55,9 @@ public:
     QPushButton *m_decryptSelectFBtn;
     QPlainTextEdit *m_decryptSelectedF;
     QPushButton *m_decryptBtn;
-    QStatusBar *statusbar;
-    QMenuBar *menubar;
-    QToolBar *toolBar;
+    QStatusBar *m_statusbar;
+    QMenuBar *m_menubar;
+    QToolBar *m_toolBar;
 
     void setupUi(QMainWindow *MainWindow)
     {
@@ -173,12 +173,12 @@ public:
 
         m_keyMVL->addWidget(m_keyMSelctAlg);
 
-        comboBox = new QComboBox(verticalLayoutWidget);
-        comboBox->addItem(QString());
-        comboBox->addItem(QString());
-        comboBox->setObjectName("comboBox");
+        m_keyMAlg = new QComboBox(verticalLayoutWidget);
+        m_keyMAlg->addItem(QString());
+        m_keyMAlg->addItem(QString());
+        m_keyMAlg->setObjectName("m_keyMAlg");
 
-        m_keyMVL->addWidget(comboBox);
+        m_keyMVL->addWidget(m_keyMAlg);
 
         m_keyMGenerateBtn = new QPushButton(verticalLayoutWidget);
         m_keyMGenerateBtn->setObjectName("m_keyMGenerateBtn");
@@ -245,16 +245,16 @@ public:
 
         m_mainStack->addWidget(m_decryptPage);
         MainWindow->setCentralWidget(centralwidget);
-        statusbar = new QStatusBar(MainWindow);
-        statusbar->setObjectName("statusbar");
-        MainWindow->setStatusBar(statusbar);
-        menubar = new QMenuBar(MainWindow);
-        menubar->setObjectName("menubar");
-        menubar->setGeometry(QRect(0, 0, 800, 22));
-        MainWindow->setMenuBar(menubar);
-        toolBar = new QToolBar(MainWindow);
-        toolBar->setObjectName("toolBar");
-        MainWindow->addToolBar(Qt::TopToolBarArea, toolBar);
+        m_statusbar = new QStatusBar(MainWindow);
+        m_statusbar->setObjectName("m_statusbar");
+        MainWindow->setStatusBar(m_statusbar);
+        m_menubar = new QMenuBar(MainWindow);
+        m_menubar->setObjectName("m_menubar");
+        m_menubar->setGeometry(QRect(0, 0, 800, 22));
+        MainWindow->setMenuBar(m_menubar);
+        m_toolBar = new QToolBar(MainWindow);
+        m_toolBar->setObjectName("m_toolBar");
+        MainWindow->addToolBar(Qt::TopToolBarArea, m_toolBar);
 
         retranslateUi(MainWindow);
 
@@ -280,8 +280,8 @@ public:
         m_keyMImportBtn->setText(QCoreApplication::translate("MainWindow", "Import key", nullptr));
         m_keyMKeyLoaded->setPlainText(QCoreApplication::translate("MainWindow", "no key loaded !", nullptr));
         m_keyMSelctAlg->setText(QCoreApplication::translate("MainWindow", "Select Algorithm", nullptr));
-        comboBox->setItemText(0, QCoreApplication::translate("MainWindow", "Symmectric - Aes", nullptr));
-        comboBox->setItemText(1, QCoreApplication::translate("MainWindow", "Asymmetric - Rsa", nullptr));
+        m_keyMAlg->setItemText(0, QCoreApplication::translate("MainWindow", "Symmectric - Aes", nullptr));
+        m_keyMAlg->setItemText(1, QCoreApplication::translate("MainWindow", "Asymmetric - Rsa", nullptr));
 
         m_keyMGenerateBtn->setText(QCoreApplication::translate("MainWindow", "Generate key", nullptr));
         m_decryptIntro->setPlainText(QCoreApplication::translate("MainWindow", "Decrypt manager section.\n"
@@ -291,7 +291,7 @@ public:
         m_decryptSelectFBtn->setText(QCoreApplication::translate("MainWindow", "Select file(s)", nullptr));
         m_decryptSelectedF->setPlainText(QCoreApplication::translate("MainWindow", "no file(s) selecte", nullptr));
         m_decryptBtn->setText(QCoreApplication::translate("MainWindow", "Decrypt", nullptr));
-        toolBar->setWindowTitle(QCoreApplication::translate("MainWindow", "toolBar", nullptr));
+        m_toolBar->setWindowTitle(QCoreApplication::translate("MainWindow", "toolBar", nullptr));
     } // retranslateUi
 
 };

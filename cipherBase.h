@@ -2,21 +2,22 @@
 #define CIPHERBASE_H
 
 #include <iostream>
+#include <QObject>
 
 /**
  * CipherBase class is abstract and represent base
  * class for cipher algorithms
  */
 
-class CipherBase {
-
+class CipherBase : public QObject {
+      Q_OBJECT
 protected:
-    std::string m_key = nullptr;
-    std::string m_label;
+    std::string m_key = "";
+    std::string m_algName;
 
 public:
     // constructors
-    CipherBase(std::string label);
+    CipherBase(std::string algName);
     virtual ~CipherBase();
 
     // methods

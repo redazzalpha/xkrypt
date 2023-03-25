@@ -1,4 +1,7 @@
 #include "cipherBase.h"
 
-CipherBase::CipherBase(std::string label): m_label(label) {}
+// constructors
+CipherBase::CipherBase(std::string algName): m_algName(algName) {}
+
+// destructor
 CipherBase::~CipherBase() {}

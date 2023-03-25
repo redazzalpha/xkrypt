@@ -3,7 +3,18 @@
 
 #include "cipherBase.h"
 
-class CipherAes {
+class CipherAes : public CipherBase {
+public:
+    // constructors
+    CipherAes();
+
+    // destructor
+    virtual ~CipherAes();
+
+    // methods
+    virtual void generateKey();
+    virtual void decrypt();
+    virtual void encrypt();
 
 };
 

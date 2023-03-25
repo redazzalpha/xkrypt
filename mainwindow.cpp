@@ -1,15 +1,18 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
-#include <QToolButton>
-#include <QPushButton>
-#include <QLabel>
-#include <QGridLayout>
-#include <iostream>
 #include "kActionBase.h"
 #include "kActionKeyMgr.h"
 #include "kActionEncrypt.h"
 #include "kActionDecrypt.h"
+#include "cipherAes.h"
+#include "cipherRsa.h"
+#include <QToolButton>
+#include <QPushButton>
+#include <QLabel>
+#include <QGridLayout>
 #include <QFileDialog>
+#include <iostream>
+
 
 // constructors
 MainWindow::MainWindow(QWidget *parent)
@@ -19,6 +22,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     initToolBar();
 
+    QObject::connect(ui->m_keyMAlg, &QComboBox::activated, this, &MainWindow::selectCipher);
 }
 
 // destructor
@@ -38,7 +42,7 @@ void MainWindow::initToolBar()
     m_actions.append(new KActionDecrypt());
 
     foreach (KActionBase* action, m_actions) {
-        ui->toolBar->addAction(action);
+        ui->m_toolBar->addAction(action);
         QObject::connect(action, &QAction::triggered, action, &KActionBase::onActionClick);
         QObject::connect(action, &KActionBase::setStackPage, ui->m_mainStack, &QStackedWidget::setCurrentIndex);
     }
@@ -72,8 +76,14 @@ void MainWindow::on_m_keyMImportBtn_clicked()
 {
     QString fileName = QFileDialog::getOpenFileName(this,"Import key", "", "All Files (*)");
 }
-
-
+void MainWindow::selectCipher(int index) {
+    if(m_cipher) delete m_cipher;
+    switch(index) {
+    case 0: m_cipher = new CipherAes; break;
+    case 1: m_cipher = new CipherRsa; break;
+    default: break;
+    }
+}
 
 
 

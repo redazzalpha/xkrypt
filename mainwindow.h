@@ -16,7 +16,7 @@ class MainWindow : public QMainWindow
 private:
     Ui::MainWindow *ui;
     QList<KActionBase*> m_actions = QList<KActionBase*>();
-    CipherBase* m_cipher;
+    CipherBase* m_cipher = nullptr;
 
 public:
     MainWindow(QWidget *parent = nullptr);
@@ -26,5 +26,12 @@ private:
     void initToolBar();
 
 private slots:
+    void on_m_encryptBtn_clicked();
+    void on_m_decryptBtn_clicked();
+    void on_m_encryptSelectFBtn_clicked();
+    void on_m_decryptSelectFBtn_clicked();
+    void on_m_keyMGenerateBtn_clicked();
+    void on_m_keyMImportBtn_clicked();
+    void selectCipher(int);
 };
 #endif // MAINWINDOW_H
