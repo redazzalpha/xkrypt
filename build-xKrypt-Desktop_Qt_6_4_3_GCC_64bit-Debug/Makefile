@@ -1043,6 +1043,8 @@ moc_mainwindow.cpp: ../mainwindow.h \
 		../../../../Qt/6.4.3/gcc_64/include/QtWidgets/qframe.h \
 		../../../../Qt/6.4.3/gcc_64/include/QtGui/qpicture.h \
 		../../../../Qt/6.4.3/gcc_64/include/QtGui/qtextdocument.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtGui/QIcon \
+		../../../../Qt/6.4.3/gcc_64/include/QtGui/QPixmap \
 		moc_predefs.h \
 		../../../../Qt/6.4.3/gcc_64/libexec/moc
 	/home/kyzer/Qt/6.4.3/gcc_64/libexec/moc $(DEFINES) --include /home/kyzer/workspace/qt/xKrypt/build-xKrypt-Desktop_Qt_6_4_3_GCC_64bit-Debug/moc_predefs.h -I/home/kyzer/Qt/6.4.3/gcc_64/mkspecs/linux-g++ -I/home/kyzer/workspace/qt/xKrypt -I/home/kyzer/Qt/6.4.3/gcc_64/include -I/home/kyzer/Qt/6.4.3/gcc_64/include/QtWidgets -I/home/kyzer/Qt/6.4.3/gcc_64/include/QtGui -I/home/kyzer/Qt/6.4.3/gcc_64/include/QtCore -I. -I/usr/include/c++/11 -I/usr/include/x86_64-linux-gnu/c++/11 -I/usr/include/c++/11/backward -I/usr/lib/gcc/x86_64-linux-gnu/11/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include ../mainwindow.h -o moc_mainwindow.cpp
@@ -2309,7 +2311,9 @@ kMessage.o: ../kMessage.cpp ../kMessage.h \
 		../../../../Qt/6.4.3/gcc_64/include/QtWidgets/qlabel.h \
 		../../../../Qt/6.4.3/gcc_64/include/QtWidgets/qframe.h \
 		../../../../Qt/6.4.3/gcc_64/include/QtGui/qpicture.h \
-		../../../../Qt/6.4.3/gcc_64/include/QtGui/qtextdocument.h
+		../../../../Qt/6.4.3/gcc_64/include/QtGui/qtextdocument.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtGui/QIcon \
+		../../../../Qt/6.4.3/gcc_64/include/QtGui/QPixmap
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o kMessage.o ../kMessage.cpp
 
 main.o: ../main.cpp ../mainwindow.h \
@@ -2473,6 +2477,8 @@ main.o: ../main.cpp ../mainwindow.h \
 		../../../../Qt/6.4.3/gcc_64/include/QtWidgets/qframe.h \
 		../../../../Qt/6.4.3/gcc_64/include/QtGui/qpicture.h \
 		../../../../Qt/6.4.3/gcc_64/include/QtGui/qtextdocument.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtGui/QIcon \
+		../../../../Qt/6.4.3/gcc_64/include/QtGui/QPixmap \
 		../../../../Qt/6.4.3/gcc_64/include/QtWidgets/QApplication \
 		../../../../Qt/6.4.3/gcc_64/include/QtWidgets/qapplication.h \
 		../../../../Qt/6.4.3/gcc_64/include/QtCore/qcoreapplication.h \
@@ -2659,6 +2665,8 @@ mainwindow.o: ../mainwindow.cpp ../mainwindow.h \
 		../../../../Qt/6.4.3/gcc_64/include/QtWidgets/qframe.h \
 		../../../../Qt/6.4.3/gcc_64/include/QtGui/qpicture.h \
 		../../../../Qt/6.4.3/gcc_64/include/QtGui/qtextdocument.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtGui/QIcon \
+		../../../../Qt/6.4.3/gcc_64/include/QtGui/QPixmap \
 		ui_mainwindow.h \
 		../kActionKeyMgr.h \
 		../kActionEncrypt.h \

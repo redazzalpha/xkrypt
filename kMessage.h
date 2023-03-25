@@ -19,8 +19,12 @@ private:
     void setBtnRejectText(std::string text);
 
 public :
+    // constructors
     KMessage(QWidget* parent = nullptr);
+
+    // destructor
     virtual ~KMessage();
+
 
 protected slots:
     virtual void accept();

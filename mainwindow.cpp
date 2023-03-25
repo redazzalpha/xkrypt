@@ -55,19 +55,19 @@ void MainWindow::connectItems() {
     QObject::connect(ui->m_keyMAlg, &QComboBox::activated, this, &MainWindow::selectCipher);
 
 }
-void MainWindow::showMessage(std::string message) {
-    m_message->setMessage(message);
-    m_message->exec();
-}
 
 // slots
 void MainWindow::on_m_encryptBtn_clicked()
 {
-    m_cipher->isKeyLoaded()? m_cipher->encrypt() : showMessage(NO_KEY_MSG("encrypt"));
+    m_cipher->isKeyLoaded() ?
+        m_cipher->encrypt() :
+        m_message->show(NO_KEY_MSG("encrypt"), ":/assets/error.png");
 }
 void MainWindow::on_m_decryptBtn_clicked()
 {
-    m_cipher->isKeyLoaded()? m_cipher->decrypt() : showMessage(NO_KEY_MSG("decrypt"));
+    m_cipher->isKeyLoaded() ?
+        m_cipher->decrypt() :
+        m_message->show(NO_KEY_MSG("decrypt"), ":/assets/error.png");
 }
 void MainWindow::on_m_encryptSelectFBtn_clicked()
 {

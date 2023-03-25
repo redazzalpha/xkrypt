@@ -5,7 +5,6 @@
 #include "cipherBase.h"
 #include "cipherAes.h"
 #include "kMessage.h"
-#include "enums.h"
 #include <QMainWindow>
 
 
@@ -34,7 +33,6 @@ private:
     void initToolBar();
     void initMessage();
     void connectItems();
-    void showMessage(std::string message);
 
 
 private slots:
