@@ -10,7 +10,6 @@
  */
 
 class KActionQuit : public KActionBase {
-
 public:
     // constructors
     KActionQuit();

@@ -64,7 +64,8 @@ void KDialogBase::setBtnRejectText(std::string text) {
 }
 void KDialogBase::setIcon(std::string iconPath) {
     m_pixmap->load(QString::fromStdString(iconPath));
-    m_messageIcon->setPixmap(m_pixmap->scaled(55, 55, Qt::KeepAspectRatio));
+    // set QPixmap size
+    m_messageIcon->setPixmap(m_pixmap->scaled(40, 40, Qt::KeepAspectRatio));
 }
 void KDialogBase::show(std::string message, std::string iconPath) {
     setIcon(iconPath);

@@ -14,7 +14,6 @@
 #include <QFileDialog>
 #include <iostream>
 
-
 // constructors
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)

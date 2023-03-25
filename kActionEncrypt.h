@@ -10,7 +10,6 @@
  */
 
 class KActionEncrypt : public KActionBase {
-
 public:
     // constructors
     KActionEncrypt();

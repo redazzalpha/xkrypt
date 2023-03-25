@@ -10,7 +10,6 @@
  */
 
 class CipherRsa : public CipherBase {
-
 public:
     // constructors
     CipherRsa();

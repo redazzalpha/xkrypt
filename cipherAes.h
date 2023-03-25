@@ -21,7 +21,6 @@ public:
     virtual void generateKey();
     virtual void decrypt();
     virtual void encrypt();
-
 };
 
 #endif // CIPHERAES_H

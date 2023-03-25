@@ -10,7 +10,6 @@
  */
 
 class KActionKeyMgr : public KActionBase {
-
 public:
     // constructors
     KActionKeyMgr();
