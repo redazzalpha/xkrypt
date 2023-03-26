@@ -33,7 +33,7 @@
      <enum>QFrame::NoFrame</enum>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>2</number>
     </property>
     <widget class="QWidget" name="m_keyMPage">
      <widget class="QWidget" name="verticalLayoutWidget">
@@ -118,25 +118,88 @@ Import key or generate one from selected algorithm.
         </widget>
        </item>
        <item>
-        <widget class="QLabel" name="m_keyMSelctAlg">
-         <property name="text">
-          <string>Select Algorithm</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QComboBox" name="m_keyMAlg">
+        <layout class="QVBoxLayout" name="m_keyMAlgVL">
          <item>
-          <property name="text">
-           <string>Symmectric - Aes</string>
-          </property>
+          <layout class="QHBoxLayout" name="m_keyMLabelHL">
+           <item>
+            <widget class="QLabel" name="m_keyMAlgLabel">
+             <property name="text">
+              <string>Algorithm:</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="m_keyMModeLabel">
+             <property name="text">
+              <string>Mode</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
          </item>
          <item>
-          <property name="text">
-           <string>Asymmetric - Rsa</string>
-          </property>
+          <layout class="QHBoxLayout" name="m_keyMAlgHL">
+           <item>
+            <widget class="QComboBox" name="m_keyMAlg">
+             <item>
+              <property name="text">
+               <string>Symmectric - Aes</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Asymmetric - Rsa</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+           <item>
+            <widget class="QComboBox" name="m_keyMMode">
+             <item>
+              <property name="text">
+               <string>GCM</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>CCM</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>EAX</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>ECB</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>CBC</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>CFB</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>OFB</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>CTR</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+          </layout>
          </item>
-        </widget>
+        </layout>
        </item>
        <item>
         <widget class="QPushButton" name="m_keyMGenerateBtn">

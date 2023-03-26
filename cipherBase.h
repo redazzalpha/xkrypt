@@ -17,7 +17,7 @@ protected:
 
 public:
     // constructors
-    CipherBase(std::string algName);
+    CipherBase(const std::string& algName);
     virtual ~CipherBase();
 
     // methods

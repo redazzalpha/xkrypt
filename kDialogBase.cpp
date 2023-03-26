@@ -53,21 +53,21 @@ void KDialogBase::connectItems() {
     QObject::connect(this, &QDialog::rejected, this, &KDialogBase::reject);
 }
 
-void KDialogBase::setMessage(std::string message) {
+void KDialogBase::setMessage(const std::string& message) {
     m_message->setText(QString::fromStdString(message));
 }
-void KDialogBase::setBtnAcceptText(std::string text) {
+void KDialogBase::setBtnAcceptText(const std::string& text) {
     m_btnAccept->setText(QString::fromStdString(text));
 }
-void KDialogBase::setBtnRejectText(std::string text) {
+void KDialogBase::setBtnRejectText(const std::string& text) {
     m_btnReject->setText(QString::fromStdString(text));
 }
-void KDialogBase::setIcon(std::string iconPath) {
+void KDialogBase::setIcon(const std::string& iconPath) {
     m_pixmap->load(QString::fromStdString(iconPath));
     // set QPixmap size
     m_messageIcon->setPixmap(m_pixmap->scaled(40, 40, Qt::KeepAspectRatio));
 }
-void KDialogBase::show(std::string message, std::string iconPath) {
+void KDialogBase::show(const std::string& message, const std::string& iconPath) {
     setIcon(iconPath);
     setMessage(message);
     exec();

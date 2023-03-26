@@ -18,7 +18,7 @@ protected:
 
 public:
     // constructor
-    KActionBase(std::string toolTipText, std::string iconPath);
+    KActionBase(const std::string& toolTipText, const std::string& iconPath);
 
     // destructor
     virtual ~KActionBase();

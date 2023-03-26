@@ -33,11 +33,11 @@ public :
     virtual ~KDialogBase();
 
     // methods
-    void setMessage(std::string message);
-    void setBtnAcceptText(std::string text);
-    void setBtnRejectText(std::string text);
-    void setIcon(std::string iconPath);
-    void show(std::string message, std::string iconPath);
+    void setMessage(const std::string& message);
+    void setBtnAcceptText(const std::string& text);
+    void setBtnRejectText(const std::string& text);
+    void setIcon(const std::string& iconPath);
+    void show(const std::string& message, const std::string& iconPath);
 
 protected:
     void hideBtnAccept();
