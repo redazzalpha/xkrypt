@@ -12,15 +12,15 @@
 class CipherRsa : public CipherBase {
 public:
     // constructors
-    CipherRsa();
+    CipherRsa(const std::string& algName);
 
     // destructor
     virtual ~CipherRsa();
 
     // methods
-    virtual void generateKey();
-    virtual void decrypt();
-    virtual void encrypt();
+    virtual void generateKey() = 0;
+    virtual void decrypt() = 0;
+    virtual void encrypt() = 0;
 
 };
 

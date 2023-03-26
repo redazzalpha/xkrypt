@@ -11,6 +11,7 @@
 
 class KActionBase: public QAction {
     Q_OBJECT
+
 protected:
     QPixmap m_pixmap;
     QIcon m_icon;

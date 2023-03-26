@@ -27,8 +27,8 @@ public :
 
 
 protected slots:
-    virtual void accept();
-    virtual void reject();
+    virtual void accept() override;
+    virtual void reject() override;
 };
 
 #endif // KMESSAGE_H

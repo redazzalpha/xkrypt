@@ -1,4 +1,5 @@
 #include "kActionKeyMgr.h"
+#include "enums.h"
 
 // constructors
 KActionKeyMgr::KActionKeyMgr(): KActionPage("key manager", ":/assets/key.png") {}

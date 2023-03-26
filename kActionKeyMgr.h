@@ -18,7 +18,7 @@ public:
     virtual ~KActionKeyMgr();
 
 public slots:
-    virtual void onActionClick();
+    virtual void onActionClick() override;
 };
 
 #endif // KACTIONKEYMGR_H

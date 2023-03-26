@@ -1,4 +1,5 @@
 #include "kActionDecrypt.h"
+#include "enums.h"
 
 // constructors
 KActionDecrypt::KActionDecrypt(): KActionPage("decrypt manager", ":/assets/decrypt.png") {}

@@ -18,7 +18,7 @@ public:
     virtual ~KActionQuit();
 
 public slots:
-    virtual void onActionClick();
+    virtual void onActionClick() override;
 };
 
 #endif // KACTIONQUIT_H

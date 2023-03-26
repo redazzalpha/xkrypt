@@ -1,7 +1,7 @@
 #include "cipherRsa.h"
 
 // constructors
-CipherRsa::CipherRsa(): CipherBase("Rsa") {}
+CipherRsa::CipherRsa(const std::string& algName): CipherBase(algName) {}
 
 // destructor
 CipherRsa::~CipherRsa() {};

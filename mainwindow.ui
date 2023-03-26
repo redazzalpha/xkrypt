@@ -33,7 +33,7 @@
      <enum>QFrame::NoFrame</enum>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="m_keyMPage">
      <widget class="QWidget" name="verticalLayoutWidget">
@@ -41,7 +41,7 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>391</width>
+        <width>464</width>
         <height>291</height>
        </rect>
       </property>
@@ -131,7 +131,7 @@ Import key or generate one from selected algorithm.
            <item>
             <widget class="QLabel" name="m_keyMModeLabel">
              <property name="text">
-              <string>Mode</string>
+              <string>Mode:</string>
              </property>
             </widget>
            </item>
@@ -140,62 +140,10 @@ Import key or generate one from selected algorithm.
          <item>
           <layout class="QHBoxLayout" name="m_keyMAlgHL">
            <item>
-            <widget class="QComboBox" name="m_keyMAlg">
-             <item>
-              <property name="text">
-               <string>Symmectric - Aes</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>Asymmetric - Rsa</string>
-              </property>
-             </item>
-            </widget>
+            <widget class="QComboBox" name="m_keyMAlg"/>
            </item>
            <item>
-            <widget class="QComboBox" name="m_keyMMode">
-             <item>
-              <property name="text">
-               <string>GCM</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>CCM</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>EAX</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>ECB</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>CBC</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>CFB</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>OFB</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>CTR</string>
-              </property>
-             </item>
-            </widget>
+            <widget class="QComboBox" name="m_keyMMode"/>
            </item>
           </layout>
          </item>

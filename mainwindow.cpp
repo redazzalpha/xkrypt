@@ -5,7 +5,7 @@
 #include "kActionEncrypt.h"
 #include "kActionDecrypt.h"
 #include "kActionQuit.h"
-#include "cipherRsa.h"
+#include "enums.h"
 #include "defines.h"
 #include <QToolButton>
 #include <QPushButton>
@@ -20,6 +20,11 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+
+    ui->m_keyMAlg->addItems(*m_algorithms);
+    ui->m_keyMMode->addItems(*m_aesModes);
+
     initToolBar();
     connectItems();
 }
@@ -29,6 +34,8 @@ MainWindow::~MainWindow()
 {
     delete ui;
     delete m_cipher;
+    delete m_aesModes;
+    delete m_rsaModes;
     foreach(KActionBase* action, m_actions)
         delete action;
 }
@@ -46,7 +53,10 @@ void MainWindow::initToolBar()
 }
 void MainWindow::connectItems() {
     // connect comboboxes
-    QObject::connect(ui->m_keyMAlg, &QComboBox::activated, this, &MainWindow::selectCipher);
+    QObject::connect(ui->m_keyMAlg, &QComboBox::textActivated, this, &MainWindow::setAlgorithm);
+    QObject::connect(ui->m_keyMMode, &QComboBox::textActivated, this, &MainWindow::setMode);
+
+    QObject::connect(ui->m_keyMAlg, &QComboBox::activated, this, &MainWindow::setModeList);
 
     // connect actions
     foreach (KActionBase* action, m_actions) {
@@ -86,13 +96,23 @@ void MainWindow::on_m_keyMImportBtn_clicked()
 {
     QString fileName = QFileDialog::getOpenFileName(this,"Import key", "", "All Files (*)");
 }
-void MainWindow::selectCipher(int alg) {
-    if(m_cipher) delete m_cipher;
-    switch(alg) {
-    case Algorithm::aes: m_cipher = new CipherAes; break;
-    case Algorithm::rsa: m_cipher = new CipherRsa; break;
-    default: m_cipher = nullptr; break;
+void MainWindow::setModeList(int selectedAlg) {
+    switch(selectedAlg) {
+    case Algorithm::aes:
+        ui->m_keyMMode->clear();
+        ui->m_keyMMode->addItems(*m_aesModes);
+        break;
+    case Algorithm::rsa:
+        ui->m_keyMMode->clear();
+        ui->m_keyMMode->addItems(*m_rsaModes);
+        break;
     }
+}
+void MainWindow::setAlgorithm(QString alg) {
+    m_selectedAlg = alg.toStdString();
+}
+void MainWindow::setMode(QString mode) {
+    m_selectedMode = mode.toStdString();
 }
 
 

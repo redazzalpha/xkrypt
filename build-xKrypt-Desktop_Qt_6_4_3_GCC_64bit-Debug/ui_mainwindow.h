@@ -81,7 +81,7 @@ public:
         m_keyMPage->setObjectName("m_keyMPage");
         verticalLayoutWidget = new QWidget(m_keyMPage);
         verticalLayoutWidget->setObjectName("verticalLayoutWidget");
-        verticalLayoutWidget->setGeometry(QRect(0, 0, 391, 291));
+        verticalLayoutWidget->setGeometry(QRect(0, 0, 464, 291));
         m_keyMVL = new QVBoxLayout(verticalLayoutWidget);
         m_keyMVL->setObjectName("m_keyMVL");
         m_keyMVL->setContentsMargins(0, 0, 0, 0);
@@ -136,21 +136,11 @@ public:
         m_keyMAlgHL = new QHBoxLayout();
         m_keyMAlgHL->setObjectName("m_keyMAlgHL");
         m_keyMAlg = new QComboBox(verticalLayoutWidget);
-        m_keyMAlg->addItem(QString());
-        m_keyMAlg->addItem(QString());
         m_keyMAlg->setObjectName("m_keyMAlg");
 
         m_keyMAlgHL->addWidget(m_keyMAlg);
 
         m_keyMMode = new QComboBox(verticalLayoutWidget);
-        m_keyMMode->addItem(QString());
-        m_keyMMode->addItem(QString());
-        m_keyMMode->addItem(QString());
-        m_keyMMode->addItem(QString());
-        m_keyMMode->addItem(QString());
-        m_keyMMode->addItem(QString());
-        m_keyMMode->addItem(QString());
-        m_keyMMode->addItem(QString());
         m_keyMMode->setObjectName("m_keyMMode");
 
         m_keyMAlgHL->addWidget(m_keyMMode);
@@ -297,7 +287,7 @@ public:
 
         retranslateUi(MainWindow);
 
-        m_mainStack->setCurrentIndex(2);
+        m_mainStack->setCurrentIndex(0);
 
 
         QMetaObject::connectSlotsByName(MainWindow);
@@ -312,19 +302,7 @@ public:
         m_keyMImportBtn->setText(QCoreApplication::translate("MainWindow", "Import key", nullptr));
         m_keyMKeyLoaded->setPlainText(QCoreApplication::translate("MainWindow", "no key loaded !", nullptr));
         m_keyMAlgLabel->setText(QCoreApplication::translate("MainWindow", "Algorithm:", nullptr));
-        m_keyMModeLabel->setText(QCoreApplication::translate("MainWindow", "Mode", nullptr));
-        m_keyMAlg->setItemText(0, QCoreApplication::translate("MainWindow", "Symmectric - Aes", nullptr));
-        m_keyMAlg->setItemText(1, QCoreApplication::translate("MainWindow", "Asymmetric - Rsa", nullptr));
-
-        m_keyMMode->setItemText(0, QCoreApplication::translate("MainWindow", "GCM", nullptr));
-        m_keyMMode->setItemText(1, QCoreApplication::translate("MainWindow", "CCM", nullptr));
-        m_keyMMode->setItemText(2, QCoreApplication::translate("MainWindow", "EAX", nullptr));
-        m_keyMMode->setItemText(3, QCoreApplication::translate("MainWindow", "ECB", nullptr));
-        m_keyMMode->setItemText(4, QCoreApplication::translate("MainWindow", "CBC", nullptr));
-        m_keyMMode->setItemText(5, QCoreApplication::translate("MainWindow", "CFB", nullptr));
-        m_keyMMode->setItemText(6, QCoreApplication::translate("MainWindow", "OFB", nullptr));
-        m_keyMMode->setItemText(7, QCoreApplication::translate("MainWindow", "CTR", nullptr));
-
+        m_keyMModeLabel->setText(QCoreApplication::translate("MainWindow", "Mode:", nullptr));
         m_keyMGenerateBtn->setText(QCoreApplication::translate("MainWindow", "Generate key", nullptr));
         m_encryptIntro->setPlainText(QCoreApplication::translate("MainWindow", "Encrypt manager section.\n"
 "Select file(s) to Encrypt.\n"

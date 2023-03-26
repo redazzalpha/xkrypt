@@ -18,7 +18,7 @@ public:
     virtual ~KActionEncrypt();
 
 public slots:
-    virtual void onActionClick();
+    virtual void onActionClick() override;
 };
 
 #endif // KACTIONENCRYPT_H
