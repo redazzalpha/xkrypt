@@ -36,12 +36,12 @@ struct qt_meta_stringdata_MainWindow_t {
     char stringdata5[31];
     char stringdata6[29];
     char stringdata7[27];
-    char stringdata8[13];
-    char stringdata9[4];
-    char stringdata10[8];
-    char stringdata11[5];
-    char stringdata12[12];
-    char stringdata13[12];
+    char stringdata8[12];
+    char stringdata9[12];
+    char stringdata10[13];
+    char stringdata11[4];
+    char stringdata12[8];
+    char stringdata13[5];
 };
 #define QT_MOC_LITERAL(ofs, len) \
     uint(sizeof(qt_meta_stringdata_MainWindow_t::offsetsAndSizes) + ofs), len 
@@ -55,12 +55,12 @@ Q_CONSTINIT static const qt_meta_stringdata_MainWindow_t qt_meta_stringdata_Main
         QT_MOC_LITERAL(91, 30),  // "on_m_decryptSelectFBtn_clicked"
         QT_MOC_LITERAL(122, 28),  // "on_m_keyMGenerateBtn_clicked"
         QT_MOC_LITERAL(151, 26),  // "on_m_keyMImportBtn_clicked"
-        QT_MOC_LITERAL(178, 12),  // "setAlgorithm"
-        QT_MOC_LITERAL(191, 3),  // "alg"
-        QT_MOC_LITERAL(195, 7),  // "setMode"
-        QT_MOC_LITERAL(203, 4),  // "mode"
-        QT_MOC_LITERAL(208, 11),  // "setModeList"
-        QT_MOC_LITERAL(220, 11)   // "selectedAlg"
+        QT_MOC_LITERAL(178, 11),  // "setModeList"
+        QT_MOC_LITERAL(190, 11),  // "selectedAlg"
+        QT_MOC_LITERAL(202, 12),  // "setAlgorithm"
+        QT_MOC_LITERAL(215, 3),  // "alg"
+        QT_MOC_LITERAL(219, 7),  // "setMode"
+        QT_MOC_LITERAL(227, 4)   // "mode"
     },
     "MainWindow",
     "on_m_encryptBtn_clicked",
@@ -70,12 +70,12 @@ Q_CONSTINIT static const qt_meta_stringdata_MainWindow_t qt_meta_stringdata_Main
     "on_m_decryptSelectFBtn_clicked",
     "on_m_keyMGenerateBtn_clicked",
     "on_m_keyMImportBtn_clicked",
+    "setModeList",
+    "selectedAlg",
     "setAlgorithm",
     "alg",
     "setMode",
-    "mode",
-    "setModeList",
-    "selectedAlg"
+    "mode"
 };
 #undef QT_MOC_LITERAL
 } // unnamed namespace
@@ -111,9 +111,9 @@ Q_CONSTINIT static const uint qt_meta_data_MainWindow[] = {
     QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void,
-    QMetaType::Void, QMetaType::QString,    9,
+    QMetaType::Void, QMetaType::Int,    9,
     QMetaType::Void, QMetaType::QString,   11,
-    QMetaType::Void, QMetaType::Int,   13,
+    QMetaType::Void, QMetaType::QString,   13,
 
        0        // eod
 };
@@ -139,15 +139,15 @@ Q_CONSTINIT const QMetaObject MainWindow::staticMetaObject = { {
         QtPrivate::TypeAndForceComplete<void, std::false_type>,
         // method 'on_m_keyMImportBtn_clicked'
         QtPrivate::TypeAndForceComplete<void, std::false_type>,
-        // method 'setAlgorithm'
-        QtPrivate::TypeAndForceComplete<void, std::false_type>,
-        QtPrivate::TypeAndForceComplete<QString, std::false_type>,
-        // method 'setMode'
-        QtPrivate::TypeAndForceComplete<void, std::false_type>,
-        QtPrivate::TypeAndForceComplete<QString, std::false_type>,
         // method 'setModeList'
         QtPrivate::TypeAndForceComplete<void, std::false_type>,
-        QtPrivate::TypeAndForceComplete<int, std::false_type>
+        QtPrivate::TypeAndForceComplete<const int, std::false_type>,
+        // method 'setAlgorithm'
+        QtPrivate::TypeAndForceComplete<void, std::false_type>,
+        QtPrivate::TypeAndForceComplete<const QString &, std::false_type>,
+        // method 'setMode'
+        QtPrivate::TypeAndForceComplete<void, std::false_type>,
+        QtPrivate::TypeAndForceComplete<const QString &, std::false_type>
     >,
     nullptr
 } };
@@ -164,9 +164,9 @@ void MainWindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         case 3: _t->on_m_decryptSelectFBtn_clicked(); break;
         case 4: _t->on_m_keyMGenerateBtn_clicked(); break;
         case 5: _t->on_m_keyMImportBtn_clicked(); break;
-        case 6: _t->setAlgorithm((*reinterpret_cast< std::add_pointer_t<QString>>(_a[1]))); break;
-        case 7: _t->setMode((*reinterpret_cast< std::add_pointer_t<QString>>(_a[1]))); break;
-        case 8: _t->setModeList((*reinterpret_cast< std::add_pointer_t<int>>(_a[1]))); break;
+        case 6: _t->setModeList((*reinterpret_cast< std::add_pointer_t<int>>(_a[1]))); break;
+        case 7: _t->setAlgorithm((*reinterpret_cast< std::add_pointer_t<QString>>(_a[1]))); break;
+        case 8: _t->setMode((*reinterpret_cast< std::add_pointer_t<QString>>(_a[1]))); break;
         default: ;
         }
     }

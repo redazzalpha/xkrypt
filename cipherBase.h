@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <QObject>
+#include <QString>
 
 /**
  * CipherBase class is abstract and represent base
@@ -14,20 +15,20 @@ class CipherBase : public QObject {
 
 protected:
     std::string m_key = "";
-    const std::string m_algName;
 
 public:
     // constructors
-    CipherBase(const std::string& algName);
+    CipherBase();
     virtual ~CipherBase();
 
     // methods
+    virtual QString getAlgName() const = 0;
+    virtual QString getModeName() const = 0;
     virtual void generateKey() = 0;
     virtual void decrypt() = 0;
     virtual void encrypt() = 0;
 
     bool isKeyLoaded() const;
-    virtual std::string getAlgName() const final;
 };
 
 #endif // CIPHERBASE_H

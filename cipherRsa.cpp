@@ -1,13 +1,14 @@
 #include "cipherRsa.h"
 
+const QString CipherRsa::AlgName = "Asymmectric - Rsa";
+
 // constructors
-CipherRsa::CipherRsa(const std::string& algName): CipherBase(algName) {}
+CipherRsa::CipherRsa(){}
 
 // destructor
 CipherRsa::~CipherRsa() {};
 
 // methods
-void CipherRsa::generateKey(){std::cout << "cipher Rsa generate key" << std::endl;}
-void CipherRsa::decrypt(){std::cout << "cipher Rsa decrypt" << std::endl;}
-void CipherRsa::encrypt(){std::cout << "cipher Rsa encrypt" << std::endl;}
-
+QString CipherRsa::getAlgName() const {
+    return CipherRsa::AlgName;
+}

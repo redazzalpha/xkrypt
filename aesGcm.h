@@ -4,8 +4,9 @@
 #include "cipherAes.h"
 
 class AesGCM : public  CipherAes {
-protected:
 public:
+    static const QString ModeName;
+
     // constructors
     AesGCM();
 
@@ -16,6 +17,7 @@ public:
     virtual void generateKey() override;
     virtual void decrypt() override;
     virtual void encrypt() override;
+    virtual QString getModeName() const override;
 };
 
 #endif // AESGCM_H

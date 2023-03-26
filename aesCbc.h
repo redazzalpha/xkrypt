@@ -5,6 +5,8 @@
 
 class AesCBC : public CipherAes {
 public:
+    static const QString ModeName;
+
     // constructors
     AesCBC();
 
@@ -15,6 +17,8 @@ public:
     virtual void generateKey() override;
     virtual void decrypt() override;
     virtual void encrypt() override;
+    virtual QString getModeName() const override;
+
 };
 
 #endif // AESCBC_H

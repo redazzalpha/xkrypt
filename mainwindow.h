@@ -4,6 +4,10 @@
 #include "kActionBase.h"
 #include "cipherBase.h"
 #include "aesGcm.h"
+#include "aesCbc.h"
+#include "aesEax.h"
+#include "rsaSsa.h"
+#include "rsaOeap.h"
 #include "kMessage.h"
 #include <QMainWindow>
 #include <QList>
@@ -19,13 +23,23 @@ class MainWindow : public QMainWindow {
 private:
     Ui::MainWindow *ui;
     QList<KActionBase*> m_actions = QList<KActionBase*>();
-    CipherBase* m_cipher = new AesGCM;
     KMessage* m_message = new KMessage(this);
-    QList<QString>* m_algorithms = new QList<QString>{"Symmectric - Aes", "Asymmetric - Rsa"};
-    QList<QString>* m_aesModes = new QList<QString>{"GCM", "CCM", "EAX", "ECB", "CBC", "CBF", "OFB","CTR"};
-    QList<QString>* m_rsaModes = new QList<QString>{"ES-OAEP-SHA", "SSA"};
     std::string m_selectedAlg = "";
     std::string m_selectedMode = "";
+    CipherBase* m_cipher = new AesGCM;
+    QList<QString>* m_algorithms = new QList<QString> {
+        CipherAes::AlgName,
+        CipherRsa::AlgName
+    };
+    QList<QString>* m_aesModes = new QList<QString>{
+        AesGCM::ModeName,
+        AesCBC::ModeName,
+        AesEAX::ModeName
+    };
+    QList<QString>* m_rsaModes = new QList<QString>{
+        RsaSSA::ModeName,
+        RsaOEAP::ModeName
+    };
 
 public:
     // constructors
@@ -46,8 +60,8 @@ private slots:
     void on_m_decryptSelectFBtn_clicked();
     void on_m_keyMGenerateBtn_clicked();
     void on_m_keyMImportBtn_clicked();
-    void setAlgorithm(QString alg);
-    void setMode(QString mode);
-    void setModeList(int selectedAlg);
+    void setModeList(const int selectedAlg);
+    void setAlgorithm(const QString& alg);
+    void setMode(const QString& mode);
 };
 #endif // MAINWINDOW_H

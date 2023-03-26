@@ -11,16 +11,21 @@
 
 class CipherAes : public CipherBase {
 public:
+    static const QString AlgName;
+
     // constructors
-    CipherAes(const std::string& algName);
+    CipherAes();
 
     // destructor
     virtual ~CipherAes();
 
     // methods
+    virtual QString getAlgName() const final;
+    virtual QString getModeName() const = 0;
     virtual void generateKey() = 0;
     virtual void decrypt() = 0;
     virtual void encrypt() = 0;
+
 };
 
 #endif // CIPHERAES_H

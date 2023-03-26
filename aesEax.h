@@ -5,6 +5,8 @@
 
 class AesEAX : public  CipherAes {
 public:
+    static const QString ModeName;
+
     // constructors
     AesEAX();
 
@@ -15,6 +17,7 @@ public:
     virtual void generateKey() override;
     virtual void decrypt() override;
     virtual void encrypt() override;
+    virtual QString getModeName() const override;
 };
 
 #endif // AESEAX_H

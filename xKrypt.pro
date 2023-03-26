@@ -25,7 +25,9 @@ SOURCES += \
     kDialogBase.cpp \
     kMessage.cpp \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    rsaOeap.cpp \
+    rsaSsa.cpp
 
 HEADERS += \
     aesCbc.h \
@@ -45,7 +47,9 @@ HEADERS += \
     kActionQuit.h \
     kDialogBase.h \
     kMessage.h \
-    mainwindow.h
+    mainwindow.h \
+    rsaOeap.h \
+    rsaSsa.h
 
 FORMS += \
     mainwindow.ui

@@ -96,7 +96,7 @@ void MainWindow::on_m_keyMImportBtn_clicked()
 {
     QString fileName = QFileDialog::getOpenFileName(this,"Import key", "", "All Files (*)");
 }
-void MainWindow::setModeList(int selectedAlg) {
+void MainWindow::setModeList(const int selectedAlg) {
     switch(selectedAlg) {
     case Algorithm::aes:
         ui->m_keyMMode->clear();
@@ -108,10 +108,10 @@ void MainWindow::setModeList(int selectedAlg) {
         break;
     }
 }
-void MainWindow::setAlgorithm(QString alg) {
-    m_selectedAlg = alg.toStdString();
+void MainWindow::setAlgorithm(const QString& alg) {
+    m_selectedAlg = alg.toStdString();    
 }
-void MainWindow::setMode(QString mode) {
+void MainWindow::setMode(const QString& mode) {
     m_selectedMode = mode.toStdString();
 }
 

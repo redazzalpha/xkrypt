@@ -68,7 +68,9 @@ SOURCES       = ../aesCbc.cpp \
 		../kDialogBase.cpp \
 		../kMessage.cpp \
 		../main.cpp \
-		../mainwindow.cpp qrc_ressources.cpp \
+		../mainwindow.cpp \
+		../rsaOeap.cpp \
+		../rsaSsa.cpp qrc_ressources.cpp \
 		moc_cipherBase.cpp \
 		moc_kActionBase.cpp \
 		moc_mainwindow.cpp
@@ -89,6 +91,8 @@ OBJECTS       = aesCbc.o \
 		kMessage.o \
 		main.o \
 		mainwindow.o \
+		rsaOeap.o \
+		rsaSsa.o \
 		qrc_ressources.o \
 		moc_cipherBase.o \
 		moc_kActionBase.o \
@@ -262,7 +266,9 @@ DIST          = /home/Qt/6.4.3/gcc_64/mkspecs/features/spec_pre.prf \
 		../kActionQuit.h \
 		../kDialogBase.h \
 		../kMessage.h \
-		../mainwindow.h ../aesCbc.cpp \
+		../mainwindow.h \
+		../rsaOeap.h \
+		../rsaSsa.h ../aesCbc.cpp \
 		../aesEax.cpp \
 		../aesGcm.cpp \
 		../cipherAes.cpp \
@@ -278,7 +284,9 @@ DIST          = /home/Qt/6.4.3/gcc_64/mkspecs/features/spec_pre.prf \
 		../kDialogBase.cpp \
 		../kMessage.cpp \
 		../main.cpp \
-		../mainwindow.cpp
+		../mainwindow.cpp \
+		../rsaOeap.cpp \
+		../rsaSsa.cpp
 QMAKE_TARGET  = xKrypt
 DESTDIR       = 
 TARGET        = xKrypt
@@ -621,8 +629,8 @@ distdir: FORCE
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents ../ressources.qrc $(DISTDIR)/
 	$(COPY_FILE) --parents ../../../../Qt/6.4.3/gcc_64/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents ../aesCbc.h ../aesEax.h ../aesGcm.h ../cipherAes.h ../cipherBase.h ../cipherRsa.h ../defines.h ../enums.h ../kAction.h ../kActionBase.h ../kActionDecrypt.h ../kActionEncrypt.h ../kActionKeyMgr.h ../kActionPage.h ../kActionQuit.h ../kDialogBase.h ../kMessage.h ../mainwindow.h $(DISTDIR)/
-	$(COPY_FILE) --parents ../aesCbc.cpp ../aesEax.cpp ../aesGcm.cpp ../cipherAes.cpp ../cipherBase.cpp ../cipherRsa.cpp ../kAction.cpp ../kActionBase.cpp ../kActionDecrypt.cpp ../kActionEncrypt.cpp ../kActionKeyMgr.cpp ../kActionPage.cpp ../kActionQuit.cpp ../kDialogBase.cpp ../kMessage.cpp ../main.cpp ../mainwindow.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents ../aesCbc.h ../aesEax.h ../aesGcm.h ../cipherAes.h ../cipherBase.h ../cipherRsa.h ../defines.h ../enums.h ../kAction.h ../kActionBase.h ../kActionDecrypt.h ../kActionEncrypt.h ../kActionKeyMgr.h ../kActionPage.h ../kActionQuit.h ../kDialogBase.h ../kMessage.h ../mainwindow.h ../rsaOeap.h ../rsaSsa.h $(DISTDIR)/
+	$(COPY_FILE) --parents ../aesCbc.cpp ../aesEax.cpp ../aesGcm.cpp ../cipherAes.cpp ../cipherBase.cpp ../cipherRsa.cpp ../kAction.cpp ../kActionBase.cpp ../kActionDecrypt.cpp ../kActionEncrypt.cpp ../kActionKeyMgr.cpp ../kActionPage.cpp ../kActionQuit.cpp ../kDialogBase.cpp ../kMessage.cpp ../main.cpp ../mainwindow.cpp ../rsaOeap.cpp ../rsaSsa.cpp $(DISTDIR)/
 	$(COPY_FILE) --parents ../mainwindow.ui $(DISTDIR)/
 
 
@@ -754,6 +762,7 @@ moc_cipherBase.cpp: ../cipherBase.h \
 		../../../../Qt/6.4.3/gcc_64/include/QtCore/qmath.h \
 		../../../../Qt/6.4.3/gcc_64/include/QtCore/qobject_impl.h \
 		../../../../Qt/6.4.3/gcc_64/include/QtCore/qbindingstorage.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/QString \
 		moc_predefs.h \
 		../../../../Qt/6.4.3/gcc_64/libexec/moc
 	/home/kyzer/Qt/6.4.3/gcc_64/libexec/moc $(DEFINES) --include /home/kyzer/workspace/qt/xKrypt/build-xKrypt-Desktop_Qt_6_4_3_GCC_64bit-Debug/moc_predefs.h -I/home/kyzer/Qt/6.4.3/gcc_64/mkspecs/linux-g++ -I/home/kyzer/workspace/qt/xKrypt -I/usr/local/include/cryptopp -I/home/kyzer/Qt/6.4.3/gcc_64/include -I/home/kyzer/Qt/6.4.3/gcc_64/include/QtWidgets -I/home/kyzer/Qt/6.4.3/gcc_64/include/QtGui -I/home/kyzer/Qt/6.4.3/gcc_64/include/QtCore -I. -I/usr/include/c++/11 -I/usr/include/x86_64-linux-gnu/c++/11 -I/usr/include/c++/11/backward -I/usr/lib/gcc/x86_64-linux-gnu/11/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include ../cipherBase.h -o moc_cipherBase.cpp
@@ -1042,6 +1051,7 @@ moc_mainwindow.cpp: ../mainwindow.h \
 		../../../../Qt/6.4.3/gcc_64/include/QtCore/qnativeinterface.h \
 		../../../../Qt/6.4.3/gcc_64/include/QtWidgets/qtabwidget.h \
 		../cipherBase.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/QString \
 		../aesGcm.h \
 		../cipherAes.h \
 		../kMessage.h \
@@ -1064,7 +1074,6 @@ moc_mainwindow.cpp: ../mainwindow.h \
 		../../../../Qt/6.4.3/gcc_64/include/QtGui/qtextdocument.h \
 		../../../../Qt/6.4.3/gcc_64/include/QtGui/QIcon \
 		../../../../Qt/6.4.3/gcc_64/include/QtGui/QPixmap \
-		../../../../Qt/6.4.3/gcc_64/include/QtCore/QString \
 		moc_predefs.h \
 		../../../../Qt/6.4.3/gcc_64/libexec/moc
 	/home/kyzer/Qt/6.4.3/gcc_64/libexec/moc $(DEFINES) --include /home/kyzer/workspace/qt/xKrypt/build-xKrypt-Desktop_Qt_6_4_3_GCC_64bit-Debug/moc_predefs.h -I/home/kyzer/Qt/6.4.3/gcc_64/mkspecs/linux-g++ -I/home/kyzer/workspace/qt/xKrypt -I/usr/local/include/cryptopp -I/home/kyzer/Qt/6.4.3/gcc_64/include -I/home/kyzer/Qt/6.4.3/gcc_64/include/QtWidgets -I/home/kyzer/Qt/6.4.3/gcc_64/include/QtGui -I/home/kyzer/Qt/6.4.3/gcc_64/include/QtCore -I. -I/usr/include/c++/11 -I/usr/include/x86_64-linux-gnu/c++/11 -I/usr/include/c++/11/backward -I/usr/lib/gcc/x86_64-linux-gnu/11/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include ../mainwindow.h -o moc_mainwindow.cpp
@@ -1162,7 +1171,8 @@ aesCbc.o: ../aesCbc.cpp ../aesCbc.h \
 		../../../../Qt/6.4.3/gcc_64/include/QtCore/qtaggedpointer.h \
 		../../../../Qt/6.4.3/gcc_64/include/QtCore/qmath.h \
 		../../../../Qt/6.4.3/gcc_64/include/QtCore/qobject_impl.h \
-		../../../../Qt/6.4.3/gcc_64/include/QtCore/qbindingstorage.h
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qbindingstorage.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/QString
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o aesCbc.o ../aesCbc.cpp
 
 aesEax.o: ../aesEax.cpp ../aesEax.h \
@@ -1237,7 +1247,8 @@ aesEax.o: ../aesEax.cpp ../aesEax.h \
 		../../../../Qt/6.4.3/gcc_64/include/QtCore/qtaggedpointer.h \
 		../../../../Qt/6.4.3/gcc_64/include/QtCore/qmath.h \
 		../../../../Qt/6.4.3/gcc_64/include/QtCore/qobject_impl.h \
-		../../../../Qt/6.4.3/gcc_64/include/QtCore/qbindingstorage.h
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qbindingstorage.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/QString
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o aesEax.o ../aesEax.cpp
 
 aesGcm.o: ../aesGcm.cpp ../aesGcm.h \
@@ -1312,7 +1323,8 @@ aesGcm.o: ../aesGcm.cpp ../aesGcm.h \
 		../../../../Qt/6.4.3/gcc_64/include/QtCore/qtaggedpointer.h \
 		../../../../Qt/6.4.3/gcc_64/include/QtCore/qmath.h \
 		../../../../Qt/6.4.3/gcc_64/include/QtCore/qobject_impl.h \
-		../../../../Qt/6.4.3/gcc_64/include/QtCore/qbindingstorage.h
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qbindingstorage.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/QString
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o aesGcm.o ../aesGcm.cpp
 
 cipherAes.o: ../cipherAes.cpp ../cipherAes.h \
@@ -1386,7 +1398,8 @@ cipherAes.o: ../cipherAes.cpp ../cipherAes.h \
 		../../../../Qt/6.4.3/gcc_64/include/QtCore/qtaggedpointer.h \
 		../../../../Qt/6.4.3/gcc_64/include/QtCore/qmath.h \
 		../../../../Qt/6.4.3/gcc_64/include/QtCore/qobject_impl.h \
-		../../../../Qt/6.4.3/gcc_64/include/QtCore/qbindingstorage.h
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qbindingstorage.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/QString
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o cipherAes.o ../cipherAes.cpp
 
 cipherBase.o: ../cipherBase.cpp ../cipherBase.h \
@@ -1459,7 +1472,8 @@ cipherBase.o: ../cipherBase.cpp ../cipherBase.h \
 		../../../../Qt/6.4.3/gcc_64/include/QtCore/qtaggedpointer.h \
 		../../../../Qt/6.4.3/gcc_64/include/QtCore/qmath.h \
 		../../../../Qt/6.4.3/gcc_64/include/QtCore/qobject_impl.h \
-		../../../../Qt/6.4.3/gcc_64/include/QtCore/qbindingstorage.h
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qbindingstorage.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/QString
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o cipherBase.o ../cipherBase.cpp
 
 cipherRsa.o: ../cipherRsa.cpp ../cipherRsa.h \
@@ -1533,7 +1547,8 @@ cipherRsa.o: ../cipherRsa.cpp ../cipherRsa.h \
 		../../../../Qt/6.4.3/gcc_64/include/QtCore/qtaggedpointer.h \
 		../../../../Qt/6.4.3/gcc_64/include/QtCore/qmath.h \
 		../../../../Qt/6.4.3/gcc_64/include/QtCore/qobject_impl.h \
-		../../../../Qt/6.4.3/gcc_64/include/QtCore/qbindingstorage.h
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qbindingstorage.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/QString
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o cipherRsa.o ../cipherRsa.cpp
 
 kAction.o: ../kAction.cpp ../kAction.h \
@@ -2988,6 +3003,7 @@ main.o: ../main.cpp ../mainwindow.h \
 		../../../../Qt/6.4.3/gcc_64/include/QtCore/qnativeinterface.h \
 		../../../../Qt/6.4.3/gcc_64/include/QtWidgets/qtabwidget.h \
 		../cipherBase.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/QString \
 		../aesGcm.h \
 		../cipherAes.h \
 		../kMessage.h \
@@ -3010,7 +3026,6 @@ main.o: ../main.cpp ../mainwindow.h \
 		../../../../Qt/6.4.3/gcc_64/include/QtGui/qtextdocument.h \
 		../../../../Qt/6.4.3/gcc_64/include/QtGui/QIcon \
 		../../../../Qt/6.4.3/gcc_64/include/QtGui/QPixmap \
-		../../../../Qt/6.4.3/gcc_64/include/QtCore/QString \
 		../../../../Qt/6.4.3/gcc_64/include/QtWidgets/QApplication \
 		../../../../Qt/6.4.3/gcc_64/include/QtWidgets/qapplication.h \
 		../../../../Qt/6.4.3/gcc_64/include/QtCore/qcoreapplication.h \
@@ -3177,6 +3192,7 @@ mainwindow.o: ../mainwindow.cpp ../mainwindow.h \
 		../../../../Qt/6.4.3/gcc_64/include/QtCore/qnativeinterface.h \
 		../../../../Qt/6.4.3/gcc_64/include/QtWidgets/qtabwidget.h \
 		../cipherBase.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/QString \
 		../aesGcm.h \
 		../cipherAes.h \
 		../kMessage.h \
@@ -3199,8 +3215,67 @@ mainwindow.o: ../mainwindow.cpp ../mainwindow.h \
 		../../../../Qt/6.4.3/gcc_64/include/QtGui/qtextdocument.h \
 		../../../../Qt/6.4.3/gcc_64/include/QtGui/QIcon \
 		../../../../Qt/6.4.3/gcc_64/include/QtGui/QPixmap \
-		../../../../Qt/6.4.3/gcc_64/include/QtCore/QString \
 		ui_mainwindow.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/QVariant \
+		../../../../Qt/6.4.3/gcc_64/include/QtWidgets/QApplication \
+		../../../../Qt/6.4.3/gcc_64/include/QtWidgets/qapplication.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qcoreapplication.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qeventloop.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qcoreapplication_platform.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qjnitypes.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qfuture.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qfutureinterface.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qmutex.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qtsan_impl.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qresultstore.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qfuture_impl.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qthreadpool.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qthread.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qdeadlinetimer.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qelapsedtimer.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qrunnable.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qexception.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qpromise.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtGui/qguiapplication.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtGui/qinputmethod.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qlocale.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtGui/qguiapplication_platform.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtWidgets/QComboBox \
+		../../../../Qt/6.4.3/gcc_64/include/QtWidgets/qcombobox.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtWidgets/qabstractitemdelegate.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtWidgets/qstyleoption.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtWidgets/qabstractspinbox.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtGui/qvalidator.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qregularexpression.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtWidgets/qslider.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtWidgets/qabstractslider.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtWidgets/qstyle.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtWidgets/qtabbar.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtWidgets/qrubberband.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qabstractitemmodel.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtWidgets/QMenuBar \
+		../../../../Qt/6.4.3/gcc_64/include/QtWidgets/qmenubar.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtWidgets/qmenu.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtWidgets/QPlainTextEdit \
+		../../../../Qt/6.4.3/gcc_64/include/QtWidgets/qplaintextedit.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtWidgets/qtextedit.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtWidgets/qabstractscrollarea.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtGui/qtextoption.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtGui/qtextcursor.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtGui/qtextformat.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtGui/qpen.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtGui/qabstracttextdocumentlayout.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtGui/qtextlayout.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtGui/qglyphrun.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtGui/qrawfont.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtGui/qfontdatabase.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtWidgets/QStackedWidget \
+		../../../../Qt/6.4.3/gcc_64/include/QtWidgets/qstackedwidget.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtWidgets/QStatusBar \
+		../../../../Qt/6.4.3/gcc_64/include/QtWidgets/qstatusbar.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtWidgets/QToolBar \
+		../../../../Qt/6.4.3/gcc_64/include/QtWidgets/qtoolbar.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtWidgets/QWidget \
 		../kActionKeyMgr.h \
 		../kActionPage.h \
 		../kActionEncrypt.h \
@@ -3219,9 +3294,160 @@ mainwindow.o: ../mainwindow.cpp ../mainwindow.h \
 		../../../../Qt/6.4.3/gcc_64/include/QtCore/qfiledevice.h \
 		../../../../Qt/6.4.3/gcc_64/include/QtCore/qfileinfo.h \
 		../../../../Qt/6.4.3/gcc_64/include/QtCore/qdatetime.h \
-		../../../../Qt/6.4.3/gcc_64/include/QtCore/qcalendar.h \
-		../../../../Qt/6.4.3/gcc_64/include/QtCore/qlocale.h
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qcalendar.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o mainwindow.o ../mainwindow.cpp
+
+rsaOeap.o: ../rsaOeap.cpp ../rsaOeap.h \
+		../cipherRsa.h \
+		../cipherBase.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/QObject \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qobject.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qobjectdefs.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qnamespace.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qglobal.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qconfig-bootstrapped.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qconfig.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qtcore-config.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qtconfigmacros.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qtcoreexports.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qsystemdetection.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qprocessordetection.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qcompilerdetection.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qtypeinfo.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qcontainerfwd.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qsysinfo.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qlogging.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qflags.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qcompare_impl.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qatomic.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qbasicatomic.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qatomic_bootstrap.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qgenericatomic.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qatomic_cxx11.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qglobalstatic.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qnumeric.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qversiontagging.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qforeach.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qtmetamacros.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qobjectdefs_impl.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qstring.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qchar.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qstringview.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qbytearray.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qrefcount.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qarraydata.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qpair.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qarraydatapointer.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qarraydataops.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qcontainertools_impl.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qbytearrayalgorithms.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qbytearrayview.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qstringfwd.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qstringliteral.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qstringalgorithms.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qanystringview.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qutf8stringview.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qstringtokenizer.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qstringbuilder.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qlist.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qhashfunctions.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qiterator.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qbytearraylist.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qstringlist.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qalgorithms.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qstringmatcher.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qcoreevent.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qscopedpointer.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qmetatype.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qcompare.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qscopeguard.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qdatastream.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qiodevicebase.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qiterable.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qmetacontainer.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qcontainerinfo.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qtaggedpointer.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qmath.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qobject_impl.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qbindingstorage.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/QString
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o rsaOeap.o ../rsaOeap.cpp
+
+rsaSsa.o: ../rsaSsa.cpp ../rsaSsa.h \
+		../cipherRsa.h \
+		../cipherBase.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/QObject \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qobject.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qobjectdefs.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qnamespace.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qglobal.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qconfig-bootstrapped.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qconfig.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qtcore-config.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qtconfigmacros.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qtcoreexports.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qsystemdetection.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qprocessordetection.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qcompilerdetection.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qtypeinfo.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qcontainerfwd.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qsysinfo.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qlogging.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qflags.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qcompare_impl.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qatomic.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qbasicatomic.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qatomic_bootstrap.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qgenericatomic.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qatomic_cxx11.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qglobalstatic.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qnumeric.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qversiontagging.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qforeach.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qtmetamacros.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qobjectdefs_impl.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qstring.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qchar.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qstringview.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qbytearray.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qrefcount.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qarraydata.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qpair.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qarraydatapointer.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qarraydataops.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qcontainertools_impl.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qbytearrayalgorithms.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qbytearrayview.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qstringfwd.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qstringliteral.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qstringalgorithms.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qanystringview.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qutf8stringview.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qstringtokenizer.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qstringbuilder.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qlist.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qhashfunctions.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qiterator.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qbytearraylist.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qstringlist.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qalgorithms.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qstringmatcher.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qcoreevent.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qscopedpointer.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qmetatype.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qcompare.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qscopeguard.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qdatastream.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qiodevicebase.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qiterable.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qmetacontainer.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qcontainerinfo.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qtaggedpointer.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qmath.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qobject_impl.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qbindingstorage.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/QString
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o rsaSsa.o ../rsaSsa.cpp
 
 qrc_ressources.o: qrc_ressources.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o qrc_ressources.o qrc_ressources.cpp
