@@ -1,7 +1,7 @@
 #include "kActionDecrypt.h"
 
 // constructors
-KActionDecrypt::KActionDecrypt(): KActionBase("decrypt manager", ":/assets/decrypt.png") {}
+KActionDecrypt::KActionDecrypt(): KActionPage("decrypt manager", ":/assets/decrypt.png") {}
 
 // destructor
 KActionDecrypt::~KActionDecrypt(){}

@@ -36,23 +36,25 @@ MainWindow::~MainWindow()
 // methods
 void MainWindow::initToolBar()
 {
+    // creates actions
     m_actions.append(new KActionKeyMgr());
     m_actions.append(new KActionEncrypt());
     m_actions.append(new KActionDecrypt());
     m_actions.append(new KActionQuit());
 
+    setIconSize(QSize(35, 35));
+}
+void MainWindow::connectItems() {
+    // connect comboboxes
+    QObject::connect(ui->m_keyMAlg, &QComboBox::activated, this, &MainWindow::selectCipher);
+
+    // connect actions
     foreach (KActionBase* action, m_actions) {
         ui->m_toolBar->addAction(action);
         QObject::connect(action, &QAction::triggered, action, &KActionBase::onActionClick);
         QObject::connect(action, &KActionBase::quit, this, &QMainWindow::close);
         QObject::connect(action, &KActionBase::setStackPage, ui->m_mainStack, &QStackedWidget::setCurrentIndex);
     }
-
-    setIconSize(QSize(35, 35));
-}
-void MainWindow::connectItems() {
-    QObject::connect(ui->m_keyMAlg, &QComboBox::activated, this, &MainWindow::selectCipher);
-
 }
 
 // slots

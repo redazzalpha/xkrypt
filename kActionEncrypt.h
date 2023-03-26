@@ -1,7 +1,7 @@
 #ifndef KACTIONENCRYPT_H
 #define KACTIONENCRYPT_H
 
-#include "kActionBase.h"
+#include "kActionPage.h"
 
 /**
  * KActionEncrypt class represents QAction object
@@ -9,7 +9,7 @@
  * manager visibility
  */
 
-class KActionEncrypt : public KActionBase {
+class KActionEncrypt : public KActionPage {
 public:
     // constructors
     KActionEncrypt();

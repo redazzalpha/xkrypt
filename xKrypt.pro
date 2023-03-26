@@ -12,10 +12,12 @@ SOURCES += \
     cipherAes.cpp \
     cipherBase.cpp \
     cipherRsa.cpp \
+    kAction.cpp \
     kActionBase.cpp \
     kActionDecrypt.cpp \
     kActionEncrypt.cpp \
     kActionKeyMgr.cpp \
+    kActionPage.cpp \
     kActionQuit.cpp \
     kDialogBase.cpp \
     kMessage.cpp \
@@ -28,10 +30,12 @@ HEADERS += \
     cipherRsa.h \
     defines.h \
     enums.h \
+    kAction.h \
     kActionBase.h \
     kActionDecrypt.h \
     kActionEncrypt.h \
     kActionKeyMgr.h \
+    kActionPage.h \
     kActionQuit.h \
     kDialogBase.h \
     kMessage.h \

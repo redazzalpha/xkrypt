@@ -1,7 +1,7 @@
 #ifndef KACTIONQUIT_H
 #define KACTIONQUIT_H
 
-#include "kActionBase.h"
+#include "kAction.h"
 
 /**
  * KActionQuit class represents QAction object
@@ -9,7 +9,7 @@
  * quit application
  */
 
-class KActionQuit : public KActionBase {
+class KActionQuit : public KAction {
 public:
     // constructors
     KActionQuit();

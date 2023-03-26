@@ -26,14 +26,13 @@ QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 namespace {
 struct qt_meta_stringdata_KActionBase_t {
-    uint offsetsAndSizes[14];
+    uint offsetsAndSizes[12];
     char stringdata0[12];
     char stringdata1[13];
     char stringdata2[1];
     char stringdata3[5];
     char stringdata4[5];
-    char stringdata5[5];
-    char stringdata6[14];
+    char stringdata5[14];
 };
 #define QT_MOC_LITERAL(ofs, len) \
     uint(sizeof(qt_meta_stringdata_KActionBase_t::offsetsAndSizes) + ofs), len 
@@ -42,15 +41,13 @@ Q_CONSTINIT static const qt_meta_stringdata_KActionBase_t qt_meta_stringdata_KAc
         QT_MOC_LITERAL(0, 11),  // "KActionBase"
         QT_MOC_LITERAL(12, 12),  // "setStackPage"
         QT_MOC_LITERAL(25, 0),  // ""
-        QT_MOC_LITERAL(26, 4),  // "Page"
-        QT_MOC_LITERAL(31, 4),  // "page"
-        QT_MOC_LITERAL(36, 4),  // "quit"
-        QT_MOC_LITERAL(41, 13)   // "onActionClick"
+        QT_MOC_LITERAL(26, 4),  // "page"
+        QT_MOC_LITERAL(31, 4),  // "quit"
+        QT_MOC_LITERAL(36, 13)   // "onActionClick"
     },
     "KActionBase",
     "setStackPage",
     "",
-    "Page",
     "page",
     "quit",
     "onActionClick"
@@ -73,13 +70,13 @@ Q_CONSTINIT static const uint qt_meta_data_KActionBase[] = {
 
  // signals: name, argc, parameters, tag, flags, initial metatype offsets
        1,    1,   32,    2, 0x06,    1 /* Public */,
-       5,    0,   35,    2, 0x06,    3 /* Public */,
+       4,    0,   35,    2, 0x06,    3 /* Public */,
 
  // slots: name, argc, parameters, tag, flags, initial metatype offsets
-       6,    0,   36,    2, 0x0a,    4 /* Public */,
+       5,    0,   36,    2, 0x0a,    4 /* Public */,
 
  // signals: parameters
-    QMetaType::Void, 0x80000000 | 3,    4,
+    QMetaType::Void, QMetaType::Int,    3,
     QMetaType::Void,
 
  // slots: parameters
@@ -99,7 +96,7 @@ Q_CONSTINIT const QMetaObject KActionBase::staticMetaObject = { {
         QtPrivate::TypeAndForceComplete<KActionBase, std::true_type>,
         // method 'setStackPage'
         QtPrivate::TypeAndForceComplete<void, std::false_type>,
-        QtPrivate::TypeAndForceComplete<Page, std::false_type>,
+        QtPrivate::TypeAndForceComplete<int, std::false_type>,
         // method 'quit'
         QtPrivate::TypeAndForceComplete<void, std::false_type>,
         // method 'onActionClick'
@@ -114,7 +111,7 @@ void KActionBase::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id,
         auto *_t = static_cast<KActionBase *>(_o);
         (void)_t;
         switch (_id) {
-        case 0: _t->setStackPage((*reinterpret_cast< std::add_pointer_t<Page>>(_a[1]))); break;
+        case 0: _t->setStackPage((*reinterpret_cast< std::add_pointer_t<int>>(_a[1]))); break;
         case 1: _t->quit(); break;
         case 2: _t->onActionClick(); break;
         default: ;
@@ -122,7 +119,7 @@ void KActionBase::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id,
     } else if (_c == QMetaObject::IndexOfMethod) {
         int *result = reinterpret_cast<int *>(_a[0]);
         {
-            using _t = void (KActionBase::*)(Page );
+            using _t = void (KActionBase::*)(int );
             if (_t _q_method = &KActionBase::setStackPage; *reinterpret_cast<_t *>(_a[1]) == _q_method) {
                 *result = 0;
                 return;
@@ -169,7 +166,7 @@ int KActionBase::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 }
 
 // SIGNAL 0
-void KActionBase::setStackPage(Page _t1)
+void KActionBase::setStackPage(int _t1)
 {
     void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t1))) };
     QMetaObject::activate(this, &staticMetaObject, 0, _a);

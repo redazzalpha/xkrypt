@@ -1,7 +1,7 @@
 #ifndef KACTIONKEYMGR_H
 #define KACTIONKEYMGR_H
 
-#include "kActionBase.h"
+#include "kActionPage.h"
 
 /**
  * KActionKeyMgr class represents QAction object
@@ -9,7 +9,7 @@
  * manager visibility
  */
 
-class KActionKeyMgr : public KActionBase {
+class KActionKeyMgr : public KActionPage {
 public:
     // constructors
     KActionKeyMgr();

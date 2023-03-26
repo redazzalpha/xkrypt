@@ -16,7 +16,7 @@
 
 class KMessage : public KDialogBase {
 private:
-    void setBtnRejectText(std::string text);
+    void setBtnRejectText(const std::string& text);
 
 public :
     // constructors

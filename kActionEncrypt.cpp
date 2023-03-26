@@ -1,7 +1,7 @@
 #include "kActionEncrypt.h"
 
 // constructors
-KActionEncrypt::KActionEncrypt(): KActionBase("encrypt manager", ":/assets/encrypt.png") {}
+KActionEncrypt::KActionEncrypt(): KActionPage("encrypt manager", ":/assets/encrypt.png") {}
 
 // destructor
 KActionEncrypt::~KActionEncrypt(){}

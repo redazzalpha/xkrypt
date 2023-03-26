@@ -1,7 +1,6 @@
 #ifndef KACTIONBASE_H
 #define KACTIONBASE_H
 
-#include "enums.h"
 #include <QAction>
 #include <QMainWindow>
 
@@ -27,9 +26,8 @@ public slots:
     virtual void onActionClick() = 0;
 
 signals:
-    void setStackPage(Page page);
+    void setStackPage(int page);
     void quit();
-
 };
 
 #endif // KACTIONBASE_H
