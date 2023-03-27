@@ -2,13 +2,16 @@
 #define MAINWINDOW_H
 
 #include "kActionBase.h"
-#include "cipherBase.h"
 #include "aesGcm.h"
 #include "aesCbc.h"
 #include "aesEax.h"
 #include "rsaSsa.h"
-#include "rsaOeap.h"
+#include "kActionKeyMgr.h"
+#include "kActionEncrypt.h"
+#include "kActionDecrypt.h"
+#include "kActionQuit.h"
 #include "kMessage.h"
+#include "rsaOeap.h"
 #include <QMainWindow>
 #include <QList>
 #include <QString>
@@ -20,12 +23,11 @@ QT_END_NAMESPACE
 
 class MainWindow : public QMainWindow {
     Q_OBJECT
+
 private:
     Ui::MainWindow *ui;
-    QList<KActionBase*> m_actions = QList<KActionBase*>();
     KMessage* m_message = new KMessage(this);
-    std::string m_selectedAlg = "";
-    std::string m_selectedMode = "";
+
     CipherBase* m_cipher = new AesGCM;
     QList<QString>* m_algorithms = new QList<QString> {
         CipherAes::AlgName,
@@ -37,8 +39,14 @@ private:
         AesEAX::ModeName
     };
     QList<QString>* m_rsaModes = new QList<QString>{
+        RsaOEAP::ModeName,
         RsaSSA::ModeName,
-        RsaOEAP::ModeName
+    };
+    QList<KActionBase*> m_actions = QList<KActionBase*> {
+        new KActionKeyMgr(),
+        new KActionEncrypt(),
+        new KActionDecrypt(),
+        new KActionQuit(),
     };
 
 public:
@@ -49,8 +57,6 @@ public:
     ~MainWindow();
 
 private:
-    void initToolBar();
-    void initMessage();
     void connectItems();
 
 private slots:
@@ -60,7 +66,6 @@ private slots:
     void on_m_decryptSelectFBtn_clicked();
     void on_m_keyMGenerateBtn_clicked();
     void on_m_keyMImportBtn_clicked();
-    void setModeList(const int selectedAlg);
     void setAlgorithm(const QString& alg);
     void setMode(const QString& mode);
 };

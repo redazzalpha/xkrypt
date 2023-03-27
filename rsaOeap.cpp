@@ -9,7 +9,7 @@ RsaOEAP::RsaOEAP() {}
 RsaOEAP::~RsaOEAP() {};
 
 // methods
-void RsaOEAP::generateKey(){std::cout << "cipher Aes generate key" << std::endl;}
+void RsaOEAP::generateKey(){std::cout << "cipher rsa - oeap generate key" << std::endl;}
 void RsaOEAP::decrypt(){std::cout << "cipher Aes decrypt" << std::endl;}
 void RsaOEAP::encrypt(){std::cout << "cipher Aes encrypt" << std::endl;}
 

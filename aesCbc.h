@@ -18,7 +18,6 @@ public:
     virtual void decrypt() override;
     virtual void encrypt() override;
     virtual QString getModeName() const override;
-
 };
 
 #endif // AESCBC_H

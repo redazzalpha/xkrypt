@@ -1,11 +1,5 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
-#include "kActionBase.h"
-#include "kActionKeyMgr.h"
-#include "kActionEncrypt.h"
-#include "kActionDecrypt.h"
-#include "kActionQuit.h"
-#include "enums.h"
 #include "defines.h"
 #include <QToolButton>
 #include <QPushButton>
@@ -20,13 +14,11 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-
-
     ui->m_keyMAlg->addItems(*m_algorithms);
     ui->m_keyMMode->addItems(*m_aesModes);
 
-    initToolBar();
     connectItems();
+    setIconSize(QSize(35, 35));
 }
 
 // destructor
@@ -36,27 +28,16 @@ MainWindow::~MainWindow()
     delete m_cipher;
     delete m_aesModes;
     delete m_rsaModes;
+    delete m_algorithms;
     foreach(KActionBase* action, m_actions)
         delete action;
 }
 
 // methods
-void MainWindow::initToolBar()
-{
-    // creates actions
-    m_actions.append(new KActionKeyMgr());
-    m_actions.append(new KActionEncrypt());
-    m_actions.append(new KActionDecrypt());
-    m_actions.append(new KActionQuit());
-
-    setIconSize(QSize(35, 35));
-}
 void MainWindow::connectItems() {
     // connect comboboxes
     QObject::connect(ui->m_keyMAlg, &QComboBox::textActivated, this, &MainWindow::setAlgorithm);
     QObject::connect(ui->m_keyMMode, &QComboBox::textActivated, this, &MainWindow::setMode);
-
-    QObject::connect(ui->m_keyMAlg, &QComboBox::activated, this, &MainWindow::setModeList);
 
     // connect actions
     foreach (KActionBase* action, m_actions) {
@@ -96,23 +77,39 @@ void MainWindow::on_m_keyMImportBtn_clicked()
 {
     QString fileName = QFileDialog::getOpenFileName(this,"Import key", "", "All Files (*)");
 }
-void MainWindow::setModeList(const int selectedAlg) {
-    switch(selectedAlg) {
-    case Algorithm::aes:
-        ui->m_keyMMode->clear();
+
+void MainWindow::setAlgorithm(const QString& alg) {
+
+    delete m_cipher;
+    ui->m_keyMMode->clear();
+
+    if(alg == CipherAes::AlgName){
+        m_cipher = new AesGCM;
         ui->m_keyMMode->addItems(*m_aesModes);
-        break;
-    case Algorithm::rsa:
-        ui->m_keyMMode->clear();
+    }
+    if(alg == CipherRsa::AlgName) {
+        m_cipher = new RsaOEAP;
         ui->m_keyMMode->addItems(*m_rsaModes);
-        break;
     }
 }
-void MainWindow::setAlgorithm(const QString& alg) {
-    m_selectedAlg = alg.toStdString();    
-}
 void MainWindow::setMode(const QString& mode) {
-    m_selectedMode = mode.toStdString();
+    delete m_cipher;
+
+    // aes modes
+    if(mode == AesGCM::ModeName) m_cipher = new AesGCM;
+    if(mode == AesGCM::ModeName) m_cipher = new AesGCM;
+    if(mode == AesEAX::ModeName) m_cipher = new AesEAX;
+    if(mode == AesGCM::ModeName) m_cipher = new AesGCM;
+    if(mode == AesCBC::ModeName) m_cipher = new AesCBC;
+    if(mode == AesGCM::ModeName) m_cipher = new AesGCM;
+    if(mode == AesGCM::ModeName) m_cipher = new AesGCM;
+    if(mode == AesGCM::ModeName) m_cipher = new AesGCM;
+
+    // rsa modes
+    if(mode == RsaOEAP::ModeName) m_cipher = new RsaOEAP;
+    if(mode == RsaSSA::ModeName) m_cipher = new RsaSSA;
+
+
 }
 
 
