@@ -6,7 +6,8 @@ CipherBase::CipherBase() {}
 // destructor
 CipherBase::~CipherBase() {}
 
-// methods
 bool CipherBase::isKeyLoaded() const {
-    return !(m_key.empty());
+    // return true by default for
+    // inherited classes that don't redefine
+    return true;
 }

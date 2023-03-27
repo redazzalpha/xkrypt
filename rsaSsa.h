@@ -14,9 +14,9 @@ public:
     virtual ~RsaSSA();
 
     // methods
-    virtual void generateKey() override;
     virtual void decrypt() override;
     virtual void encrypt() override;
+    virtual std::string generateKey(const bool saveOnfile) override;
     virtual QString getModeName() const override;
 };
 

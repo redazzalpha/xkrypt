@@ -11,24 +11,26 @@
  */
 
 class CipherBase : public QObject {
-      Q_OBJECT
-
-protected:
-    std::string m_key = "";
+    Q_OBJECT
 
 public:
     // constructors
     CipherBase();
+
+    // destructor
     virtual ~CipherBase();
 
     // methods
     virtual QString getAlgName() const = 0;
     virtual QString getModeName() const = 0;
-    virtual void generateKey() = 0;
     virtual void decrypt() = 0;
     virtual void encrypt() = 0;
+    virtual std::string generateKey(const bool saveOnfile) = 0;
 
-    bool isKeyLoaded() const;
+    virtual bool isKeyLoaded() const;
+
+
+
 };
 
 #endif // CIPHERBASE_H

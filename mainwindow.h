@@ -42,12 +42,18 @@ private:
         RsaOEAP::ModeName,
         RsaSSA::ModeName,
     };
+    QList<QString>* m_aesKeys = new QList<QString>{
+        QString::number(CryptoPP::AES::DEFAULT_KEYLENGTH),
+        QString::number(CryptoPP::AES::MAX_KEYLENGTH),
+    };
+
     QList<KActionBase*> m_actions = QList<KActionBase*> {
         new KActionKeyMgr(),
         new KActionEncrypt(),
         new KActionDecrypt(),
         new KActionQuit(),
     };
+
 
 public:
     // constructors
@@ -68,5 +74,6 @@ private slots:
     void on_m_keyMImportBtn_clicked();
     void setAlgorithm(const QString& alg);
     void setMode(const QString& mode);
+    void setKey(const int keyLength);
 };
 #endif // MAINWINDOW_H

@@ -1,6 +1,5 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
-#include "defines.h"
 #include <QToolButton>
 #include <QPushButton>
 #include <QLabel>
@@ -8,14 +7,19 @@
 #include <QFileDialog>
 #include <iostream>
 
+using namespace std;
+using namespace CryptoPP;
+
 // constructors
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    ui->m_keyMAlg->addItems(*m_algorithms);
-    ui->m_keyMMode->addItems(*m_aesModes);
+
+    ui->m_keyMAlgs->addItems(*m_algorithms);
+    ui->m_keyMModes->addItems(*m_aesModes);
+    ui->m_keyMKeys->addItems(*m_aesKeys);
 
     connectItems();
     setIconSize(QSize(35, 35));
@@ -36,8 +40,9 @@ MainWindow::~MainWindow()
 // methods
 void MainWindow::connectItems() {
     // connect comboboxes
-    QObject::connect(ui->m_keyMAlg, &QComboBox::textActivated, this, &MainWindow::setAlgorithm);
-    QObject::connect(ui->m_keyMMode, &QComboBox::textActivated, this, &MainWindow::setMode);
+    QObject::connect(ui->m_keyMAlgs, &QComboBox::textActivated, this, &MainWindow::setAlgorithm);
+    QObject::connect(ui->m_keyMModes, &QComboBox::textActivated, this, &MainWindow::setMode);
+    QObject::connect(ui->m_keyMKeys, &QComboBox::activated, this, &MainWindow::setKey);
 
     // connect actions
     foreach (KActionBase* action, m_actions) {
@@ -53,13 +58,13 @@ void MainWindow::on_m_encryptBtn_clicked()
 {
     m_cipher->isKeyLoaded() ?
         m_cipher->encrypt() :
-        m_message->show(NO_KEY_MSG("encrypt"), ":/assets/error.png");
+        m_message->show( "Cannot ecnrypt - No key has not been loaded! \n Please load key or generate one and retry.", ":/assets/error.png");
 }
 void MainWindow::on_m_decryptBtn_clicked()
 {
     m_cipher->isKeyLoaded() ?
         m_cipher->decrypt() :
-        m_message->show(NO_KEY_MSG("decrypt"), ":/assets/error.png");
+        m_message->show( "Cannot decrypt - No key has not been loaded! \n Please load key or generate one and retry.", ":/assets/error.png");
 }
 void MainWindow::on_m_encryptSelectFBtn_clicked()
 {
@@ -71,7 +76,9 @@ void MainWindow::on_m_decryptSelectFBtn_clicked()
 }
 void MainWindow::on_m_keyMGenerateBtn_clicked()
 {
-    m_cipher->generateKey();
+    string key = m_cipher->generateKey(ui->m_keyMCheckBox->isChecked());
+    ui->m_keyMKeyLoaded->setPlainText(QString::fromStdString(key));
+    if(ui->m_keyMCheckBox->isChecked()) ui->m_keyMCheckBox->setChecked(false);
 }
 void MainWindow::on_m_keyMImportBtn_clicked()
 {
@@ -81,34 +88,49 @@ void MainWindow::on_m_keyMImportBtn_clicked()
 void MainWindow::setAlgorithm(const QString& alg) {
 
     delete m_cipher;
-    ui->m_keyMMode->clear();
+    ui->m_keyMModes->clear();
+    ui->m_keyMKeys->clear();
 
     if(alg == CipherAes::AlgName){
-        m_cipher = new AesGCM;
-        ui->m_keyMMode->addItems(*m_aesModes);
+        int keyLength = ui->m_keyMKeys->currentText().toInt();
+        m_cipher = new AesGCM(keyLength);
+        ui->m_keyMModes->addItems(*m_aesModes);
+        ui->m_keyMKeys->addItems(*m_aesKeys);
+        ui->m_keyMKeys->setVisible(true);
     }
     if(alg == CipherRsa::AlgName) {
         m_cipher = new RsaOEAP;
-        ui->m_keyMMode->addItems(*m_rsaModes);
+        ui->m_keyMModes->addItems(*m_rsaModes);
+        ui->m_keyMKeys->setVisible(false);
     }
 }
 void MainWindow::setMode(const QString& mode) {
     delete m_cipher;
+    int keyLength = ui->m_keyMKeys->currentText().toInt();
+
 
     // aes modes
-    if(mode == AesGCM::ModeName) m_cipher = new AesGCM;
-    if(mode == AesGCM::ModeName) m_cipher = new AesGCM;
-    if(mode == AesEAX::ModeName) m_cipher = new AesEAX;
-    if(mode == AesGCM::ModeName) m_cipher = new AesGCM;
-    if(mode == AesCBC::ModeName) m_cipher = new AesCBC;
-    if(mode == AesGCM::ModeName) m_cipher = new AesGCM;
-    if(mode == AesGCM::ModeName) m_cipher = new AesGCM;
-    if(mode == AesGCM::ModeName) m_cipher = new AesGCM;
+    if(mode == AesGCM::ModeName) m_cipher = new AesGCM(keyLength);
+    if(mode == AesGCM::ModeName) m_cipher = new AesGCM(keyLength);
+    if(mode == AesEAX::ModeName) m_cipher = new AesEAX(keyLength);
+    if(mode == AesGCM::ModeName) m_cipher = new AesGCM(keyLength);
+    if(mode == AesCBC::ModeName) m_cipher = new AesCBC(keyLength);
+    if(mode == AesGCM::ModeName) m_cipher = new AesGCM(keyLength);
+    if(mode == AesGCM::ModeName) m_cipher = new AesGCM(keyLength);
+    if(mode == AesGCM::ModeName) m_cipher = new AesGCM(keyLength);
 
     // rsa modes
     if(mode == RsaOEAP::ModeName) m_cipher = new RsaOEAP;
     if(mode == RsaSSA::ModeName) m_cipher = new RsaSSA;
-
+}
+void MainWindow::setKey(const int keyLength) {
+    switch(keyLength) {
+    case CryptoPP::AES::DEFAULT_KEYLENGTH :
+        break;
+    case CryptoPP::AES::MAX_KEYLENGTH :
+        break;
+    default: break;
+    }
 
 }
 

@@ -1410,7 +1410,81 @@ cipherAes.o: ../cipherAes.cpp ../cipherAes.h \
 		../../../../Qt/6.4.3/gcc_64/include/QtCore/qmath.h \
 		../../../../Qt/6.4.3/gcc_64/include/QtCore/qobject_impl.h \
 		../../../../Qt/6.4.3/gcc_64/include/QtCore/qbindingstorage.h \
-		../../../../Qt/6.4.3/gcc_64/include/QtCore/QString
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/QString \
+		../../../../Qt/6.4.3/gcc_64/include/QtWidgets/QFileDialog \
+		../../../../Qt/6.4.3/gcc_64/include/QtWidgets/qfiledialog.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtWidgets/qtwidgetsglobal.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtGui/qtguiglobal.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtGui/qtgui-config.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtGui/qtguiexports.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtWidgets/qtwidgets-config.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtWidgets/qtwidgetsexports.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qdir.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qfile.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qfiledevice.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qiodevice.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qfileinfo.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qshareddata.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qdatetime.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qcalendar.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qlocale.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qvariant.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qdebug.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qtextstream.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qstringconverter_base.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qcontiguouscache.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qsharedpointer.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qsharedpointer_impl.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qmap.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qshareddata_impl.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qset.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qhash.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qvarlengtharray.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qurl.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtWidgets/qdialog.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtWidgets/qwidget.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtGui/qwindowdefs.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtGui/qwindowdefs_win.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qmargins.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtGui/qaction.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtGui/qkeysequence.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtGui/qicon.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qsize.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtGui/qpixmap.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtGui/qpaintdevice.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qrect.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qpoint.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtGui/qcolor.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtGui/qrgb.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtGui/qrgba64.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtGui/qimage.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtGui/qpixelformat.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtGui/qtransform.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtGui/qpolygon.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtGui/qregion.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qline.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtGui/qpalette.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtGui/qbrush.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtGui/qfont.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtGui/qfontmetrics.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtGui/qfontinfo.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtWidgets/qsizepolicy.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtGui/qcursor.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtGui/qbitmap.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtGui/qevent.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qpointer.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtGui/qeventpoint.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtGui/qvector2d.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtGui/qvectornd.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtGui/qpointingdevice.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtGui/qinputdevice.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtGui/qscreen.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/QList \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/QRect \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/QSize \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/QSizeF \
+		../../../../Qt/6.4.3/gcc_64/include/QtGui/QTransform \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qnativeinterface.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o cipherAes.o ../cipherAes.cpp
 
 cipherBase.o: ../cipherBase.cpp ../cipherBase.h \
@@ -3249,67 +3323,6 @@ mainwindow.o: ../mainwindow.cpp ../mainwindow.h \
 		../../../../Qt/6.4.3/gcc_64/include/QtGui/QPixmap \
 		../rsaOeap.h \
 		ui_mainwindow.h \
-		../../../../Qt/6.4.3/gcc_64/include/QtCore/QVariant \
-		../../../../Qt/6.4.3/gcc_64/include/QtWidgets/QApplication \
-		../../../../Qt/6.4.3/gcc_64/include/QtWidgets/qapplication.h \
-		../../../../Qt/6.4.3/gcc_64/include/QtCore/qcoreapplication.h \
-		../../../../Qt/6.4.3/gcc_64/include/QtCore/qeventloop.h \
-		../../../../Qt/6.4.3/gcc_64/include/QtCore/qcoreapplication_platform.h \
-		../../../../Qt/6.4.3/gcc_64/include/QtCore/qjnitypes.h \
-		../../../../Qt/6.4.3/gcc_64/include/QtCore/qfuture.h \
-		../../../../Qt/6.4.3/gcc_64/include/QtCore/qfutureinterface.h \
-		../../../../Qt/6.4.3/gcc_64/include/QtCore/qmutex.h \
-		../../../../Qt/6.4.3/gcc_64/include/QtCore/qtsan_impl.h \
-		../../../../Qt/6.4.3/gcc_64/include/QtCore/qresultstore.h \
-		../../../../Qt/6.4.3/gcc_64/include/QtCore/qfuture_impl.h \
-		../../../../Qt/6.4.3/gcc_64/include/QtCore/qthreadpool.h \
-		../../../../Qt/6.4.3/gcc_64/include/QtCore/qthread.h \
-		../../../../Qt/6.4.3/gcc_64/include/QtCore/qdeadlinetimer.h \
-		../../../../Qt/6.4.3/gcc_64/include/QtCore/qelapsedtimer.h \
-		../../../../Qt/6.4.3/gcc_64/include/QtCore/qrunnable.h \
-		../../../../Qt/6.4.3/gcc_64/include/QtCore/qexception.h \
-		../../../../Qt/6.4.3/gcc_64/include/QtCore/qpromise.h \
-		../../../../Qt/6.4.3/gcc_64/include/QtGui/qguiapplication.h \
-		../../../../Qt/6.4.3/gcc_64/include/QtGui/qinputmethod.h \
-		../../../../Qt/6.4.3/gcc_64/include/QtCore/qlocale.h \
-		../../../../Qt/6.4.3/gcc_64/include/QtGui/qguiapplication_platform.h \
-		../../../../Qt/6.4.3/gcc_64/include/QtWidgets/QComboBox \
-		../../../../Qt/6.4.3/gcc_64/include/QtWidgets/qcombobox.h \
-		../../../../Qt/6.4.3/gcc_64/include/QtWidgets/qabstractitemdelegate.h \
-		../../../../Qt/6.4.3/gcc_64/include/QtWidgets/qstyleoption.h \
-		../../../../Qt/6.4.3/gcc_64/include/QtWidgets/qabstractspinbox.h \
-		../../../../Qt/6.4.3/gcc_64/include/QtGui/qvalidator.h \
-		../../../../Qt/6.4.3/gcc_64/include/QtCore/qregularexpression.h \
-		../../../../Qt/6.4.3/gcc_64/include/QtWidgets/qslider.h \
-		../../../../Qt/6.4.3/gcc_64/include/QtWidgets/qabstractslider.h \
-		../../../../Qt/6.4.3/gcc_64/include/QtWidgets/qstyle.h \
-		../../../../Qt/6.4.3/gcc_64/include/QtWidgets/qtabbar.h \
-		../../../../Qt/6.4.3/gcc_64/include/QtWidgets/qrubberband.h \
-		../../../../Qt/6.4.3/gcc_64/include/QtCore/qabstractitemmodel.h \
-		../../../../Qt/6.4.3/gcc_64/include/QtWidgets/QMenuBar \
-		../../../../Qt/6.4.3/gcc_64/include/QtWidgets/qmenubar.h \
-		../../../../Qt/6.4.3/gcc_64/include/QtWidgets/qmenu.h \
-		../../../../Qt/6.4.3/gcc_64/include/QtWidgets/QPlainTextEdit \
-		../../../../Qt/6.4.3/gcc_64/include/QtWidgets/qplaintextedit.h \
-		../../../../Qt/6.4.3/gcc_64/include/QtWidgets/qtextedit.h \
-		../../../../Qt/6.4.3/gcc_64/include/QtWidgets/qabstractscrollarea.h \
-		../../../../Qt/6.4.3/gcc_64/include/QtGui/qtextoption.h \
-		../../../../Qt/6.4.3/gcc_64/include/QtGui/qtextcursor.h \
-		../../../../Qt/6.4.3/gcc_64/include/QtGui/qtextformat.h \
-		../../../../Qt/6.4.3/gcc_64/include/QtGui/qpen.h \
-		../../../../Qt/6.4.3/gcc_64/include/QtGui/qabstracttextdocumentlayout.h \
-		../../../../Qt/6.4.3/gcc_64/include/QtGui/qtextlayout.h \
-		../../../../Qt/6.4.3/gcc_64/include/QtGui/qglyphrun.h \
-		../../../../Qt/6.4.3/gcc_64/include/QtGui/qrawfont.h \
-		../../../../Qt/6.4.3/gcc_64/include/QtGui/qfontdatabase.h \
-		../../../../Qt/6.4.3/gcc_64/include/QtWidgets/QStackedWidget \
-		../../../../Qt/6.4.3/gcc_64/include/QtWidgets/qstackedwidget.h \
-		../../../../Qt/6.4.3/gcc_64/include/QtWidgets/QStatusBar \
-		../../../../Qt/6.4.3/gcc_64/include/QtWidgets/qstatusbar.h \
-		../../../../Qt/6.4.3/gcc_64/include/QtWidgets/QToolBar \
-		../../../../Qt/6.4.3/gcc_64/include/QtWidgets/qtoolbar.h \
-		../../../../Qt/6.4.3/gcc_64/include/QtWidgets/QWidget \
-		../defines.h \
 		../../../../Qt/6.4.3/gcc_64/include/QtWidgets/QToolButton \
 		../../../../Qt/6.4.3/gcc_64/include/QtWidgets/qtoolbutton.h \
 		../../../../Qt/6.4.3/gcc_64/include/QtWidgets/QGridLayout \
@@ -3320,7 +3333,8 @@ mainwindow.o: ../mainwindow.cpp ../mainwindow.h \
 		../../../../Qt/6.4.3/gcc_64/include/QtCore/qfiledevice.h \
 		../../../../Qt/6.4.3/gcc_64/include/QtCore/qfileinfo.h \
 		../../../../Qt/6.4.3/gcc_64/include/QtCore/qdatetime.h \
-		../../../../Qt/6.4.3/gcc_64/include/QtCore/qcalendar.h
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qcalendar.h \
+		../../../../Qt/6.4.3/gcc_64/include/QtCore/qlocale.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o mainwindow.o ../mainwindow.cpp
 
 rsaOeap.o: ../rsaOeap.cpp ../rsaOeap.h \

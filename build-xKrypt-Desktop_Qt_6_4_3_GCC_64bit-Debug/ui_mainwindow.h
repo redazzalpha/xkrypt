@@ -11,13 +11,16 @@
 
 #include <QtCore/QVariant>
 #include <QtWidgets/QApplication>
+#include <QtWidgets/QCheckBox>
 #include <QtWidgets/QComboBox>
+#include <QtWidgets/QFrame>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QMenuBar>
 #include <QtWidgets/QPlainTextEdit>
 #include <QtWidgets/QPushButton>
+#include <QtWidgets/QSpacerItem>
 #include <QtWidgets/QStackedWidget>
 #include <QtWidgets/QStatusBar>
 #include <QtWidgets/QToolBar>
@@ -33,18 +36,35 @@ public:
     QStackedWidget *m_mainStack;
     QWidget *m_keyMPage;
     QWidget *verticalLayoutWidget;
-    QVBoxLayout *m_keyMVL;
-    QPlainTextEdit *m_keyMIntro;
+    QVBoxLayout *vlayout;
+    QLabel *m_keyMIntro;
+    QFrame *line_3;
+    QSpacerItem *verticalSpacer_3;
+    QLabel *label;
+    QSpacerItem *verticalSpacer_5;
     QPushButton *m_keyMImportBtn;
-    QPlainTextEdit *m_keyMKeyLoaded;
-    QVBoxLayout *m_keyMAlgVL;
-    QHBoxLayout *m_keyMLabelHL;
-    QLabel *m_keyMAlgLabel;
-    QLabel *m_keyMModeLabel;
-    QHBoxLayout *m_keyMAlgHL;
-    QComboBox *m_keyMAlg;
-    QComboBox *m_keyMMode;
+    QSpacerItem *verticalSpacer;
+    QFrame *line;
+    QSpacerItem *verticalSpacer_4;
+    QLabel *label_2;
+    QSpacerItem *verticalSpacer_6;
+    QVBoxLayout *vlayout_1;
+    QHBoxLayout *hlayout_1;
+    QLabel *label_5;
+    QLabel *label_6;
+    QLabel *label_7;
+    QHBoxLayout *hlayout;
+    QComboBox *m_keyMAlgs;
+    QComboBox *m_keyMModes;
+    QComboBox *m_keyMKeys;
+    QSpacerItem *verticalSpacer_7;
+    QHBoxLayout *horizontalLayout;
+    QCheckBox *m_keyMCheckBox;
     QPushButton *m_keyMGenerateBtn;
+    QSpacerItem *horizontalSpacer;
+    QSpacerItem *verticalSpacer_2;
+    QFrame *line_2;
+    QPlainTextEdit *m_keyMKeyLoaded;
     QWidget *m_encryptPage;
     QWidget *verticalLayoutWidget_6;
     QVBoxLayout *m_encryptVL;
@@ -81,27 +101,156 @@ public:
         m_keyMPage->setObjectName("m_keyMPage");
         verticalLayoutWidget = new QWidget(m_keyMPage);
         verticalLayoutWidget->setObjectName("verticalLayoutWidget");
-        verticalLayoutWidget->setGeometry(QRect(0, 0, 464, 291));
-        m_keyMVL = new QVBoxLayout(verticalLayoutWidget);
-        m_keyMVL->setObjectName("m_keyMVL");
-        m_keyMVL->setContentsMargins(0, 0, 0, 0);
-        m_keyMIntro = new QPlainTextEdit(verticalLayoutWidget);
+        verticalLayoutWidget->setGeometry(QRect(0, 0, 464, 491));
+        vlayout = new QVBoxLayout(verticalLayoutWidget);
+        vlayout->setObjectName("vlayout");
+        vlayout->setContentsMargins(0, 0, 0, 0);
+        m_keyMIntro = new QLabel(verticalLayoutWidget);
         m_keyMIntro->setObjectName("m_keyMIntro");
-        m_keyMIntro->setAutoFillBackground(false);
-        m_keyMIntro->setStyleSheet(QString::fromUtf8("background-color: rgba(0, 0, 0, 0);"));
-        m_keyMIntro->setFrameShape(QFrame::NoFrame);
-        m_keyMIntro->setFrameShadow(QFrame::Plain);
-        m_keyMIntro->setTabChangesFocus(false);
-        m_keyMIntro->setReadOnly(true);
-        m_keyMIntro->setTextInteractionFlags(Qt::NoTextInteraction);
-        m_keyMIntro->setBackgroundVisible(false);
 
-        m_keyMVL->addWidget(m_keyMIntro);
+        vlayout->addWidget(m_keyMIntro);
+
+        line_3 = new QFrame(verticalLayoutWidget);
+        line_3->setObjectName("line_3");
+        line_3->setFrameShape(QFrame::HLine);
+        line_3->setFrameShadow(QFrame::Sunken);
+
+        vlayout->addWidget(line_3);
+
+        verticalSpacer_3 = new QSpacerItem(20, 220, QSizePolicy::Minimum, QSizePolicy::Expanding);
+
+        vlayout->addItem(verticalSpacer_3);
+
+        label = new QLabel(verticalLayoutWidget);
+        label->setObjectName("label");
+        QFont font;
+        font.setBold(true);
+        font.setUnderline(true);
+        label->setFont(font);
+
+        vlayout->addWidget(label);
+
+        verticalSpacer_5 = new QSpacerItem(20, 200, QSizePolicy::Minimum, QSizePolicy::Expanding);
+
+        vlayout->addItem(verticalSpacer_5);
 
         m_keyMImportBtn = new QPushButton(verticalLayoutWidget);
         m_keyMImportBtn->setObjectName("m_keyMImportBtn");
+        m_keyMImportBtn->setMaximumSize(QSize(120, 16777215));
 
-        m_keyMVL->addWidget(m_keyMImportBtn);
+        vlayout->addWidget(m_keyMImportBtn);
+
+        verticalSpacer = new QSpacerItem(20, 220, QSizePolicy::Minimum, QSizePolicy::Expanding);
+
+        vlayout->addItem(verticalSpacer);
+
+        line = new QFrame(verticalLayoutWidget);
+        line->setObjectName("line");
+        line->setFrameShape(QFrame::HLine);
+        line->setFrameShadow(QFrame::Sunken);
+
+        vlayout->addWidget(line);
+
+        verticalSpacer_4 = new QSpacerItem(20, 220, QSizePolicy::Minimum, QSizePolicy::Expanding);
+
+        vlayout->addItem(verticalSpacer_4);
+
+        label_2 = new QLabel(verticalLayoutWidget);
+        label_2->setObjectName("label_2");
+        QFont font1;
+        font1.setBold(true);
+        font1.setUnderline(true);
+        font1.setStrikeOut(false);
+        font1.setKerning(true);
+        label_2->setFont(font1);
+        label_2->setMargin(0);
+
+        vlayout->addWidget(label_2);
+
+        verticalSpacer_6 = new QSpacerItem(20, 200, QSizePolicy::Minimum, QSizePolicy::Expanding);
+
+        vlayout->addItem(verticalSpacer_6);
+
+        vlayout_1 = new QVBoxLayout();
+        vlayout_1->setObjectName("vlayout_1");
+        hlayout_1 = new QHBoxLayout();
+        hlayout_1->setObjectName("hlayout_1");
+        label_5 = new QLabel(verticalLayoutWidget);
+        label_5->setObjectName("label_5");
+
+        hlayout_1->addWidget(label_5);
+
+        label_6 = new QLabel(verticalLayoutWidget);
+        label_6->setObjectName("label_6");
+
+        hlayout_1->addWidget(label_6);
+
+        label_7 = new QLabel(verticalLayoutWidget);
+        label_7->setObjectName("label_7");
+
+        hlayout_1->addWidget(label_7);
+
+
+        vlayout_1->addLayout(hlayout_1);
+
+        hlayout = new QHBoxLayout();
+        hlayout->setObjectName("hlayout");
+        m_keyMAlgs = new QComboBox(verticalLayoutWidget);
+        m_keyMAlgs->setObjectName("m_keyMAlgs");
+
+        hlayout->addWidget(m_keyMAlgs);
+
+        m_keyMModes = new QComboBox(verticalLayoutWidget);
+        m_keyMModes->setObjectName("m_keyMModes");
+
+        hlayout->addWidget(m_keyMModes);
+
+        m_keyMKeys = new QComboBox(verticalLayoutWidget);
+        m_keyMKeys->setObjectName("m_keyMKeys");
+
+        hlayout->addWidget(m_keyMKeys);
+
+
+        vlayout_1->addLayout(hlayout);
+
+
+        vlayout->addLayout(vlayout_1);
+
+        verticalSpacer_7 = new QSpacerItem(20, 200, QSizePolicy::Minimum, QSizePolicy::Expanding);
+
+        vlayout->addItem(verticalSpacer_7);
+
+        horizontalLayout = new QHBoxLayout();
+        horizontalLayout->setObjectName("horizontalLayout");
+        m_keyMCheckBox = new QCheckBox(verticalLayoutWidget);
+        m_keyMCheckBox->setObjectName("m_keyMCheckBox");
+        m_keyMCheckBox->setMaximumSize(QSize(100, 16777215));
+
+        horizontalLayout->addWidget(m_keyMCheckBox);
+
+        m_keyMGenerateBtn = new QPushButton(verticalLayoutWidget);
+        m_keyMGenerateBtn->setObjectName("m_keyMGenerateBtn");
+        m_keyMGenerateBtn->setMaximumSize(QSize(120, 16777215));
+
+        horizontalLayout->addWidget(m_keyMGenerateBtn);
+
+        horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+        horizontalLayout->addItem(horizontalSpacer);
+
+
+        vlayout->addLayout(horizontalLayout);
+
+        verticalSpacer_2 = new QSpacerItem(20, 220, QSizePolicy::Minimum, QSizePolicy::Expanding);
+
+        vlayout->addItem(verticalSpacer_2);
+
+        line_2 = new QFrame(verticalLayoutWidget);
+        line_2->setObjectName("line_2");
+        line_2->setFrameShape(QFrame::HLine);
+        line_2->setFrameShadow(QFrame::Sunken);
+
+        vlayout->addWidget(line_2);
 
         m_keyMKeyLoaded = new QPlainTextEdit(verticalLayoutWidget);
         m_keyMKeyLoaded->setObjectName("m_keyMKeyLoaded");
@@ -114,47 +263,7 @@ public:
         m_keyMKeyLoaded->setTextInteractionFlags(Qt::NoTextInteraction);
         m_keyMKeyLoaded->setBackgroundVisible(false);
 
-        m_keyMVL->addWidget(m_keyMKeyLoaded);
-
-        m_keyMAlgVL = new QVBoxLayout();
-        m_keyMAlgVL->setObjectName("m_keyMAlgVL");
-        m_keyMLabelHL = new QHBoxLayout();
-        m_keyMLabelHL->setObjectName("m_keyMLabelHL");
-        m_keyMAlgLabel = new QLabel(verticalLayoutWidget);
-        m_keyMAlgLabel->setObjectName("m_keyMAlgLabel");
-
-        m_keyMLabelHL->addWidget(m_keyMAlgLabel);
-
-        m_keyMModeLabel = new QLabel(verticalLayoutWidget);
-        m_keyMModeLabel->setObjectName("m_keyMModeLabel");
-
-        m_keyMLabelHL->addWidget(m_keyMModeLabel);
-
-
-        m_keyMAlgVL->addLayout(m_keyMLabelHL);
-
-        m_keyMAlgHL = new QHBoxLayout();
-        m_keyMAlgHL->setObjectName("m_keyMAlgHL");
-        m_keyMAlg = new QComboBox(verticalLayoutWidget);
-        m_keyMAlg->setObjectName("m_keyMAlg");
-
-        m_keyMAlgHL->addWidget(m_keyMAlg);
-
-        m_keyMMode = new QComboBox(verticalLayoutWidget);
-        m_keyMMode->setObjectName("m_keyMMode");
-
-        m_keyMAlgHL->addWidget(m_keyMMode);
-
-
-        m_keyMAlgVL->addLayout(m_keyMAlgHL);
-
-
-        m_keyMVL->addLayout(m_keyMAlgVL);
-
-        m_keyMGenerateBtn = new QPushButton(verticalLayoutWidget);
-        m_keyMGenerateBtn->setObjectName("m_keyMGenerateBtn");
-
-        m_keyMVL->addWidget(m_keyMGenerateBtn);
+        vlayout->addWidget(m_keyMKeyLoaded);
 
         m_mainStack->addWidget(m_keyMPage);
         m_encryptPage = new QWidget();
@@ -296,14 +405,18 @@ public:
     void retranslateUi(QMainWindow *MainWindow)
     {
         MainWindow->setWindowTitle(QCoreApplication::translate("MainWindow", "xKrypt", nullptr));
-        m_keyMIntro->setPlainText(QCoreApplication::translate("MainWindow", "Key manager section.\n"
+        m_keyMIntro->setText(QCoreApplication::translate("MainWindow", "Key manager section.\n"
 "Import key or generate one from selected algorithm.\n"
 "", nullptr));
-        m_keyMImportBtn->setText(QCoreApplication::translate("MainWindow", "Import key", nullptr));
+        label->setText(QCoreApplication::translate("MainWindow", "Import key:", nullptr));
+        m_keyMImportBtn->setText(QCoreApplication::translate("MainWindow", "Select file(s)", nullptr));
+        label_2->setText(QCoreApplication::translate("MainWindow", "Generate key:", nullptr));
+        label_5->setText(QCoreApplication::translate("MainWindow", "Algorithm:", nullptr));
+        label_6->setText(QCoreApplication::translate("MainWindow", "Mode:", nullptr));
+        label_7->setText(QCoreApplication::translate("MainWindow", "key (bits):", nullptr));
+        m_keyMCheckBox->setText(QCoreApplication::translate("MainWindow", "save on file", nullptr));
+        m_keyMGenerateBtn->setText(QCoreApplication::translate("MainWindow", "Generate", nullptr));
         m_keyMKeyLoaded->setPlainText(QCoreApplication::translate("MainWindow", "no key loaded !", nullptr));
-        m_keyMAlgLabel->setText(QCoreApplication::translate("MainWindow", "Algorithm:", nullptr));
-        m_keyMModeLabel->setText(QCoreApplication::translate("MainWindow", "Mode:", nullptr));
-        m_keyMGenerateBtn->setText(QCoreApplication::translate("MainWindow", "Generate key", nullptr));
         m_encryptIntro->setPlainText(QCoreApplication::translate("MainWindow", "Encrypt manager section.\n"
 "Select file(s) to Encrypt.\n"
 "", nullptr));

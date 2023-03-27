@@ -22,9 +22,9 @@ public:
     // methods
     virtual QString getAlgName() const final;
     virtual QString getModeName() const = 0;
-    virtual void generateKey() = 0;
     virtual void decrypt() = 0;
     virtual void encrypt() = 0;
+    virtual std::string generateKey(const bool saveOnfile) = 0;
 };
 
 #endif // CIPHERRSA_H

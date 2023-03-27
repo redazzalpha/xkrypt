@@ -1,15 +1,16 @@
 #include "aesEax.h"
 
+using namespace CryptoPP;
+
 const QString AesEAX::ModeName = "EAX";
 
 // constructors
-AesEAX::AesEAX(){}
+AesEAX::AesEAX(const int keyLength): CipherAes(keyLength){}
 
 // destructor
 AesEAX::~AesEAX() {};
 
 // methods
-void AesEAX::generateKey(){std::cout << "cipher Aes - eax generate key" << std::endl;}
 void AesEAX::decrypt(){std::cout << "cipher Aes decrypt" << std::endl;}
 void AesEAX::encrypt(){std::cout << "cipher Aes encrypt" << std::endl;}
 

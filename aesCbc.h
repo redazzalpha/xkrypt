@@ -8,13 +8,12 @@ public:
     static const QString ModeName;
 
     // constructors
-    AesCBC();
+    AesCBC(const int keyLength = CryptoPP::AES::DEFAULT_KEYLENGTH);
 
     // destructor
     virtual ~AesCBC();
 
     // methods
-    virtual void generateKey() override;
     virtual void decrypt() override;
     virtual void encrypt() override;
     virtual QString getModeName() const override;
