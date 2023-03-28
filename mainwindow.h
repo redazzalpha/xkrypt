@@ -66,6 +66,11 @@ private:
     void connectItems();
     bool isFileExist(std::string filename);
 
+    void dialogFileExists();
+    void dialogRenameFile();
+    void dialogError(const std::string& message);
+    void dialogNoKeyError(const std::string& action);
+
 
 private slots:
     void on_m_encryptBtn_clicked();

@@ -1,7 +1,4 @@
 #include "mainwindow.h"
-#include "kChoice.h"
-#include "kMessage.h"
-#include "kInput.h"
 #include "./ui_mainwindow.h"
 #include "base64.h"
 #include <QToolButton>
@@ -9,6 +6,8 @@
 #include <QLabel>
 #include <QGridLayout>
 #include <QFileDialog>
+#include <QMessageBox>
+#include <QInputDialog>
 #include <iostream>
 
 using namespace std;
@@ -27,6 +26,10 @@ MainWindow::MainWindow(QWidget *parent)
 
     connectItems();
     setIconSize(QSize(35, 35));
+
+
+    dialogNoKeyError("Encrypt");
+
 }
 
 // destructor
@@ -60,16 +63,16 @@ void MainWindow::connectItems() {
 // slots
 void MainWindow::on_m_encryptBtn_clicked()
 {
-    m_cipher->isKeyLoaded() ?
-        m_cipher->encrypt() :
-        KMessage(this).show("Cannot ecnrypt - No key has not been loaded! \n Please load key or generate one and retry.", ":/assets/error.png");
+//    m_cipher->isKeyLoaded() ?
+//        m_cipher->encrypt() :
+//        KMessage(this).show("Cannot ecnrypt - No key has not been loaded! \n Please load key or generate one and retry.", ":/assets/error.png");
         //m_message->show( "Cannot ecnrypt - No key has not been loaded! \n Please load key or generate one and retry.", ":/assets/error.png");
 }
 void MainWindow::on_m_decryptBtn_clicked()
 {
-    m_cipher->isKeyLoaded() ?
-        m_cipher->decrypt() :
-        KMessage(this).show("Cannot decrypt - No key has not been loaded! \n Please load key or generate one and retry.", ":/assets/error.png");
+//    m_cipher->isKeyLoaded() ?
+//        m_cipher->decrypt() :
+//        KMessage(this).show("Cannot decrypt - No key has not been loaded! \n Please load key or generate one and retry.", ":/assets/error.png");
         //m_message->show( "Cannot decrypt - No key has not been loaded! \n Please load key or generate one and retry.", ":/assets/error.png");
 }
 void MainWindow::on_m_encryptSelectFBtn_clicked()
@@ -96,16 +99,8 @@ void MainWindow::on_m_keyMGenerateBtn_clicked()
                 encoderBase64.MessageEnd();
             }
             else {
-                KChoice* choice = new KChoice(this);
-                choice->setMessage("File already exists!\nWhat do you want to do?");
-                choice->setBtnAcceptText("Rename file");
-                choice->setBtnRejectText("Change directory");
-                choice->addButton("Override file");
-                choice->setIcon(":/assets/warning.png");
 
-                choice->exec();
-
-
+                dialogFileExists();
 
             }
         }
@@ -177,6 +172,74 @@ void MainWindow::setKey(const int keyLength) {
 
 bool MainWindow::isFileExist(std::string filename) {
     return std::fstream(filename).good();
+}
+void MainWindow::dialogFileExists() {
+
+    QMessageBox msg(this);
+    QPushButton* changeDirectory =  msg.addButton("Change directory", QMessageBox::AcceptRole);
+    QPushButton* override =  msg.addButton("Override file", QMessageBox::ActionRole);
+    QPushButton* rename =  msg.addButton("Rename file", QMessageBox::ActionRole);
+    QPushButton* cancel =  msg.addButton("cancel", QMessageBox::RejectRole);
+
+    cancel->setVisible(false);
+    msg.setWindowTitle("xKrypt - Warning");
+    msg.setWindowIcon(QIcon(QPixmap(":/assets/warning.ico")));
+    msg.setText("<td><img src=:/assets/warning.png width=50 height=50/></td><td valign=middle>File already exists! What yoy want to do?</td>");
+    msg.setDefaultButton(changeDirectory);
+    msg.setEscapeButton(cancel);
+    msg.setModal(true);
+    msg.exec();
+
+    if(msg.clickedButton() == changeDirectory) {
+
+    }
+    else if(msg.clickedButton() == override) {
+
+    }
+    else if(msg.clickedButton() == rename) {
+        dialogRenameFile();
+    }
+    else if(msg.clickedButton() == cancel) {
+
+    }
+
+}
+void MainWindow::dialogRenameFile() {
+    QInputDialog input(this);
+    input.setWindowTitle("xKrypt - insert");
+    input.setWindowIcon(QIcon(QPixmap(":/assets/file.ico")));
+    input.setLabelText("<td><img src=:/assets/file.png width=50 height=50/></td><td valign=middle>Please insert filename</td>");
+    input.setFixedSize(500, 200);
+    input.setTextValue("aes_2.key");
+    input.setModal(true);
+    input.exec();
+}
+void MainWindow::dialogError(const std::string& message) {
+    string text = "<td><img src=:/assets/error.png width=50 height=50/></td><td valign=middle>" + message + "</td>";
+    QMessageBox msg(this);
+    QPushButton* ok =  msg.addButton("Ok", QMessageBox::AcceptRole);
+
+    msg.setWindowTitle("xKrypt - Error");
+    msg.setWindowIcon(QIcon(QPixmap(":/assets/error.ico")));
+    msg.setText(QString::fromStdString(text));
+    msg.setDefaultButton(ok);
+    msg.setEscapeButton(ok);
+    msg.setModal(true);
+    msg.exec();
+}
+void MainWindow::dialogNoKeyError(const std::string& action) {
+    string text = "<td><img src=:/assets/error.png width=50 height=50/></td><td valign=middle> Cannot " + action + " - No key loaded!\nPlease generate or import key and retry.</td>";
+    QMessageBox msg(this);
+    QPushButton* ok =  msg.addButton("Ok", QMessageBox::AcceptRole);
+
+    msg.setWindowTitle("xKrypt - Error");
+    msg.setWindowIcon(QIcon(QPixmap(":/assets/error.ico")));
+    msg.setText(QString::fromStdString(text));
+    msg.setDefaultButton(ok);
+    msg.setEscapeButton(ok);
+    msg.setModal(true);
+    msg.exec();
+
 }
 
 
