@@ -20,5 +20,7 @@
         <file>assets/warning.ico</file>
         <file>assets/encrypt.ico</file>
         <file>assets/encrypt.png</file>
+        <file>assets/file.ico</file>
+        <file>assets/file.png</file>
     </qresource>
 </RCC>

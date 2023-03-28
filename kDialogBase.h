@@ -16,6 +16,7 @@
 
 class KDialogBase : public QDialog {
 protected:
+    // data members
     QLabel* m_message = new QLabel("No message set!");
     QPixmap* m_pixmap = new QPixmap();
     QLabel* m_messageIcon = new QLabel();
@@ -39,17 +40,22 @@ public :
     void setIcon(const std::string& iconPath);
     void show(const std::string& message, const std::string& iconPath);
 
+    // methods
+private :
+    void connectItems();
+
 protected:
     void hideBtnAccept();
     void hideBtnReject();
     void showBtnAccept();
     void showBtnReject();
+    void closeDialog();
 
-private:
-    void initLayouts();
-    void connectItems();
+public:
+    virtual QPushButton* addButton(const std::string& text);
+    virtual QPushButton* insertButton(const std::string& text, const int pos);
 
-protected slots:
+public slots:
     virtual void accept() = 0;
     virtual void reject() = 0;
 

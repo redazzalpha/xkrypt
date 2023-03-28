@@ -10,7 +10,7 @@
 #include "kActionEncrypt.h"
 #include "kActionDecrypt.h"
 #include "kActionQuit.h"
-#include "kMessage.h"
+//#include "kMessage.h"
 #include "rsaOeap.h"
 #include <QMainWindow>
 #include <QList>
@@ -26,7 +26,7 @@ class MainWindow : public QMainWindow {
 
 private:
     Ui::MainWindow *ui;
-    KMessage* m_message = new KMessage(this);
+    //KMessage* m_message = new KMessage(this);
 
     CipherBase* m_cipher = new AesGCM;
     QList<QString>* m_algorithms = new QList<QString> {
@@ -64,6 +64,8 @@ public:
 
 private:
     void connectItems();
+    bool isFileExist(std::string filename);
+
 
 private slots:
     void on_m_encryptBtn_clicked();

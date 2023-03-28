@@ -3,10 +3,8 @@
 
 #include "cipherBase.h"
 #include "osrng.h"
-#include "secblock.h"
 #include "hex.h"
 #include "files.h"
-#include <stdio.h>
 
 /**
  * CipherAes class represents Aes algorithms
@@ -35,9 +33,8 @@ public:
     virtual QString getModeName() const = 0;
     virtual void decrypt() = 0;
     virtual void encrypt() = 0;
-    virtual std::string generateKey(const bool saveOnfile) final;
-
-    bool isKeyLoaded() const;
+    virtual CryptoPP::SecByteBlock generateKey() final;
+    virtual bool isKeyLoaded() const final;
 };
 
 #endif // CIPHERAES_H

@@ -6,7 +6,6 @@ KDialogBase::KDialogBase(QWidget* parent): QDialog(parent) {
 
     setMinimumSize(300, 100);
     setModal(true);
-    initLayouts();
     connectItems();
 }
 
@@ -26,24 +25,6 @@ KDialogBase::~KDialogBase() {
 }
 
 // methods
-void KDialogBase::initLayouts() {
-
-    m_message->setAlignment(Qt::AlignCenter);
-
-    // message layout
-    m_msgLayout->setAlignment(Qt::AlignCenter);
-    m_msgLayout->addWidget(m_messageIcon ,0, Qt::AlignCenter);
-    m_msgLayout->addWidget(m_message, Qt::AlignCenter);
-
-    // buttons layout
-    m_btnLayout->setAlignment(Qt::AlignCenter);
-    m_btnLayout->addWidget(m_btnReject, 0, Qt::AlignCenter);
-    m_btnLayout->addWidget(m_btnAccept, 0, Qt::AlignCenter);
-
-    // main layout
-    m_mainLayout->addLayout(m_msgLayout);
-    m_mainLayout->addLayout(m_btnLayout);
-}
 void KDialogBase::connectItems() {
 
     QObject::connect(m_btnAccept, &QPushButton::clicked, this, &QDialog::accept);
@@ -86,3 +67,9 @@ void KDialogBase::showBtnReject() {
     m_btnReject->setVisible(true);
 }
 
+void KDialogBase::closeDialog() {
+    delete this;
+}
+
+QPushButton* KDialogBase::addButton(const std::string&) {return nullptr;}
+QPushButton* KDialogBase::insertButton(const std::string&, const int) {return nullptr;}

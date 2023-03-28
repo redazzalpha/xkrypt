@@ -1,5 +1,9 @@
 #include "mainwindow.h"
+#include "kChoice.h"
+#include "kMessage.h"
+#include "kInput.h"
 #include "./ui_mainwindow.h"
+#include "base64.h"
 #include <QToolButton>
 #include <QPushButton>
 #include <QLabel>
@@ -58,13 +62,15 @@ void MainWindow::on_m_encryptBtn_clicked()
 {
     m_cipher->isKeyLoaded() ?
         m_cipher->encrypt() :
-        m_message->show( "Cannot ecnrypt - No key has not been loaded! \n Please load key or generate one and retry.", ":/assets/error.png");
+        KMessage(this).show("Cannot ecnrypt - No key has not been loaded! \n Please load key or generate one and retry.", ":/assets/error.png");
+        //m_message->show( "Cannot ecnrypt - No key has not been loaded! \n Please load key or generate one and retry.", ":/assets/error.png");
 }
 void MainWindow::on_m_decryptBtn_clicked()
 {
     m_cipher->isKeyLoaded() ?
         m_cipher->decrypt() :
-        m_message->show( "Cannot decrypt - No key has not been loaded! \n Please load key or generate one and retry.", ":/assets/error.png");
+        KMessage(this).show("Cannot decrypt - No key has not been loaded! \n Please load key or generate one and retry.", ":/assets/error.png");
+        //m_message->show( "Cannot decrypt - No key has not been loaded! \n Please load key or generate one and retry.", ":/assets/error.png");
 }
 void MainWindow::on_m_encryptSelectFBtn_clicked()
 {
@@ -76,8 +82,43 @@ void MainWindow::on_m_decryptSelectFBtn_clicked()
 }
 void MainWindow::on_m_keyMGenerateBtn_clicked()
 {
-    string key = m_cipher->generateKey(ui->m_keyMCheckBox->isChecked());
-    ui->m_keyMKeyLoaded->setPlainText(QString::fromStdString(key));
+    SecByteBlock key = m_cipher->generateKey();
+
+    if(ui->m_keyMCheckBox->isChecked()) {
+        QString dir = QFileDialog::getExistingDirectory(nullptr, "Select saving directory", "");
+        if(!dir.isEmpty()) {
+            string fname = dir.toStdString() + "/aes.key";
+
+            if(!isFileExist(fname)) {
+                FileSink* fs = new FileSink(fname.c_str());
+                Base64Encoder encoderBase64(fs);
+                encoderBase64.Put(key, key.size());
+                encoderBase64.MessageEnd();
+            }
+            else {
+                KChoice* choice = new KChoice(this);
+                choice->setMessage("File already exists!\nWhat do you want to do?");
+                choice->setBtnAcceptText("Rename file");
+                choice->setBtnRejectText("Change directory");
+                choice->addButton("Override file");
+                choice->setIcon(":/assets/warning.png");
+
+                choice->exec();
+
+
+
+            }
+        }
+    }
+
+    stringstream ss;
+    FileSink* fs = new FileSink(ss);
+    Base64Encoder encoderBase64(fs);
+
+    encoderBase64.Put(key, key.size());
+    encoderBase64.MessageEnd();
+
+    ui->m_keyMKeyLoaded->setPlainText(QString::fromStdString(ss.str()));
     if(ui->m_keyMCheckBox->isChecked()) ui->m_keyMCheckBox->setChecked(false);
 }
 void MainWindow::on_m_keyMImportBtn_clicked()
@@ -134,6 +175,9 @@ void MainWindow::setKey(const int keyLength) {
 
 }
 
+bool MainWindow::isFileExist(std::string filename) {
+    return std::fstream(filename).good();
+}
 
 
 

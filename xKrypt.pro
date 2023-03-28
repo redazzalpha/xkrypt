@@ -22,7 +22,9 @@ SOURCES += \
     kActionKeyMgr.cpp \
     kActionPage.cpp \
     kActionQuit.cpp \
+    kChoice.cpp \
     kDialogBase.cpp \
+    kInput.cpp \
     kMessage.cpp \
     main.cpp \
     mainwindow.cpp \
@@ -45,7 +47,9 @@ HEADERS += \
     kActionKeyMgr.h \
     kActionPage.h \
     kActionQuit.h \
+    kChoice.h \
     kDialogBase.h \
+    kInput.h \
     kMessage.h \
     mainwindow.h \
     rsaOeap.h \

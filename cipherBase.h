@@ -1,6 +1,7 @@
 #ifndef CIPHERBASE_H
 #define CIPHERBASE_H
 
+#include "secblock.h"
 #include <iostream>
 #include <QObject>
 #include <QString>
@@ -25,9 +26,11 @@ public:
     virtual QString getModeName() const = 0;
     virtual void decrypt() = 0;
     virtual void encrypt() = 0;
-    virtual std::string generateKey(const bool saveOnfile) = 0;
-
+    virtual CryptoPP::SecByteBlock generateKey() = 0;
     virtual bool isKeyLoaded() const;
+
+
+
 
 
 

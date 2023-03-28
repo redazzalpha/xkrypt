@@ -16,6 +16,7 @@
 
 class KMessage : public KDialogBase {
 private:
+    // data members
     void setBtnRejectText(const std::string& text);
 
 public :
@@ -25,8 +26,11 @@ public :
     // destructor
     virtual ~KMessage();
 
+    // methods
+private:
+    void initLayouts();
 
-protected slots:
+public slots:
     virtual void accept() override;
     virtual void reject() override;
 };

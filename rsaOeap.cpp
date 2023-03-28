@@ -1,5 +1,6 @@
 #include "rsaOeap.h"
 
+using namespace CryptoPP;
 using namespace std;
 
 const QString RsaOEAP::ModeName = "ES-OAEP-SHA";
@@ -16,11 +17,12 @@ QString RsaOEAP::getModeName() const {
 }
 void RsaOEAP::decrypt(){std::cout << "cipher Aes decrypt" << std::endl;}
 void RsaOEAP::encrypt(){std::cout << "cipher Aes encrypt" << std::endl;}
-string RsaOEAP::generateKey(const bool saveOnfile){
-    std::cout << "cipher rsa - oeap generate key" << std::endl;
-    return "";
-}
 
+CryptoPP::SecByteBlock RsaOEAP::generateKey() {
+    CryptoPP::SecByteBlock m_key;
+    return m_key;
+
+}
 
 
 

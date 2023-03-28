@@ -3,6 +3,7 @@
 
 #include "cipherRsa.h"
 
+
 class RsaOEAP : public CipherRsa {
 public:
     static const QString ModeName;
@@ -14,10 +15,10 @@ public:
     virtual ~RsaOEAP();
 
     // methods
+    virtual QString getModeName() const override;
     virtual void decrypt() override;
     virtual void encrypt() override;
-    virtual std::string generateKey(const bool saveOnfile) override;
-    virtual QString getModeName() const override;
+    virtual CryptoPP::SecByteBlock generateKey() override;
 };
 
 #endif // RSAOEAP_H
