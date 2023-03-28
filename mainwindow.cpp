@@ -26,10 +26,6 @@ MainWindow::MainWindow(QWidget *parent)
 
     connectItems();
     setIconSize(QSize(35, 35));
-
-
-    dialogNoKeyError("Encrypt");
-
 }
 
 // destructor
@@ -88,21 +84,23 @@ void MainWindow::on_m_keyMGenerateBtn_clicked()
     SecByteBlock key = m_cipher->generateKey();
 
     if(ui->m_keyMCheckBox->isChecked()) {
-        QString dir = QFileDialog::getExistingDirectory(nullptr, "Select saving directory", "");
-        if(!dir.isEmpty()) {
-            string fname = dir.toStdString() + "/aes.key";
+        bool loop = true, override = false;
+        QString dir;
+        while(loop) {
+            if(!override) dir = QFileDialog::getExistingDirectory(nullptr, "Select saving directory", "");
+            if(!dir.isEmpty()) {
+                string fname = dir.toStdString() + "/aes.key";
 
-            if(!isFileExist(fname)) {
-                FileSink* fs = new FileSink(fname.c_str());
-                Base64Encoder encoderBase64(fs);
-                encoderBase64.Put(key, key.size());
-                encoderBase64.MessageEnd();
+                if(!isFileExist(fname) || override) {
+                    FileSink* fs = new FileSink(fname.c_str());
+                    Base64Encoder encoderBase64(fs);
+                    encoderBase64.Put(key, key.size());
+                    encoderBase64.MessageEnd();
+                    break;
+                }
+                else dialogFileExists(loop, override);
             }
-            else {
-
-                dialogFileExists();
-
-            }
+            else loop = false;
         }
     }
 
@@ -173,7 +171,7 @@ void MainWindow::setKey(const int keyLength) {
 bool MainWindow::isFileExist(std::string filename) {
     return std::fstream(filename).good();
 }
-void MainWindow::dialogFileExists() {
+void MainWindow::dialogFileExists(bool& loop, bool& overrides) {
 
     QMessageBox msg(this);
     QPushButton* changeDirectory =  msg.addButton("Change directory", QMessageBox::AcceptRole);
@@ -191,18 +189,17 @@ void MainWindow::dialogFileExists() {
     msg.exec();
 
     if(msg.clickedButton() == changeDirectory) {
-
+        return;
     }
     else if(msg.clickedButton() == override) {
-
+        overrides = true;
     }
     else if(msg.clickedButton() == rename) {
         dialogRenameFile();
     }
     else if(msg.clickedButton() == cancel) {
-
+        loop = false;
     }
-
 }
 void MainWindow::dialogRenameFile() {
     QInputDialog input(this);

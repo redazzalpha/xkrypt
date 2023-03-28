@@ -66,7 +66,7 @@ private:
     void connectItems();
     bool isFileExist(std::string filename);
 
-    void dialogFileExists();
+    void dialogFileExists(bool& loop, bool& overrides);
     void dialogRenameFile();
     void dialogError(const std::string& message);
     void dialogNoKeyError(const std::string& action);
