@@ -26,8 +26,9 @@ MainWindow::MainWindow(QWidget *parent)
 
     connectItems();
     setIconSize(QSize(35, 35));
-}
 
+
+}
 // destructor
 MainWindow::~MainWindow()
 {
@@ -85,21 +86,22 @@ void MainWindow::on_m_keyMGenerateBtn_clicked()
     m_genLoop = true;
     m_genOverride = false;
     m_dir = "";
+    m_fname = "";
 
     if(ui->m_keyMCheckBox->isChecked()) {
         while(m_genLoop) {
             if(!m_genOverride) m_dir = QFileDialog::getExistingDirectory(nullptr, "Select saving directory", "");
             if(!m_dir.isEmpty()) {
-                string fname = m_dir.toStdString() + "/aes.key";
-
-                if(!isFileExist(fname) || m_genOverride) {
-                    FileSink* fs = new FileSink(fname.c_str());
+                dialogInsertFilename("Please insert filename");
+                if((!isFileExist(m_fname) || m_genOverride) && !m_fname.empty()) {
+                    FileSink* fs = new FileSink(m_fname.c_str());
                     Base64Encoder encoderBase64(fs);
                     encoderBase64.Put(key, key.size());
                     encoderBase64.MessageEnd();
                     break;
                 }
-                else dialogFileExists();
+                else if(m_fname.empty()) break;
+                else dialogFileExists("File already exists! What you want to do?");
             }
             else m_genLoop = false;
         }
@@ -166,14 +168,13 @@ void MainWindow::setKey(const int keyLength) {
         break;
     default: break;
     }
-
 }
 
 bool MainWindow::isFileExist(std::string filename) {
     return std::fstream(filename).good();
 }
-void MainWindow::dialogFileExists() {
-
+void MainWindow::dialogFileExists(const string& message) {
+    string text = "<td><img src=:/assets/warning.png width=50 height=50/></td><td valign=middle>" + message + "</td>";
     QMessageBox msg(this);
     QPushButton* changeDirectory =  msg.addButton("Change directory", QMessageBox::AcceptRole);
     QPushButton* override =  msg.addButton("Override file", QMessageBox::ActionRole);
@@ -183,7 +184,7 @@ void MainWindow::dialogFileExists() {
     cancel->setVisible(false);
     msg.setWindowTitle("xKrypt - Warning");
     msg.setWindowIcon(QIcon(QPixmap(":/assets/warning.ico")));
-    msg.setText("<td><img src=:/assets/warning.png width=50 height=50/></td><td valign=middle>File already exists! What you want to do?</td>");
+    msg.setText(QString::fromStdString(text));
     msg.setDefaultButton(changeDirectory);
     msg.setEscapeButton(cancel);
     msg.setModal(true);
@@ -197,48 +198,25 @@ void MainWindow::dialogFileExists() {
         dialogWarning("Are you sure you want to override file?");
     }
     else if(msg.clickedButton() == rename) {
-        dialogRenameFile();
+        dialogInsertFilename("Please insert filename");
     }
     else if(msg.clickedButton() == cancel) {
         m_genLoop = false;
     }
 }
-void MainWindow::dialogRenameFile() {
+void MainWindow::dialogInsertFilename(const string& message) {
+    string text = "<td><img src=:/assets/file.png width=50 height=50/></td><td valign=middle>" + message + "</td>";
     QInputDialog input(this);
+    m_fname = "";
+
     input.setWindowTitle("xKrypt - insert");
     input.setWindowIcon(QIcon(QPixmap(":/assets/file.ico")));
-    input.setLabelText("<td><img src=:/assets/file.png width=50 height=50/></td><td valign=middle>Please insert filename</td>");
+    input.setLabelText(QString::fromStdString(text));
     input.setFixedSize(500, 200);
-    input.setTextValue("aes_2.key");
     input.setModal(true);
-    input.exec();
-}
-void MainWindow::dialogError(const std::string& message) {
-    string text = "<td><img src=:/assets/error.png width=50 height=50/></td><td valign=middle>" + message + "</td>";
-    QMessageBox msg(this);
-    QPushButton* ok =  msg.addButton("Ok", QMessageBox::AcceptRole);
-
-    msg.setWindowTitle("xKrypt - Error");
-    msg.setWindowIcon(QIcon(QPixmap(":/assets/error.ico")));
-    msg.setText(QString::fromStdString(text));
-    msg.setDefaultButton(ok);
-    msg.setEscapeButton(ok);
-    msg.setModal(true);
-    msg.exec();
-}
-void MainWindow::dialogNoKeyError(const std::string& action) {
-    string text = "<td><img src=:/assets/error.png width=50 height=50/></td><td valign=middle> Cannot " + action + " - No key loaded!\nPlease generate or import key and retry.</td>";
-    QMessageBox msg(this);
-    QPushButton* ok =  msg.addButton("Ok", QMessageBox::AcceptRole);
-
-    msg.setWindowTitle("xKrypt - Error");
-    msg.setWindowIcon(QIcon(QPixmap(":/assets/error.ico")));
-    msg.setText(QString::fromStdString(text));
-    msg.setDefaultButton(ok);
-    msg.setEscapeButton(ok);
-    msg.setModal(true);
-    msg.exec();
-
+    if(input.exec()) {
+        m_fname = m_dir.toStdString() + "/" + input.textValue().toStdString();
+    }
 }
 void MainWindow::dialogWarning(const string& message) {
     string text = "<td><img src=:/assets/warning.png width=50 height=50/></td><td valign=middle>" + message +  "</td>";
@@ -259,6 +237,34 @@ void MainWindow::dialogWarning(const string& message) {
         m_genOverride = false;
         m_genLoop = false;
     }
+}
+void MainWindow::dialogError(const string& message) {
+    string text = "<td><img src=:/assets/error.png width=50 height=50/></td><td valign=middle>" + message + "</td>";
+    QMessageBox msg(this);
+    QPushButton* ok =  msg.addButton("Ok", QMessageBox::AcceptRole);
+
+    msg.setWindowTitle("xKrypt - Error");
+    msg.setWindowIcon(QIcon(QPixmap(":/assets/error.ico")));
+    msg.setText(QString::fromStdString(text));
+    msg.setDefaultButton(ok);
+    msg.setEscapeButton(ok);
+    msg.setModal(true);
+    msg.exec();
+}
+void MainWindow::dialogNoKeyError(const string& message) {
+    // Cannot [encrypt | decrypt] - No key loaded!\nPlease generate or import key and retry.
+    string text = "<td><img src=:/assets/error.png width=50 height=50/></td><td valign=middle>" + message + "</td>";
+    QMessageBox msg(this);
+    QPushButton* ok =  msg.addButton("Ok", QMessageBox::AcceptRole);
+
+    msg.setWindowTitle("xKrypt - Error");
+    msg.setWindowIcon(QIcon(QPixmap(":/assets/error.ico")));
+    msg.setText(QString::fromStdString(text));
+    msg.setDefaultButton(ok);
+    msg.setEscapeButton(ok);
+    msg.setModal(true);
+    msg.exec();
+
 }
 
 

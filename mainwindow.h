@@ -28,6 +28,7 @@ private:
     Ui::MainWindow *ui;
     bool m_genLoop = true;
     bool m_genOverride = false;
+    std::string m_fname = "aes.key";
     QString m_dir;
 
     CipherBase* m_cipher = new AesGCM;
@@ -68,11 +69,11 @@ private:
     void connectItems();
     bool isFileExist(std::string filename);
 
-    void dialogFileExists();
-    void dialogRenameFile();
+    void dialogFileExists(const std::string& message);
+    void dialogInsertFilename(const std::string& message);
     void dialogWarning(const std::string& message);
     void dialogError(const std::string& message);
-    void dialogNoKeyError(const std::string& action);
+    void dialogNoKeyError(const std::string& message);
 
 
 private slots:
