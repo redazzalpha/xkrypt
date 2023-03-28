@@ -84,13 +84,13 @@ void MainWindow::on_m_keyMGenerateBtn_clicked()
     SecByteBlock key = m_cipher->generateKey();
     m_genLoop = true;
     m_genOverride = false;
+    m_dir = "";
 
     if(ui->m_keyMCheckBox->isChecked()) {
-        QString dir;
         while(m_genLoop) {
-            if(!m_genOverride) dir = QFileDialog::getExistingDirectory(nullptr, "Select saving directory", "");
-            if(!dir.isEmpty()) {
-                string fname = dir.toStdString() + "/aes.key";
+            if(!m_genOverride) m_dir = QFileDialog::getExistingDirectory(nullptr, "Select saving directory", "");
+            if(!m_dir.isEmpty()) {
+                string fname = m_dir.toStdString() + "/aes.key";
 
                 if(!isFileExist(fname) || m_genOverride) {
                     FileSink* fs = new FileSink(fname.c_str());
@@ -254,11 +254,11 @@ void MainWindow::dialogWarning(const string& message) {
     msg.setModal(true);
     msg.exec();
 
-    if(msg.clickedButton() == ok)
-        m_genOverride = true;
-    else if (msg.clickedButton() == cancel)
+    if(msg.clickedButton() == ok) m_genOverride = true;
+    else if (msg.clickedButton() == cancel) {
         m_genOverride = false;
-
+        m_genLoop = false;
+    }
 }
 
 
