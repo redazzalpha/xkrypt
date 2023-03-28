@@ -82,25 +82,26 @@ void MainWindow::on_m_decryptSelectFBtn_clicked()
 void MainWindow::on_m_keyMGenerateBtn_clicked()
 {
     SecByteBlock key = m_cipher->generateKey();
+    m_genLoop = true;
+    m_genOverride = false;
 
     if(ui->m_keyMCheckBox->isChecked()) {
-        bool loop = true, override = false;
         QString dir;
-        while(loop) {
-            if(!override) dir = QFileDialog::getExistingDirectory(nullptr, "Select saving directory", "");
+        while(m_genLoop) {
+            if(!m_genOverride) dir = QFileDialog::getExistingDirectory(nullptr, "Select saving directory", "");
             if(!dir.isEmpty()) {
                 string fname = dir.toStdString() + "/aes.key";
 
-                if(!isFileExist(fname) || override) {
+                if(!isFileExist(fname) || m_genOverride) {
                     FileSink* fs = new FileSink(fname.c_str());
                     Base64Encoder encoderBase64(fs);
                     encoderBase64.Put(key, key.size());
                     encoderBase64.MessageEnd();
                     break;
                 }
-                else dialogFileExists(loop, override);
+                else dialogFileExists();
             }
-            else loop = false;
+            else m_genLoop = false;
         }
     }
 
@@ -171,7 +172,7 @@ void MainWindow::setKey(const int keyLength) {
 bool MainWindow::isFileExist(std::string filename) {
     return std::fstream(filename).good();
 }
-void MainWindow::dialogFileExists(bool& loop, bool& overrides) {
+void MainWindow::dialogFileExists() {
 
     QMessageBox msg(this);
     QPushButton* changeDirectory =  msg.addButton("Change directory", QMessageBox::AcceptRole);
@@ -182,7 +183,7 @@ void MainWindow::dialogFileExists(bool& loop, bool& overrides) {
     cancel->setVisible(false);
     msg.setWindowTitle("xKrypt - Warning");
     msg.setWindowIcon(QIcon(QPixmap(":/assets/warning.ico")));
-    msg.setText("<td><img src=:/assets/warning.png width=50 height=50/></td><td valign=middle>File already exists! What yoy want to do?</td>");
+    msg.setText("<td><img src=:/assets/warning.png width=50 height=50/></td><td valign=middle>File already exists! What you want to do?</td>");
     msg.setDefaultButton(changeDirectory);
     msg.setEscapeButton(cancel);
     msg.setModal(true);
@@ -192,13 +193,14 @@ void MainWindow::dialogFileExists(bool& loop, bool& overrides) {
         return;
     }
     else if(msg.clickedButton() == override) {
-        overrides = true;
+        m_genOverride = true;
+        dialogWarning("Are you sure you want to override file?");
     }
     else if(msg.clickedButton() == rename) {
         dialogRenameFile();
     }
     else if(msg.clickedButton() == cancel) {
-        loop = false;
+        m_genLoop = false;
     }
 }
 void MainWindow::dialogRenameFile() {
@@ -238,6 +240,25 @@ void MainWindow::dialogNoKeyError(const std::string& action) {
     msg.exec();
 
 }
+void MainWindow::dialogWarning(const string& message) {
+    string text = "<td><img src=:/assets/warning.png width=50 height=50/></td><td valign=middle>" + message +  "</td>";
+    QMessageBox msg(this);
+    QPushButton* ok =  msg.addButton("Ok", QMessageBox::AcceptRole);
+    QPushButton* cancel =  msg.addButton("Cancel", QMessageBox::RejectRole);
 
+    msg.setWindowTitle("xKrypt - Warning");
+    msg.setWindowIcon(QIcon(QPixmap(":/assets/warning.ico")));
+    msg.setText(QString::fromStdString(text));
+    msg.setDefaultButton(cancel);
+    msg.setEscapeButton(cancel);
+    msg.setModal(true);
+    msg.exec();
+
+    if(msg.clickedButton() == ok)
+        m_genOverride = true;
+    else if (msg.clickedButton() == cancel)
+        m_genOverride = false;
+
+}
 
 

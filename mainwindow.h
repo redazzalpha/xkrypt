@@ -26,7 +26,9 @@ class MainWindow : public QMainWindow {
 
 private:
     Ui::MainWindow *ui;
-    //KMessage* m_message = new KMessage(this);
+    bool m_genLoop = true;
+    bool m_genOverride = false;
+    QString m_dir;
 
     CipherBase* m_cipher = new AesGCM;
     QList<QString>* m_algorithms = new QList<QString> {
@@ -66,8 +68,9 @@ private:
     void connectItems();
     bool isFileExist(std::string filename);
 
-    void dialogFileExists(bool& loop, bool& overrides);
+    void dialogFileExists();
     void dialogRenameFile();
+    void dialogWarning(const std::string& message);
     void dialogError(const std::string& message);
     void dialogNoKeyError(const std::string& action);
 
