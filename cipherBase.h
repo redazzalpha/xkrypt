@@ -28,12 +28,7 @@ public:
     virtual void encrypt() = 0;
     virtual CryptoPP::SecByteBlock generateKey() = 0;
     virtual bool isKeyLoaded() const;
-
-
-
-
-
-
+    virtual void flushKey();
 };
 
 #endif // CIPHERBASE_H

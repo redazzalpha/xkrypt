@@ -70,12 +70,14 @@ public:
 private:
     void connectItems();
     bool isFileExist(std::string filename);
+    void saveOnFile(CryptoPP::SecByteBlock key);
 
     QMessageBox::ButtonRole dialogFileExists(const std::string& message);
     bool dialogInsertFilename(const std::string& message);
     bool dialogConfirm(const std::string& message);
+    void dialogSuccessMessage(const std::string& message);
     void dialogErrorMessage(const std::string& message);
-    void dialogNoKeyMessage(const std::string& message);
+    void dialogNoKeyMessage(const std::string& action);
 
     void writeKeyBinary(CryptoPP::SecByteBlock key);
     void writeKeyHex(CryptoPP::SecByteBlock key);
@@ -95,5 +97,8 @@ private slots:
     void setAlgorithm(const QString& alg);
     void setMode(const QString& mode);
     void setKey(const int keyLength);
+    void showKey(bool isChecked);
+    void colorKey();
+    void flushKey();
 };
 #endif // MAINWINDOW_H

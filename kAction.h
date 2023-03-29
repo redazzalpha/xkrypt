@@ -12,7 +12,7 @@ public:
     virtual ~KAction();
 
 public slots:
-    virtual void onActionClick() = 0;
+    virtual void onActionClick() override = 0;
 };
 
 #endif // KACTION_H

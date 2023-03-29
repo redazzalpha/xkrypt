@@ -21,10 +21,10 @@ public:
 
     // methods
     virtual QString getAlgName() const final;
-    virtual QString getModeName() const = 0;
-    virtual void decrypt() = 0;
-    virtual void encrypt() = 0;
-    virtual CryptoPP::SecByteBlock generateKey() = 0;
+    virtual QString getModeName() const override = 0;
+    virtual void decrypt() override = 0;
+    virtual void encrypt() override = 0;
+    virtual CryptoPP::SecByteBlock generateKey() override = 0;
 };
 
 #endif // CIPHERRSA_H

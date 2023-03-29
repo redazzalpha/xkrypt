@@ -14,3 +14,4 @@ bool CipherBase::isKeyLoaded() const {
     // inherited classes that don't redefine
     return true;
 }
+void CipherBase::flushKey() {}

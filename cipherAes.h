@@ -18,6 +18,7 @@ protected:
     CryptoPP::SecByteBlock m_key;
     CryptoPP::SecByteBlock m_iv = CryptoPP::SecByteBlock(CryptoPP::AES::BLOCKSIZE);
     CryptoPP::HexEncoder m_encoder = CryptoPP::HexEncoder(new CryptoPP::FileSink(std::cout));
+    int m_keyLength = 0;
 
 public:
     static const QString AlgName;
@@ -29,12 +30,15 @@ public:
     virtual ~CipherAes();
 
     // methods
-    virtual QString getAlgName() const final;
-    virtual QString getModeName() const = 0;
-    virtual void decrypt() = 0;
-    virtual void encrypt() = 0;
     virtual CryptoPP::SecByteBlock generateKey() final;
+    virtual QString getAlgName() const final;
+    virtual QString getModeName() const override = 0 ;
+    virtual void decrypt() override = 0;
+    virtual void encrypt() override = 0;
     virtual bool isKeyLoaded() const final;
+    virtual void flushKey() override;
+
+
 };
 
 #endif // CIPHERAES_H

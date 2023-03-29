@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
 #include "base64.h"
+#include "defines.h"
 #include <QToolButton>
 #include <QPushButton>
 #include <QLabel>
@@ -47,6 +48,15 @@ void MainWindow::connectItems() {
     QObject::connect(ui->m_keyMModes, &QComboBox::textActivated, this, &MainWindow::setMode);
     QObject::connect(ui->m_keyMKeys, &QComboBox::activated, this, &MainWindow::setKey);
 
+    // connect checkboxes
+    QObject::connect(ui->m_keyMshowKey, &QCheckBox::clicked, this, &MainWindow::showKey);
+
+    // connect buttons
+    QObject::connect(ui->m_keyMFlushBtn, &QPushButton::clicked, this, &MainWindow::flushKey);
+
+    // connect plain texts
+    QObject::connect(ui->m_keyMKeyLoaded, &QPlainTextEdit::textChanged, this, &MainWindow::colorKey);
+
     // connect actions
     foreach (KActionBase* action, m_actions) {
         ui->m_toolBar->addAction(action);
@@ -55,22 +65,48 @@ void MainWindow::connectItems() {
         QObject::connect(action, &KActionBase::setStackPage, ui->m_mainStack, &QStackedWidget::setCurrentIndex);
     }
 }
-bool MainWindow::isFileExist(std::string filename) {
+bool MainWindow::isFileExist(string filename) {
     return std::fstream(filename).good();
 }
+void MainWindow::saveOnFile(SecByteBlock key) {
+    m_override = false;
+    m_create = false;
+    m_changeDirectory = false;
+    m_dir = "";
+    m_fname = "";
 
+    while(true) {
+        if(!m_override && !m_create) m_dir = QFileDialog::getExistingDirectory(nullptr, "Select saving directory", "");
+        if(!m_dir.isEmpty()) {
+            bool canWrite = true;
+            if(!m_override && !m_create && !m_changeDirectory) canWrite = dialogInsertFilename("Please insert filename");
+            if(canWrite) {
+                string dir = m_dir.toStdString() +  "/" + m_fname;
+                if(!isFileExist(dir) || m_override) {
+                    m_dir =  QString::fromStdString(dir);
+                    writeKeyBase64(key);
+                    break;
+                }
+                else {
+                    QMessageBox::ButtonRole role = dialogFileExists("File already exists! What you want to do?");
+                    if(role == QMessageBox::AcceptRole)  { m_changeDirectory = true; continue; }
+                    if(role == QMessageBox::ApplyRole) { m_override = true; continue; }
+                    if(role == QMessageBox::ActionRole) { m_create = true; continue; }
+                    if(role == QMessageBox::RejectRole) break;
+                }
+            }
+            else break;
+        }
+        else break;
+    }
+}
 QMessageBox::ButtonRole MainWindow::dialogFileExists(const string& message) {
     string text = "<td><img src=:/assets/warning.png width=50 height=50/></td><td valign=middle>" + message + "</td>";
     QMessageBox msg(this);
     QPushButton* changeDirectory =  msg.addButton("Change directory", QMessageBox::AcceptRole);
     QPushButton* override =  msg.addButton("Override file", QMessageBox::ApplyRole);
-<<<<<<< HEAD
-    QPushButton* rename =  msg.addButton("Rename file", QMessageBox::ActionRole);
-    QPushButton* cancel =  msg.addButton("cancel", QMessageBox::RejectRole);
-=======
     QPushButton* create =  msg.addButton("Create file", QMessageBox::ActionRole);
     QPushButton* cancel =  msg.addButton("Cancel", QMessageBox::RejectRole);
->>>>>>> slave
 
     cancel->setVisible(false);
     msg.setWindowTitle("xKrypt - Warning");
@@ -84,12 +120,8 @@ QMessageBox::ButtonRole MainWindow::dialogFileExists(const string& message) {
     if(msg.clickedButton() == changeDirectory)
         return QMessageBox::AcceptRole;
     else if(msg.clickedButton() == override)
-        return dialogConfirm("Are you sure you want to override file?")? QMessageBox::ApplyRole : QMessageBox::RejectRole;
-<<<<<<< HEAD
-    else if(msg.clickedButton() == rename)
-=======
+        return dialogConfirm("Are you sure you want to override file?<br />This operation cannot be undone!")? QMessageBox::ApplyRole : QMessageBox::RejectRole;
     else if(msg.clickedButton() == create)
->>>>>>> slave
         return dialogInsertFilename("Please insert filename")? QMessageBox::ActionRole: QMessageBox::RejectRole;
     else if(msg.clickedButton() == cancel)
         return QMessageBox::RejectRole;
@@ -132,6 +164,19 @@ bool MainWindow::dialogConfirm(const string& message) {
 
     return isConfirmed;
 }
+void MainWindow::dialogSuccessMessage(const string& message) {
+    string text = "<td><img src=:/assets/success.png width=50 height=50/></td><td valign=middle>" + message + "</td>";
+    QMessageBox msg(this);
+    QPushButton* ok =  msg.addButton("Ok", QMessageBox::AcceptRole);
+
+    msg.setWindowTitle("xKrypt - Success");
+    msg.setWindowIcon(QIcon(QPixmap(":/assets/error.ico")));
+    msg.setText(QString::fromStdString(text));
+    msg.setDefaultButton(ok);
+    msg.setEscapeButton(ok);
+    msg.setModal(true);
+    msg.exec();
+}
 void MainWindow::dialogErrorMessage(const string& message) {
     string text = "<td><img src=:/assets/error.png width=50 height=50/></td><td valign=middle>" + message + "</td>";
     QMessageBox msg(this);
@@ -145,9 +190,8 @@ void MainWindow::dialogErrorMessage(const string& message) {
     msg.setModal(true);
     msg.exec();
 }
-void MainWindow::dialogNoKeyMessage(const string& message) {
-    // Cannot [encrypt | decrypt] - No key loaded!\nPlease generate or import key and retry.
-    string text = "<td><img src=:/assets/error.png width=50 height=50/></td><td valign=middle>" + message + "</td>";
+void MainWindow::dialogNoKeyMessage(const string& action) {
+    string text = "<td><img src=:/assets/error.png width=50 height=50/></td><td valign=middle>Cannot " + action + " - No key loaded!<br />Please generate or import key and retry</td>";
     QMessageBox msg(this);
     QPushButton* ok =  msg.addButton("Ok", QMessageBox::AcceptRole);
 
@@ -200,17 +244,15 @@ string MainWindow::keyToHex(SecByteBlock key) {
 // slots
 void MainWindow::on_m_encryptBtn_clicked()
 {
-//    m_cipher->isKeyLoaded() ?
-//        m_cipher->encrypt() :
-//        KMessage(this).show("Cannot ecnrypt - No key has not been loaded! \n Please load key or generate one and retry.", ":/assets/error.png");
-        //m_message->show( "Cannot ecnrypt - No key has not been loaded! \n Please load key or generate one and retry.", ":/assets/error.png");
+    m_cipher->isKeyLoaded()?
+        m_cipher->encrypt():
+        dialogNoKeyMessage("encrypt");
 }
 void MainWindow::on_m_decryptBtn_clicked()
 {
-//    m_cipher->isKeyLoaded() ?
-//        m_cipher->decrypt() :
-//        KMessage(this).show("Cannot decrypt - No key has not been loaded! \n Please load key or generate one and retry.", ":/assets/error.png");
-        //m_message->show( "Cannot decrypt - No key has not been loaded! \n Please load key or generate one and retry.", ":/assets/error.png");
+    m_cipher->isKeyLoaded()?
+        m_cipher->decrypt():
+        dialogNoKeyMessage("decrypt");
 }
 void MainWindow::on_m_encryptSelectFBtn_clicked()
 {
@@ -223,46 +265,14 @@ void MainWindow::on_m_decryptSelectFBtn_clicked()
 void MainWindow::on_m_keyMGenerateBtn_clicked()
 {
     SecByteBlock key = m_cipher->generateKey();
-    m_override = false;
-    m_create = false;
-    m_changeDirectory = false;
-    m_dir = "";
-    m_fname = "";
 
-    // save key on file
-    if(ui->m_keyMSaveOnF->isChecked()) {
-        while(true) {
-            if(!m_override && !m_create) m_dir = QFileDialog::getExistingDirectory(nullptr, "Select saving directory", "");
-            if(!m_dir.isEmpty()) {
-                bool canWrite = true;
-                if(!m_override && !m_create && !m_changeDirectory) canWrite = dialogInsertFilename("Please insert filename");
-                if(canWrite) {
-                    string dir = m_dir.toStdString() +  "/" + m_fname;
-                    if(!isFileExist(dir) || m_override) {
-                        m_dir =  QString::fromStdString(dir);
-                        writeKeyBase64(key);
-                        break;
-                    }
-                    else {
-                        QMessageBox::ButtonRole role = dialogFileExists("File already exists! What you want to do?");
-                        if(role == QMessageBox::AcceptRole)  { m_changeDirectory = true; continue; }
-                        if(role == QMessageBox::ApplyRole) { m_override = true; continue; }
-                        if(role == QMessageBox::ActionRole) { m_create = true; continue; }
-                        if(role == QMessageBox::RejectRole) break;
-                    }
-                }
-                else break;
-            }
-            else break;
-        }
-    }
+    if(ui->m_keyMSaveOnF->isChecked()) saveOnFile(key);
+    QString s = "";
 
-    // show key on window output
-    if(ui->m_keyMshowKey->isChecked())
-        ui->m_keyMKeyLoaded->setPlainText(QString::fromStdString(keyToBase64(key)));
+    ui->m_keyMKeyLoaded->setPlainText(QString::fromStdString(keyToBase64(key)));
 
     ui->m_keyMSaveOnF->setChecked(false);
-    ui->m_keyMshowKey->setChecked(true);
+    dialogSuccessMessage("The key has been successfully generated");
 }
 void MainWindow::on_m_keyMImportBtn_clicked()
 {
@@ -315,4 +325,23 @@ void MainWindow::setKey(const int keyLength) {
     default: break;
     }
 }
-
+void MainWindow::showKey(bool isChecked) {
+    bool isEmpty = ui->m_keyMKeyLoaded->toPlainText() == QString::fromStdString(NO_KEY_LOADED);
+    if(isChecked) {
+        if(isEmpty) ui->m_keyMKeyLoaded->setStyleSheet("background-color:rgba(0,0,0,0);color:red;");
+        else ui->m_keyMKeyLoaded->setStyleSheet("background-color:rgba(0,0,0,0);");
+    }
+    else ui->m_keyMKeyLoaded->setStyleSheet("background-color:rgba(0,0,0,0); color:rgba(0,0,0,0)");
+}
+void MainWindow::colorKey() {
+    bool isEmpty = ui->m_keyMKeyLoaded->toPlainText() == QString::fromStdString(NO_KEY_LOADED);
+    if(ui->m_keyMshowKey->isChecked()) {
+        if(isEmpty) ui->m_keyMKeyLoaded->setStyleSheet("background-color:rgba(0,0,0,0);color:red;");
+        else ui->m_keyMKeyLoaded->setStyleSheet("background-color:rgba(0,0,0,0);");
+    }
+    else ui->m_keyMKeyLoaded->setStyleSheet("background-color:rgba(0,0,0,0); color:rgba(0,0,0,0)");
+}
+void MainWindow::flushKey() {
+    m_cipher->flushKey();
+    ui->m_keyMKeyLoaded->setPlainText(NO_KEY_LOADED);
+}

@@ -62,6 +62,7 @@ public:
     QCheckBox *m_keyMSaveOnF;
     QCheckBox *m_keyMshowKey;
     QPushButton *m_keyMGenerateBtn;
+    QPushButton *m_keyMFlushBtn;
     QSpacerItem *horizontalSpacer;
     QSpacerItem *verticalSpacer_2;
     QFrame *line_2;
@@ -242,6 +243,12 @@ public:
 
         horizontalLayout->addWidget(m_keyMGenerateBtn);
 
+        m_keyMFlushBtn = new QPushButton(verticalLayoutWidget);
+        m_keyMFlushBtn->setObjectName("m_keyMFlushBtn");
+        m_keyMFlushBtn->setMaximumSize(QSize(120, 16777215));
+
+        horizontalLayout->addWidget(m_keyMFlushBtn);
+
         horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
         horizontalLayout->addItem(horizontalSpacer);
@@ -263,7 +270,7 @@ public:
         m_keyMKeyLoaded = new QPlainTextEdit(verticalLayoutWidget);
         m_keyMKeyLoaded->setObjectName("m_keyMKeyLoaded");
         m_keyMKeyLoaded->setAutoFillBackground(false);
-        m_keyMKeyLoaded->setStyleSheet(QString::fromUtf8("background-color: rgba(0, 0, 0, 0);"));
+        m_keyMKeyLoaded->setStyleSheet(QString::fromUtf8("background-color: rgba(0, 0, 0, 0);color:red;"));
         m_keyMKeyLoaded->setFrameShape(QFrame::NoFrame);
         m_keyMKeyLoaded->setFrameShadow(QFrame::Plain);
         m_keyMKeyLoaded->setTabChangesFocus(false);
@@ -425,6 +432,7 @@ public:
         m_keyMSaveOnF->setText(QCoreApplication::translate("MainWindow", "save on file", nullptr));
         m_keyMshowKey->setText(QCoreApplication::translate("MainWindow", "show key", nullptr));
         m_keyMGenerateBtn->setText(QCoreApplication::translate("MainWindow", "Generate", nullptr));
+        m_keyMFlushBtn->setText(QCoreApplication::translate("MainWindow", "Flush key", nullptr));
         m_keyMKeyLoaded->setPlainText(QCoreApplication::translate("MainWindow", "no key loaded !", nullptr));
         m_encryptIntro->setPlainText(QCoreApplication::translate("MainWindow", "Encrypt manager section.\n"
 "Select file(s) to Encrypt.\n"
