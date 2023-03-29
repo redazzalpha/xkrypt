@@ -1,16 +1,16 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include "kActionBase.h"
-#include "aesGcm.h"
-#include "aesCbc.h"
-#include "aesEax.h"
-#include "rsaSsa.h"
-#include "kActionKeyMgr.h"
-#include "kActionEncrypt.h"
-#include "kActionDecrypt.h"
-#include "kActionQuit.h"
-#include "rsaOeap.h"
+#include "aesgcm.h"
+#include "aescbc.h"
+#include "aeseax.h"
+#include "keygen.h"
+#include "rsassa.h"
+#include "rsaoeap.h"
+#include "kactionkeyMgr.h"
+#include "kactionencrypt.h"
+#include "kactiondecrypt.h"
+#include "kactionquit.h"
 #include <QMainWindow>
 #include <QList>
 #include <QString>
@@ -33,6 +33,7 @@ private:
     std::string m_fname = "";
     QString m_dir;
 
+    KeyGen* m_keygen = new KeyGen;
     CipherBase* m_cipher = new AesGCM;
     QList<QString>* m_algorithms = new QList<QString> {
         CipherAes::AlgName,

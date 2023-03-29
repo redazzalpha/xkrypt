@@ -9,43 +9,45 @@ CONFIG += c++17
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    aesCbc.cpp \
-    aesEax.cpp \
-    aesGcm.cpp \
-    cipherAes.cpp \
-    cipherBase.cpp \
-    cipherRsa.cpp \
-    kAction.cpp \
-    kActionBase.cpp \
-    kActionDecrypt.cpp \
-    kActionEncrypt.cpp \
-    kActionKeyMgr.cpp \
-    kActionPage.cpp \
-    kActionQuit.cpp \
+    aescbc.cpp \
+    aeseax.cpp \
+    aesgcm.cpp \
+    cipheraes.cpp \
+    cipherbase.cpp \
+    cipherrsa.cpp \
+    kaction.cpp \
+    kactionbase.cpp \
+    kactiondecrypt.cpp \
+    kactionencrypt.cpp \
+    kactionkeyMgr.cpp \
+    kactionpage.cpp \
+    kactionquit.cpp \
+    keygen.cpp \
     main.cpp \
     mainwindow.cpp \
-    rsaOeap.cpp \
-    rsaSsa.cpp
+    rsaoeap.cpp \
+    rsassa.cpp
 
 HEADERS += \
-    aesCbc.h \
-    aesEax.h \
-    aesGcm.h \
-    cipherAes.h \
-    cipherBase.h \
-    cipherRsa.h \
+    aescbc.h \
+    aeseax.h \
+    aesgcm.h \
+    cipheraes.h \
+    cipherbase.h \
+    cipherrsa.h \
     defines.h \
     enums.h \
-    kAction.h \
-    kActionBase.h \
-    kActionDecrypt.h \
-    kActionEncrypt.h \
-    kActionKeyMgr.h \
-    kActionPage.h \
-    kActionQuit.h \
+    kaction.h \
+    kactionbase.h \
+    kactiondecrypt.h \
+    kactionencrypt.h \
+    kactionkeyMgr.h \
+    kactionpage.h \
+    kactionquit.h \
+    keygen.h \
     mainwindow.h \
-    rsaOeap.h \
-    rsaSsa.h
+    rsaoeap.h \
+    rsassa.h
 
 FORMS += \
     mainwindow.ui

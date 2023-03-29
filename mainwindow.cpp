@@ -1,7 +1,10 @@
-#include "mainwindow.h"
 #include "./ui_mainwindow.h"
-#include "base64.h"
+#include "mainwindow.h"
 #include "defines.h"
+#include "base64.h"
+#include "hex.h"
+#include "files.h"
+#include "aes.h"
 #include <QToolButton>
 #include <QPushButton>
 #include <QLabel>
@@ -9,6 +12,7 @@
 #include <QFileDialog>
 #include <QInputDialog>
 #include <iostream>
+#include <fstream>
 
 using namespace std;
 using namespace CryptoPP;
@@ -33,6 +37,7 @@ MainWindow::MainWindow(QWidget *parent)
 MainWindow::~MainWindow()
 {
     delete ui;
+    delete m_keygen;
     delete m_cipher;
     delete m_aesModes;
     delete m_rsaModes;
@@ -229,6 +234,7 @@ string MainWindow::keyToBase64(SecByteBlock key) {
 
     encoderBase64.Put(key, key.size());
     encoderBase64.MessageEnd();
+
     return ss.str();
 }
 string MainWindow::keyToHex(SecByteBlock key) {
@@ -244,15 +250,15 @@ string MainWindow::keyToHex(SecByteBlock key) {
 // slots
 void MainWindow::on_m_encryptBtn_clicked()
 {
-    m_cipher->isKeyLoaded()?
-        m_cipher->encrypt():
-        dialogNoKeyMessage("encrypt");
+//    m_keygen->isKeyLoaded()?
+//        m_cipher->encrypt():
+//        dialogNoKeyMessage("encrypt");
 }
 void MainWindow::on_m_decryptBtn_clicked()
 {
-    m_cipher->isKeyLoaded()?
-        m_cipher->decrypt():
-        dialogNoKeyMessage("decrypt");
+//    m_keygen->isKeyLoaded()?
+//        m_cipher->decrypt():
+//        dialogNoKeyMessage("decrypt");
 }
 void MainWindow::on_m_encryptSelectFBtn_clicked()
 {
@@ -264,15 +270,15 @@ void MainWindow::on_m_decryptSelectFBtn_clicked()
 }
 void MainWindow::on_m_keyMGenerateBtn_clicked()
 {
-    SecByteBlock key = m_cipher->generateKey();
+    SecByteBlock key = m_keygen->generateKey();
 
     if(ui->m_keyMSaveOnF->isChecked()) saveOnFile(key);
-    QString s = "";
 
     ui->m_keyMKeyLoaded->setPlainText(QString::fromStdString(keyToBase64(key)));
 
     ui->m_keyMSaveOnF->setChecked(false);
     dialogSuccessMessage("The key has been successfully generated");
+
 }
 void MainWindow::on_m_keyMImportBtn_clicked()
 {
@@ -287,7 +293,7 @@ void MainWindow::setAlgorithm(const QString& alg) {
 
     if(alg == CipherAes::AlgName){
         int keyLength = ui->m_keyMKeys->currentText().toInt();
-        m_cipher = new AesGCM(keyLength);
+        m_cipher = new AesGCM;
         ui->m_keyMModes->addItems(*m_aesModes);
         ui->m_keyMKeys->addItems(*m_aesKeys);
         ui->m_keyMKeys->setVisible(true);
@@ -303,14 +309,14 @@ void MainWindow::setMode(const QString& mode) {
     int keyLength = ui->m_keyMKeys->currentText().toInt();
 
     // aes modes
-    if(mode == AesGCM::ModeName) m_cipher = new AesGCM(keyLength);
-    if(mode == AesGCM::ModeName) m_cipher = new AesGCM(keyLength);
-    if(mode == AesEAX::ModeName) m_cipher = new AesEAX(keyLength);
-    if(mode == AesGCM::ModeName) m_cipher = new AesGCM(keyLength);
-    if(mode == AesCBC::ModeName) m_cipher = new AesCBC(keyLength);
-    if(mode == AesGCM::ModeName) m_cipher = new AesGCM(keyLength);
-    if(mode == AesGCM::ModeName) m_cipher = new AesGCM(keyLength);
-    if(mode == AesGCM::ModeName) m_cipher = new AesGCM(keyLength);
+    if(mode == AesGCM::ModeName) m_cipher = new AesGCM;
+    if(mode == AesGCM::ModeName) m_cipher = new AesGCM;
+    if(mode == AesEAX::ModeName) m_cipher = new AesEAX;
+    if(mode == AesGCM::ModeName) m_cipher = new AesGCM;
+    if(mode == AesCBC::ModeName) m_cipher = new AesCBC;
+    if(mode == AesGCM::ModeName) m_cipher = new AesGCM;
+    if(mode == AesGCM::ModeName) m_cipher = new AesGCM;
+    if(mode == AesGCM::ModeName) m_cipher = new AesGCM;
 
     // rsa modes
     if(mode == RsaOEAP::ModeName) m_cipher = new RsaOEAP;
@@ -342,6 +348,6 @@ void MainWindow::colorKey() {
     else ui->m_keyMKeyLoaded->setStyleSheet("background-color:rgba(0,0,0,0); color:rgba(0,0,0,0)");
 }
 void MainWindow::flushKey() {
-    m_cipher->flushKey();
+    m_keygen->flushKey();
     ui->m_keyMKeyLoaded->setPlainText(NO_KEY_LOADED);
 }
