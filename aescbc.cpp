@@ -14,25 +14,8 @@ AesCBC::AesCBC() {}
 AesCBC::~AesCBC() {};
 
 // methods
-void AesCBC::encrypt(SecByteBlock key, SecByteBlock iv){
-    try
-    {
-        std::string cipher = "", plain = "";
-
-        CBC_Mode< AES >::Encryption e;
-        e.SetKeyWithIV(key, key.size(), iv);
-
-        StringSink* sk = new StringSink(cipher);
-        StreamTransformationFilter* stf = new StreamTransformationFilter(e, sk);
-
-        StringSource s(plain, true, stf);
-    }
-    catch(const Exception& e)
-    {
-        std::cerr << e.what() << std::endl;
-        exit(1);
-    }
-
+QString AesCBC::getModeName() const {
+    return AesCBC::ModeName;
 }
 void AesCBC::decrypt(SecByteBlock key, SecByteBlock iv){
     try
@@ -56,9 +39,26 @@ void AesCBC::decrypt(SecByteBlock key, SecByteBlock iv){
         exit(1);
     }
 }
+void AesCBC::encrypt(SecByteBlock key, SecByteBlock iv){
+    try
+    {
+        std::string cipher = "", plain = "";
 
-QString AesCBC::getModeName() const {
-    return AesCBC::ModeName;
+        CBC_Mode< AES >::Encryption e;
+        e.SetKeyWithIV(key, key.size(), iv);
+
+        StringSink* sk = new StringSink(cipher);
+        StreamTransformationFilter* stf = new StreamTransformationFilter(e, sk);
+
+        StringSource s(plain, true, stf);
+    }
+    catch(const Exception& e)
+    {
+        std::cerr << e.what() << std::endl;
+        exit(1);
+    }
+
 }
+
 
 
