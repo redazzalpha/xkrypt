@@ -64,8 +64,13 @@ QMessageBox::ButtonRole MainWindow::dialogFileExists(const string& message) {
     QMessageBox msg(this);
     QPushButton* changeDirectory =  msg.addButton("Change directory", QMessageBox::AcceptRole);
     QPushButton* override =  msg.addButton("Override file", QMessageBox::ApplyRole);
+<<<<<<< HEAD
     QPushButton* rename =  msg.addButton("Rename file", QMessageBox::ActionRole);
     QPushButton* cancel =  msg.addButton("cancel", QMessageBox::RejectRole);
+=======
+    QPushButton* create =  msg.addButton("Create file", QMessageBox::ActionRole);
+    QPushButton* cancel =  msg.addButton("Cancel", QMessageBox::RejectRole);
+>>>>>>> slave
 
     cancel->setVisible(false);
     msg.setWindowTitle("xKrypt - Warning");
@@ -80,7 +85,11 @@ QMessageBox::ButtonRole MainWindow::dialogFileExists(const string& message) {
         return QMessageBox::AcceptRole;
     else if(msg.clickedButton() == override)
         return dialogConfirm("Are you sure you want to override file?")? QMessageBox::ApplyRole : QMessageBox::RejectRole;
+<<<<<<< HEAD
     else if(msg.clickedButton() == rename)
+=======
+    else if(msg.clickedButton() == create)
+>>>>>>> slave
         return dialogInsertFilename("Please insert filename")? QMessageBox::ActionRole: QMessageBox::RejectRole;
     else if(msg.clickedButton() == cancel)
         return QMessageBox::RejectRole;
