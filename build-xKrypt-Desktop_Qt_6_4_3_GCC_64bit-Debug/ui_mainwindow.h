@@ -59,7 +59,8 @@ public:
     QComboBox *m_keyMKeys;
     QSpacerItem *verticalSpacer_7;
     QHBoxLayout *horizontalLayout;
-    QCheckBox *m_keyMCheckBox;
+    QCheckBox *m_keyMSaveOnF;
+    QCheckBox *m_keyMshowKey;
     QPushButton *m_keyMGenerateBtn;
     QSpacerItem *horizontalSpacer;
     QSpacerItem *verticalSpacer_2;
@@ -222,11 +223,18 @@ public:
 
         horizontalLayout = new QHBoxLayout();
         horizontalLayout->setObjectName("horizontalLayout");
-        m_keyMCheckBox = new QCheckBox(verticalLayoutWidget);
-        m_keyMCheckBox->setObjectName("m_keyMCheckBox");
-        m_keyMCheckBox->setMaximumSize(QSize(100, 16777215));
+        m_keyMSaveOnF = new QCheckBox(verticalLayoutWidget);
+        m_keyMSaveOnF->setObjectName("m_keyMSaveOnF");
+        m_keyMSaveOnF->setMaximumSize(QSize(100, 16777215));
 
-        horizontalLayout->addWidget(m_keyMCheckBox);
+        horizontalLayout->addWidget(m_keyMSaveOnF);
+
+        m_keyMshowKey = new QCheckBox(verticalLayoutWidget);
+        m_keyMshowKey->setObjectName("m_keyMshowKey");
+        m_keyMshowKey->setChecked(true);
+        m_keyMshowKey->setTristate(false);
+
+        horizontalLayout->addWidget(m_keyMshowKey);
 
         m_keyMGenerateBtn = new QPushButton(verticalLayoutWidget);
         m_keyMGenerateBtn->setObjectName("m_keyMGenerateBtn");
@@ -414,7 +422,8 @@ public:
         label_5->setText(QCoreApplication::translate("MainWindow", "Algorithm:", nullptr));
         label_6->setText(QCoreApplication::translate("MainWindow", "Mode:", nullptr));
         label_7->setText(QCoreApplication::translate("MainWindow", "key (bits):", nullptr));
-        m_keyMCheckBox->setText(QCoreApplication::translate("MainWindow", "save on file", nullptr));
+        m_keyMSaveOnF->setText(QCoreApplication::translate("MainWindow", "save on file", nullptr));
+        m_keyMshowKey->setText(QCoreApplication::translate("MainWindow", "show key", nullptr));
         m_keyMGenerateBtn->setText(QCoreApplication::translate("MainWindow", "Generate", nullptr));
         m_keyMKeyLoaded->setPlainText(QCoreApplication::translate("MainWindow", "no key loaded !", nullptr));
         m_encryptIntro->setPlainText(QCoreApplication::translate("MainWindow", "Encrypt manager section.\n"
