@@ -48,40 +48,52 @@ public:
     QSpacerItem *verticalSpacer_4;
     QLabel *label_2;
     QSpacerItem *verticalSpacer_6;
-    QVBoxLayout *vlayout_1;
-    QHBoxLayout *hlayout_1;
-    QLabel *label_5;
-    QLabel *label_6;
-    QLabel *label_7;
-    QHBoxLayout *hlayout;
-    QComboBox *m_keyMAlgs;
-    QComboBox *m_keyMModes;
-    QComboBox *m_keyMKeys;
-    QSpacerItem *verticalSpacer_7;
+    QVBoxLayout *vlayout_5;
+    QLabel *label_13;
     QHBoxLayout *horizontalLayout;
-    QCheckBox *m_keyMSaveOnF;
-    QCheckBox *m_keyMshowKey;
+    QComboBox *m_keyMKeyLength;
     QPushButton *m_keyMGenerateBtn;
     QPushButton *m_keyMFlushBtn;
+    QSpacerItem *horizontalSpacer_2;
+    QHBoxLayout *hlayout;
+    QCheckBox *m_keyMSaveOnF;
+    QCheckBox *m_keyMshowKey;
     QSpacerItem *horizontalSpacer;
     QSpacerItem *verticalSpacer_2;
     QFrame *line_2;
     QPlainTextEdit *m_keyMKeyLoaded;
     QWidget *m_encryptPage;
     QWidget *verticalLayoutWidget_6;
-    QVBoxLayout *m_encryptVL;
+    QVBoxLayout *vlayout_3;
     QPlainTextEdit *m_encryptIntro;
     QPlainTextEdit *m_encryptKeyLoaded;
     QPushButton *m_encryptSelectFBtn;
     QPlainTextEdit *m_encryptSelectedF;
+    QVBoxLayout *vlayout_4;
+    QHBoxLayout *hlayout_3;
+    QLabel *label_8;
+    QLabel *label_9;
+    QLabel *label_10;
+    QHBoxLayout *hlayout_4;
+    QComboBox *m_keyMAlgs_2;
+    QComboBox *m_keyMModes_2;
+    QComboBox *m_keyMKeys_2;
     QPushButton *m_encryptBtn;
     QWidget *m_decryptPage;
     QWidget *verticalLayoutWidget_5;
-    QVBoxLayout *m_decryptVL;
+    QVBoxLayout *vlayout_2;
     QPlainTextEdit *m_decryptIntro;
     QPlainTextEdit *m_decryptLoadedKey;
     QPushButton *m_decryptSelectFBtn;
     QPlainTextEdit *m_decryptSelectedF;
+    QVBoxLayout *vlayout_1;
+    QHBoxLayout *hlayout_1;
+    QLabel *label_5;
+    QLabel *label_6;
+    QLabel *label_7;
+    QHBoxLayout *hlayout_2;
+    QComboBox *m_keyMAlgs;
+    QComboBox *m_keyMModes;
     QPushButton *m_decryptBtn;
     QStatusBar *m_statusbar;
     QMenuBar *m_menubar;
@@ -173,69 +185,20 @@ public:
 
         vlayout->addItem(verticalSpacer_6);
 
-        vlayout_1 = new QVBoxLayout();
-        vlayout_1->setObjectName("vlayout_1");
-        hlayout_1 = new QHBoxLayout();
-        hlayout_1->setObjectName("hlayout_1");
-        label_5 = new QLabel(verticalLayoutWidget);
-        label_5->setObjectName("label_5");
+        vlayout_5 = new QVBoxLayout();
+        vlayout_5->setObjectName("vlayout_5");
+        label_13 = new QLabel(verticalLayoutWidget);
+        label_13->setObjectName("label_13");
 
-        hlayout_1->addWidget(label_5);
-
-        label_6 = new QLabel(verticalLayoutWidget);
-        label_6->setObjectName("label_6");
-
-        hlayout_1->addWidget(label_6);
-
-        label_7 = new QLabel(verticalLayoutWidget);
-        label_7->setObjectName("label_7");
-
-        hlayout_1->addWidget(label_7);
-
-
-        vlayout_1->addLayout(hlayout_1);
-
-        hlayout = new QHBoxLayout();
-        hlayout->setObjectName("hlayout");
-        m_keyMAlgs = new QComboBox(verticalLayoutWidget);
-        m_keyMAlgs->setObjectName("m_keyMAlgs");
-
-        hlayout->addWidget(m_keyMAlgs);
-
-        m_keyMModes = new QComboBox(verticalLayoutWidget);
-        m_keyMModes->setObjectName("m_keyMModes");
-
-        hlayout->addWidget(m_keyMModes);
-
-        m_keyMKeys = new QComboBox(verticalLayoutWidget);
-        m_keyMKeys->setObjectName("m_keyMKeys");
-
-        hlayout->addWidget(m_keyMKeys);
-
-
-        vlayout_1->addLayout(hlayout);
-
-
-        vlayout->addLayout(vlayout_1);
-
-        verticalSpacer_7 = new QSpacerItem(20, 200, QSizePolicy::Minimum, QSizePolicy::Expanding);
-
-        vlayout->addItem(verticalSpacer_7);
+        vlayout_5->addWidget(label_13);
 
         horizontalLayout = new QHBoxLayout();
         horizontalLayout->setObjectName("horizontalLayout");
-        m_keyMSaveOnF = new QCheckBox(verticalLayoutWidget);
-        m_keyMSaveOnF->setObjectName("m_keyMSaveOnF");
-        m_keyMSaveOnF->setMaximumSize(QSize(100, 16777215));
+        m_keyMKeyLength = new QComboBox(verticalLayoutWidget);
+        m_keyMKeyLength->setObjectName("m_keyMKeyLength");
+        m_keyMKeyLength->setMinimumSize(QSize(70, 0));
 
-        horizontalLayout->addWidget(m_keyMSaveOnF);
-
-        m_keyMshowKey = new QCheckBox(verticalLayoutWidget);
-        m_keyMshowKey->setObjectName("m_keyMshowKey");
-        m_keyMshowKey->setChecked(true);
-        m_keyMshowKey->setTristate(false);
-
-        horizontalLayout->addWidget(m_keyMshowKey);
+        horizontalLayout->addWidget(m_keyMKeyLength);
 
         m_keyMGenerateBtn = new QPushButton(verticalLayoutWidget);
         m_keyMGenerateBtn->setObjectName("m_keyMGenerateBtn");
@@ -249,12 +212,37 @@ public:
 
         horizontalLayout->addWidget(m_keyMFlushBtn);
 
+        horizontalSpacer_2 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+        horizontalLayout->addItem(horizontalSpacer_2);
+
+
+        vlayout_5->addLayout(horizontalLayout);
+
+
+        vlayout->addLayout(vlayout_5);
+
+        hlayout = new QHBoxLayout();
+        hlayout->setObjectName("hlayout");
+        m_keyMSaveOnF = new QCheckBox(verticalLayoutWidget);
+        m_keyMSaveOnF->setObjectName("m_keyMSaveOnF");
+        m_keyMSaveOnF->setMaximumSize(QSize(100, 16777215));
+
+        hlayout->addWidget(m_keyMSaveOnF);
+
+        m_keyMshowKey = new QCheckBox(verticalLayoutWidget);
+        m_keyMshowKey->setObjectName("m_keyMshowKey");
+        m_keyMshowKey->setChecked(true);
+        m_keyMshowKey->setTristate(false);
+
+        hlayout->addWidget(m_keyMshowKey);
+
         horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
-        horizontalLayout->addItem(horizontalSpacer);
+        hlayout->addItem(horizontalSpacer);
 
 
-        vlayout->addLayout(horizontalLayout);
+        vlayout->addLayout(hlayout);
 
         verticalSpacer_2 = new QSpacerItem(20, 220, QSizePolicy::Minimum, QSizePolicy::Expanding);
 
@@ -285,10 +273,10 @@ public:
         m_encryptPage->setObjectName("m_encryptPage");
         verticalLayoutWidget_6 = new QWidget(m_encryptPage);
         verticalLayoutWidget_6->setObjectName("verticalLayoutWidget_6");
-        verticalLayoutWidget_6->setGeometry(QRect(0, 0, 431, 337));
-        m_encryptVL = new QVBoxLayout(verticalLayoutWidget_6);
-        m_encryptVL->setObjectName("m_encryptVL");
-        m_encryptVL->setContentsMargins(0, 0, 0, 0);
+        verticalLayoutWidget_6->setGeometry(QRect(0, 0, 431, 340));
+        vlayout_3 = new QVBoxLayout(verticalLayoutWidget_6);
+        vlayout_3->setObjectName("vlayout_3");
+        vlayout_3->setContentsMargins(0, 0, 0, 0);
         m_encryptIntro = new QPlainTextEdit(verticalLayoutWidget_6);
         m_encryptIntro->setObjectName("m_encryptIntro");
         m_encryptIntro->setAutoFillBackground(false);
@@ -300,7 +288,7 @@ public:
         m_encryptIntro->setTextInteractionFlags(Qt::NoTextInteraction);
         m_encryptIntro->setBackgroundVisible(false);
 
-        m_encryptVL->addWidget(m_encryptIntro);
+        vlayout_3->addWidget(m_encryptIntro);
 
         m_encryptKeyLoaded = new QPlainTextEdit(verticalLayoutWidget_6);
         m_encryptKeyLoaded->setObjectName("m_encryptKeyLoaded");
@@ -313,12 +301,12 @@ public:
         m_encryptKeyLoaded->setTextInteractionFlags(Qt::NoTextInteraction);
         m_encryptKeyLoaded->setBackgroundVisible(false);
 
-        m_encryptVL->addWidget(m_encryptKeyLoaded);
+        vlayout_3->addWidget(m_encryptKeyLoaded);
 
         m_encryptSelectFBtn = new QPushButton(verticalLayoutWidget_6);
         m_encryptSelectFBtn->setObjectName("m_encryptSelectFBtn");
 
-        m_encryptVL->addWidget(m_encryptSelectFBtn);
+        vlayout_3->addWidget(m_encryptSelectFBtn);
 
         m_encryptSelectedF = new QPlainTextEdit(verticalLayoutWidget_6);
         m_encryptSelectedF->setObjectName("m_encryptSelectedF");
@@ -331,22 +319,67 @@ public:
         m_encryptSelectedF->setTextInteractionFlags(Qt::NoTextInteraction);
         m_encryptSelectedF->setBackgroundVisible(false);
 
-        m_encryptVL->addWidget(m_encryptSelectedF);
+        vlayout_3->addWidget(m_encryptSelectedF);
+
+        vlayout_4 = new QVBoxLayout();
+        vlayout_4->setObjectName("vlayout_4");
+        hlayout_3 = new QHBoxLayout();
+        hlayout_3->setObjectName("hlayout_3");
+        label_8 = new QLabel(verticalLayoutWidget_6);
+        label_8->setObjectName("label_8");
+
+        hlayout_3->addWidget(label_8);
+
+        label_9 = new QLabel(verticalLayoutWidget_6);
+        label_9->setObjectName("label_9");
+
+        hlayout_3->addWidget(label_9);
+
+        label_10 = new QLabel(verticalLayoutWidget_6);
+        label_10->setObjectName("label_10");
+
+        hlayout_3->addWidget(label_10);
+
+
+        vlayout_4->addLayout(hlayout_3);
+
+        hlayout_4 = new QHBoxLayout();
+        hlayout_4->setObjectName("hlayout_4");
+        m_keyMAlgs_2 = new QComboBox(verticalLayoutWidget_6);
+        m_keyMAlgs_2->setObjectName("m_keyMAlgs_2");
+
+        hlayout_4->addWidget(m_keyMAlgs_2);
+
+        m_keyMModes_2 = new QComboBox(verticalLayoutWidget_6);
+        m_keyMModes_2->setObjectName("m_keyMModes_2");
+
+        hlayout_4->addWidget(m_keyMModes_2);
+
+        m_keyMKeys_2 = new QComboBox(verticalLayoutWidget_6);
+        m_keyMKeys_2->setObjectName("m_keyMKeys_2");
+
+        hlayout_4->addWidget(m_keyMKeys_2);
+
+
+        vlayout_4->addLayout(hlayout_4);
+
+
+        vlayout_3->addLayout(vlayout_4);
 
         m_encryptBtn = new QPushButton(verticalLayoutWidget_6);
         m_encryptBtn->setObjectName("m_encryptBtn");
 
-        m_encryptVL->addWidget(m_encryptBtn);
+        vlayout_3->addWidget(m_encryptBtn);
 
         m_mainStack->addWidget(m_encryptPage);
         m_decryptPage = new QWidget();
         m_decryptPage->setObjectName("m_decryptPage");
         verticalLayoutWidget_5 = new QWidget(m_decryptPage);
         verticalLayoutWidget_5->setObjectName("verticalLayoutWidget_5");
-        verticalLayoutWidget_5->setGeometry(QRect(0, 0, 431, 337));
-        m_decryptVL = new QVBoxLayout(verticalLayoutWidget_5);
-        m_decryptVL->setObjectName("m_decryptVL");
-        m_decryptVL->setContentsMargins(0, 0, 0, 0);
+        verticalLayoutWidget_5->setGeometry(QRect(0, 0, 431, 340));
+        vlayout_2 = new QVBoxLayout(verticalLayoutWidget_5);
+        vlayout_2->setObjectName("vlayout_2");
+        vlayout_2->setContentsMargins(0, 0, 0, 0);
         m_decryptIntro = new QPlainTextEdit(verticalLayoutWidget_5);
         m_decryptIntro->setObjectName("m_decryptIntro");
         m_decryptIntro->setAutoFillBackground(false);
@@ -358,7 +391,7 @@ public:
         m_decryptIntro->setTextInteractionFlags(Qt::NoTextInteraction);
         m_decryptIntro->setBackgroundVisible(false);
 
-        m_decryptVL->addWidget(m_decryptIntro);
+        vlayout_2->addWidget(m_decryptIntro);
 
         m_decryptLoadedKey = new QPlainTextEdit(verticalLayoutWidget_5);
         m_decryptLoadedKey->setObjectName("m_decryptLoadedKey");
@@ -371,12 +404,12 @@ public:
         m_decryptLoadedKey->setTextInteractionFlags(Qt::NoTextInteraction);
         m_decryptLoadedKey->setBackgroundVisible(false);
 
-        m_decryptVL->addWidget(m_decryptLoadedKey);
+        vlayout_2->addWidget(m_decryptLoadedKey);
 
         m_decryptSelectFBtn = new QPushButton(verticalLayoutWidget_5);
         m_decryptSelectFBtn->setObjectName("m_decryptSelectFBtn");
 
-        m_decryptVL->addWidget(m_decryptSelectFBtn);
+        vlayout_2->addWidget(m_decryptSelectFBtn);
 
         m_decryptSelectedF = new QPlainTextEdit(verticalLayoutWidget_5);
         m_decryptSelectedF->setObjectName("m_decryptSelectedF");
@@ -389,12 +422,52 @@ public:
         m_decryptSelectedF->setTextInteractionFlags(Qt::NoTextInteraction);
         m_decryptSelectedF->setBackgroundVisible(false);
 
-        m_decryptVL->addWidget(m_decryptSelectedF);
+        vlayout_2->addWidget(m_decryptSelectedF);
+
+        vlayout_1 = new QVBoxLayout();
+        vlayout_1->setObjectName("vlayout_1");
+        hlayout_1 = new QHBoxLayout();
+        hlayout_1->setObjectName("hlayout_1");
+        label_5 = new QLabel(verticalLayoutWidget_5);
+        label_5->setObjectName("label_5");
+
+        hlayout_1->addWidget(label_5);
+
+        label_6 = new QLabel(verticalLayoutWidget_5);
+        label_6->setObjectName("label_6");
+
+        hlayout_1->addWidget(label_6);
+
+        label_7 = new QLabel(verticalLayoutWidget_5);
+        label_7->setObjectName("label_7");
+
+        hlayout_1->addWidget(label_7);
+
+
+        vlayout_1->addLayout(hlayout_1);
+
+        hlayout_2 = new QHBoxLayout();
+        hlayout_2->setObjectName("hlayout_2");
+        m_keyMAlgs = new QComboBox(verticalLayoutWidget_5);
+        m_keyMAlgs->setObjectName("m_keyMAlgs");
+
+        hlayout_2->addWidget(m_keyMAlgs);
+
+        m_keyMModes = new QComboBox(verticalLayoutWidget_5);
+        m_keyMModes->setObjectName("m_keyMModes");
+
+        hlayout_2->addWidget(m_keyMModes);
+
+
+        vlayout_1->addLayout(hlayout_2);
+
+
+        vlayout_2->addLayout(vlayout_1);
 
         m_decryptBtn = new QPushButton(verticalLayoutWidget_5);
         m_decryptBtn->setObjectName("m_decryptBtn");
 
-        m_decryptVL->addWidget(m_decryptBtn);
+        vlayout_2->addWidget(m_decryptBtn);
 
         m_mainStack->addWidget(m_decryptPage);
         MainWindow->setCentralWidget(centralwidget);
@@ -426,13 +499,11 @@ public:
         label->setText(QCoreApplication::translate("MainWindow", "Import key:", nullptr));
         m_keyMImportBtn->setText(QCoreApplication::translate("MainWindow", "Select file(s)", nullptr));
         label_2->setText(QCoreApplication::translate("MainWindow", "Generate key:", nullptr));
-        label_5->setText(QCoreApplication::translate("MainWindow", "Algorithm:", nullptr));
-        label_6->setText(QCoreApplication::translate("MainWindow", "Mode:", nullptr));
-        label_7->setText(QCoreApplication::translate("MainWindow", "key (bits):", nullptr));
-        m_keyMSaveOnF->setText(QCoreApplication::translate("MainWindow", "save on file", nullptr));
-        m_keyMshowKey->setText(QCoreApplication::translate("MainWindow", "show key", nullptr));
+        label_13->setText(QCoreApplication::translate("MainWindow", "key (bits):", nullptr));
         m_keyMGenerateBtn->setText(QCoreApplication::translate("MainWindow", "Generate", nullptr));
         m_keyMFlushBtn->setText(QCoreApplication::translate("MainWindow", "Flush key", nullptr));
+        m_keyMSaveOnF->setText(QCoreApplication::translate("MainWindow", "save on file", nullptr));
+        m_keyMshowKey->setText(QCoreApplication::translate("MainWindow", "show key", nullptr));
         m_keyMKeyLoaded->setPlainText(QCoreApplication::translate("MainWindow", "no key loaded !", nullptr));
         m_encryptIntro->setPlainText(QCoreApplication::translate("MainWindow", "Encrypt manager section.\n"
 "Select file(s) to Encrypt.\n"
@@ -440,13 +511,19 @@ public:
         m_encryptKeyLoaded->setPlainText(QCoreApplication::translate("MainWindow", "no key loaded", nullptr));
         m_encryptSelectFBtn->setText(QCoreApplication::translate("MainWindow", "Select file(s)", nullptr));
         m_encryptSelectedF->setPlainText(QCoreApplication::translate("MainWindow", "no file(s) selected", nullptr));
+        label_8->setText(QCoreApplication::translate("MainWindow", "Algorithm:", nullptr));
+        label_9->setText(QCoreApplication::translate("MainWindow", "Mode:", nullptr));
+        label_10->setText(QCoreApplication::translate("MainWindow", "key (bits):", nullptr));
         m_encryptBtn->setText(QCoreApplication::translate("MainWindow", "Encrypt", nullptr));
         m_decryptIntro->setPlainText(QCoreApplication::translate("MainWindow", "Decrypt manager section.\n"
 "Select file(s) to Decrypt.\n"
 "", nullptr));
         m_decryptLoadedKey->setPlainText(QCoreApplication::translate("MainWindow", "no key loaded", nullptr));
         m_decryptSelectFBtn->setText(QCoreApplication::translate("MainWindow", "Select file(s)", nullptr));
-        m_decryptSelectedF->setPlainText(QCoreApplication::translate("MainWindow", "no file(s) selecte", nullptr));
+        m_decryptSelectedF->setPlainText(QCoreApplication::translate("MainWindow", "no file(s) selected", nullptr));
+        label_5->setText(QCoreApplication::translate("MainWindow", "Algorithm:", nullptr));
+        label_6->setText(QCoreApplication::translate("MainWindow", "Mode:", nullptr));
+        label_7->setText(QCoreApplication::translate("MainWindow", "key (bits):", nullptr));
         m_decryptBtn->setText(QCoreApplication::translate("MainWindow", "Decrypt", nullptr));
         m_toolBar->setWindowTitle(QCoreApplication::translate("MainWindow", "toolBar", nullptr));
     } // retranslateUi

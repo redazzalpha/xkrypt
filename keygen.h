@@ -18,6 +18,7 @@ public:
 
     // methods
     void setKeyLength(int keyLength = CryptoPP::AES::DEFAULT_KEYLENGTH);
+    int getKeyLength();
     CryptoPP::SecByteBlock generateKey();
     bool isKeyLoaded() const;
     void flushKey();

@@ -1,5 +1,6 @@
 #include "./ui_mainwindow.h"
 #include "mainwindow.h"
+#include "enums.h"
 #include "defines.h"
 #include "base64.h"
 #include "hex.h"
@@ -26,7 +27,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     ui->m_keyMAlgs->addItems(*m_algorithms);
     ui->m_keyMModes->addItems(*m_aesModes);
-    ui->m_keyMKeys->addItems(*m_aesKeys);
+    ui->m_keyMKeyLength->addItems(*m_aesKeys);
 
     connectItems();
     setIconSize(QSize(35, 35));
@@ -51,7 +52,7 @@ void MainWindow::connectItems() {
     // connect comboboxes
     QObject::connect(ui->m_keyMAlgs, &QComboBox::textActivated, this, &MainWindow::setAlgorithm);
     QObject::connect(ui->m_keyMModes, &QComboBox::textActivated, this, &MainWindow::setMode);
-    QObject::connect(ui->m_keyMKeys, &QComboBox::activated, this, &MainWindow::setKey);
+    QObject::connect(ui->m_keyMKeyLength, &QComboBox::activated, this, &MainWindow::setKeyLength);
 
     // connect checkboxes
     QObject::connect(ui->m_keyMshowKey, &QCheckBox::clicked, this, &MainWindow::showKey);
@@ -279,6 +280,8 @@ void MainWindow::on_m_keyMGenerateBtn_clicked()
     ui->m_keyMSaveOnF->setChecked(false);
     dialogSuccessMessage("The key has been successfully generated");
 
+
+
 }
 void MainWindow::on_m_keyMImportBtn_clicked()
 {
@@ -289,24 +292,24 @@ void MainWindow::setAlgorithm(const QString& alg) {
 
     delete m_cipher;
     ui->m_keyMModes->clear();
-    ui->m_keyMKeys->clear();
+    ui->m_keyMKeyLength->clear();
 
     if(alg == CipherAes::AlgName){
-        int keyLength = ui->m_keyMKeys->currentText().toInt();
+        int keyLength = ui->m_keyMKeyLength->currentText().toInt();
         m_cipher = new AesGCM;
         ui->m_keyMModes->addItems(*m_aesModes);
-        ui->m_keyMKeys->addItems(*m_aesKeys);
-        ui->m_keyMKeys->setVisible(true);
+        ui->m_keyMKeyLength->addItems(*m_aesKeys);
+        ui->m_keyMKeyLength->setVisible(true);
     }
     if(alg == CipherRsa::AlgName) {
         m_cipher = new RsaOEAP;
         ui->m_keyMModes->addItems(*m_rsaModes);
-        ui->m_keyMKeys->setVisible(false);
+        ui->m_keyMKeyLength->setVisible(false);
     }
 }
 void MainWindow::setMode(const QString& mode) {
     delete m_cipher;
-    int keyLength = ui->m_keyMKeys->currentText().toInt();
+    int keyLength = ui->m_keyMKeyLength->currentText().toInt();
 
     // aes modes
     if(mode == AesGCM::ModeName) m_cipher = new AesGCM;
@@ -322,13 +325,17 @@ void MainWindow::setMode(const QString& mode) {
     if(mode == RsaOEAP::ModeName) m_cipher = new RsaOEAP;
     if(mode == RsaSSA::ModeName) m_cipher = new RsaSSA;
 }
-void MainWindow::setKey(const int keyLength) {
-    switch(keyLength) {
-    case CryptoPP::AES::DEFAULT_KEYLENGTH :
-        break;
-    case CryptoPP::AES::MAX_KEYLENGTH :
-        break;
-    default: break;
+void MainWindow::setKeyLength(const int index) {
+    switch(index) {
+    case 0 : m_keygen->setKeyLength(Key::KEYLENGTH_DEFAULT); break;
+    case 1 : m_keygen->setKeyLength(Key::KEYLENGTH_32); break;
+    case 2 : m_keygen->setKeyLength(Key::KEYLENGTH_64); break;
+    case 3 : m_keygen->setKeyLength(Key::KEYLENGTH_128); break;
+    case 4 : m_keygen->setKeyLength(Key::KEYLENGTH_256); break;
+    case 5 : m_keygen->setKeyLength(Key::KEYLENGTH_512); break;
+    case 6 : m_keygen->setKeyLength(Key::KEYLENGTH_1024); break;
+    case 7 : m_keygen->setKeyLength(Key::KEYLENGTH_2048); break;
+    default: m_keygen->setKeyLength(Key::KEYLENGTH_DEFAULT);
     }
 }
 void MainWindow::showKey(bool isChecked) {

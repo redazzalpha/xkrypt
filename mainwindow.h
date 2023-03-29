@@ -7,6 +7,7 @@
 #include "keygen.h"
 #include "rsassa.h"
 #include "rsaoeap.h"
+#include "enums.h"
 #include "kactionkeyMgr.h"
 #include "kactionencrypt.h"
 #include "kactiondecrypt.h"
@@ -49,8 +50,14 @@ private:
         RsaSSA::ModeName,
     };
     QList<QString>* m_aesKeys = new QList<QString>{
-        QString::number(CryptoPP::AES::DEFAULT_KEYLENGTH),
-        QString::number(CryptoPP::AES::MAX_KEYLENGTH),
+        QString::number(Key::KEYLENGTH_DEFAULT),
+        QString::number(Key::KEYLENGTH_32),
+        QString::number(Key::KEYLENGTH_64),
+        QString::number(Key::KEYLENGTH_128),
+        QString::number(Key::KEYLENGTH_256),
+        QString::number(Key::KEYLENGTH_512),
+        QString::number(Key::KEYLENGTH_1024),
+        QString::number(Key::KEYLENGTH_2048),
     };
 
     QList<KActionBase*> m_actions = QList<KActionBase*> {
@@ -97,7 +104,7 @@ private slots:
 
     void setAlgorithm(const QString& alg);
     void setMode(const QString& mode);
-    void setKey(const int keyLength);
+    void setKeyLength(const int index);
     void showKey(bool isChecked);
     void colorKey();
     void flushKey();

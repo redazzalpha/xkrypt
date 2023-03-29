@@ -179,62 +179,71 @@ Import key or generate one from selected algorithm.
         </spacer>
        </item>
        <item>
-        <layout class="QVBoxLayout" name="vlayout_1">
+        <layout class="QVBoxLayout" name="vlayout_5">
          <item>
-          <layout class="QHBoxLayout" name="hlayout_1">
-           <item>
-            <widget class="QLabel" name="label_5">
-             <property name="text">
-              <string>Algorithm:</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLabel" name="label_6">
-             <property name="text">
-              <string>Mode:</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLabel" name="label_7">
-             <property name="text">
-              <string>key (bits):</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
+          <widget class="QLabel" name="label_13">
+           <property name="text">
+            <string>key (bits):</string>
+           </property>
+          </widget>
          </item>
          <item>
-          <layout class="QHBoxLayout" name="hlayout">
+          <layout class="QHBoxLayout" name="horizontalLayout">
            <item>
-            <widget class="QComboBox" name="m_keyMAlgs"/>
+            <widget class="QComboBox" name="m_keyMKeyLength">
+             <property name="minimumSize">
+              <size>
+               <width>70</width>
+               <height>0</height>
+              </size>
+             </property>
+            </widget>
            </item>
            <item>
-            <widget class="QComboBox" name="m_keyMModes"/>
+            <widget class="QPushButton" name="m_keyMGenerateBtn">
+             <property name="maximumSize">
+              <size>
+               <width>120</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>Generate</string>
+             </property>
+            </widget>
            </item>
            <item>
-            <widget class="QComboBox" name="m_keyMKeys"/>
+            <widget class="QPushButton" name="m_keyMFlushBtn">
+             <property name="maximumSize">
+              <size>
+               <width>120</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>Flush key</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_2">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
            </item>
           </layout>
          </item>
         </layout>
        </item>
        <item>
-        <spacer name="verticalSpacer_7">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>200</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout">
+        <layout class="QHBoxLayout" name="hlayout">
          <item>
           <widget class="QCheckBox" name="m_keyMSaveOnF">
            <property name="maximumSize">
@@ -258,32 +267,6 @@ Import key or generate one from selected algorithm.
            </property>
            <property name="tristate">
             <bool>false</bool>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="m_keyMGenerateBtn">
-           <property name="maximumSize">
-            <size>
-             <width>120</width>
-             <height>16777215</height>
-            </size>
-           </property>
-           <property name="text">
-            <string>Generate</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="m_keyMFlushBtn">
-           <property name="maximumSize">
-            <size>
-             <width>120</width>
-             <height>16777215</height>
-            </size>
-           </property>
-           <property name="text">
-            <string>Flush key</string>
            </property>
           </widget>
          </item>
@@ -363,10 +346,10 @@ Import key or generate one from selected algorithm.
         <x>0</x>
         <y>0</y>
         <width>431</width>
-        <height>337</height>
+        <height>340</height>
        </rect>
       </property>
-      <layout class="QVBoxLayout" name="m_encryptVL">
+      <layout class="QVBoxLayout" name="vlayout_3">
        <item>
         <widget class="QPlainTextEdit" name="m_encryptIntro">
          <property name="autoFillBackground">
@@ -470,6 +453,48 @@ Select file(s) to Encrypt.
         </widget>
        </item>
        <item>
+        <layout class="QVBoxLayout" name="vlayout_4">
+         <item>
+          <layout class="QHBoxLayout" name="hlayout_3">
+           <item>
+            <widget class="QLabel" name="label_8">
+             <property name="text">
+              <string>Algorithm:</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="label_9">
+             <property name="text">
+              <string>Mode:</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="label_10">
+             <property name="text">
+              <string>key (bits):</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="hlayout_4">
+           <item>
+            <widget class="QComboBox" name="m_keyMAlgs_2"/>
+           </item>
+           <item>
+            <widget class="QComboBox" name="m_keyMModes_2"/>
+           </item>
+           <item>
+            <widget class="QComboBox" name="m_keyMKeys_2"/>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </item>
+       <item>
         <widget class="QPushButton" name="m_encryptBtn">
          <property name="text">
           <string>Encrypt</string>
@@ -486,10 +511,10 @@ Select file(s) to Encrypt.
         <x>0</x>
         <y>0</y>
         <width>431</width>
-        <height>337</height>
+        <height>340</height>
        </rect>
       </property>
-      <layout class="QVBoxLayout" name="m_decryptVL">
+      <layout class="QVBoxLayout" name="vlayout_2">
        <item>
         <widget class="QPlainTextEdit" name="m_decryptIntro">
          <property name="autoFillBackground">
@@ -582,7 +607,7 @@ Select file(s) to Decrypt.
           <bool>true</bool>
          </property>
          <property name="plainText">
-          <string>no file(s) selecte</string>
+          <string>no file(s) selected</string>
          </property>
          <property name="textInteractionFlags">
           <set>Qt::NoTextInteraction</set>
@@ -591,6 +616,45 @@ Select file(s) to Decrypt.
           <bool>false</bool>
          </property>
         </widget>
+       </item>
+       <item>
+        <layout class="QVBoxLayout" name="vlayout_1">
+         <item>
+          <layout class="QHBoxLayout" name="hlayout_1">
+           <item>
+            <widget class="QLabel" name="label_5">
+             <property name="text">
+              <string>Algorithm:</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="label_6">
+             <property name="text">
+              <string>Mode:</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="label_7">
+             <property name="text">
+              <string>key (bits):</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="hlayout_2">
+           <item>
+            <widget class="QComboBox" name="m_keyMAlgs"/>
+           </item>
+           <item>
+            <widget class="QComboBox" name="m_keyMModes"/>
+           </item>
+          </layout>
+         </item>
+        </layout>
        </item>
        <item>
         <widget class="QPushButton" name="m_decryptBtn">

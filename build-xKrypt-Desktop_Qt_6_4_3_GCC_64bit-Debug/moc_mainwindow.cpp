@@ -39,8 +39,8 @@ struct qt_meta_stringdata_MainWindow_t {
     char stringdata9[4];
     char stringdata10[8];
     char stringdata11[5];
-    char stringdata12[7];
-    char stringdata13[10];
+    char stringdata12[13];
+    char stringdata13[6];
     char stringdata14[8];
     char stringdata15[10];
     char stringdata16[9];
@@ -62,12 +62,12 @@ Q_CONSTINIT static const qt_meta_stringdata_MainWindow_t qt_meta_stringdata_Main
         QT_MOC_LITERAL(191, 3),  // "alg"
         QT_MOC_LITERAL(195, 7),  // "setMode"
         QT_MOC_LITERAL(203, 4),  // "mode"
-        QT_MOC_LITERAL(208, 6),  // "setKey"
-        QT_MOC_LITERAL(215, 9),  // "keyLength"
-        QT_MOC_LITERAL(225, 7),  // "showKey"
-        QT_MOC_LITERAL(233, 9),  // "isChecked"
-        QT_MOC_LITERAL(243, 8),  // "colorKey"
-        QT_MOC_LITERAL(252, 8)   // "flushKey"
+        QT_MOC_LITERAL(208, 12),  // "setKeyLength"
+        QT_MOC_LITERAL(221, 5),  // "index"
+        QT_MOC_LITERAL(227, 7),  // "showKey"
+        QT_MOC_LITERAL(235, 9),  // "isChecked"
+        QT_MOC_LITERAL(245, 8),  // "colorKey"
+        QT_MOC_LITERAL(254, 8)   // "flushKey"
     },
     "MainWindow",
     "on_m_encryptBtn_clicked",
@@ -81,8 +81,8 @@ Q_CONSTINIT static const qt_meta_stringdata_MainWindow_t qt_meta_stringdata_Main
     "alg",
     "setMode",
     "mode",
-    "setKey",
-    "keyLength",
+    "setKeyLength",
+    "index",
     "showKey",
     "isChecked",
     "colorKey",
@@ -162,7 +162,7 @@ Q_CONSTINIT const QMetaObject MainWindow::staticMetaObject = { {
         // method 'setMode'
         QtPrivate::TypeAndForceComplete<void, std::false_type>,
         QtPrivate::TypeAndForceComplete<const QString &, std::false_type>,
-        // method 'setKey'
+        // method 'setKeyLength'
         QtPrivate::TypeAndForceComplete<void, std::false_type>,
         QtPrivate::TypeAndForceComplete<const int, std::false_type>,
         // method 'showKey'
@@ -190,7 +190,7 @@ void MainWindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         case 5: _t->on_m_keyMImportBtn_clicked(); break;
         case 6: _t->setAlgorithm((*reinterpret_cast< std::add_pointer_t<QString>>(_a[1]))); break;
         case 7: _t->setMode((*reinterpret_cast< std::add_pointer_t<QString>>(_a[1]))); break;
-        case 8: _t->setKey((*reinterpret_cast< std::add_pointer_t<int>>(_a[1]))); break;
+        case 8: _t->setKeyLength((*reinterpret_cast< std::add_pointer_t<int>>(_a[1]))); break;
         case 9: _t->showKey((*reinterpret_cast< std::add_pointer_t<bool>>(_a[1]))); break;
         case 10: _t->colorKey(); break;
         case 11: _t->flushKey(); break;

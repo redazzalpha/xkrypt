@@ -11,6 +11,9 @@ KeyGen::KeyGen(int keyLength): m_keyLength(keyLength) {}
 void KeyGen::setKeyLength(int keyLength) {
     m_keyLength = keyLength;
 }
+int KeyGen::getKeyLength() {
+    return m_key.size();
+}
 SecByteBlock KeyGen::generateKey() {
     m_key.CleanNew(m_keyLength);
     m_prng.GenerateBlock(m_key, m_key.size());
