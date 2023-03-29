@@ -6,7 +6,6 @@
 #include <QLabel>
 #include <QGridLayout>
 #include <QFileDialog>
-#include <QMessageBox>
 #include <QInputDialog>
 #include <iostream>
 
@@ -56,6 +55,138 @@ void MainWindow::connectItems() {
         QObject::connect(action, &KActionBase::setStackPage, ui->m_mainStack, &QStackedWidget::setCurrentIndex);
     }
 }
+bool MainWindow::isFileExist(std::string filename) {
+    return std::fstream(filename).good();
+}
+
+QMessageBox::ButtonRole MainWindow::dialogFileExists(const string& message) {
+    string text = "<td><img src=:/assets/warning.png width=50 height=50/></td><td valign=middle>" + message + "</td>";
+    QMessageBox msg(this);
+    QPushButton* changeDirectory =  msg.addButton("Change directory", QMessageBox::AcceptRole);
+    QPushButton* override =  msg.addButton("Override file", QMessageBox::ApplyRole);
+    QPushButton* rename =  msg.addButton("Rename file", QMessageBox::ActionRole);
+    QPushButton* cancel =  msg.addButton("cancel", QMessageBox::RejectRole);
+
+    cancel->setVisible(false);
+    msg.setWindowTitle("xKrypt - Warning");
+    msg.setWindowIcon(QIcon(QPixmap(":/assets/warning.ico")));
+    msg.setText(QString::fromStdString(text));
+    msg.setDefaultButton(changeDirectory);
+    msg.setEscapeButton(cancel);
+    msg.setModal(true);
+    msg.exec();
+
+    if(msg.clickedButton() == changeDirectory)
+        return QMessageBox::AcceptRole;
+    else if(msg.clickedButton() == override)
+        return dialogConfirm("Are you sure you want to override file?")? QMessageBox::ApplyRole : QMessageBox::RejectRole;
+    else if(msg.clickedButton() == rename)
+        return dialogInsertFilename("Please insert filename")? QMessageBox::ActionRole: QMessageBox::RejectRole;
+    else if(msg.clickedButton() == cancel)
+        return QMessageBox::RejectRole;
+    return QMessageBox::RejectRole;
+}
+bool MainWindow::dialogInsertFilename(const string& message) {
+    string text = "<td><img src=:/assets/file.png width=50 height=50/></td><td valign=middle>" + message + "</td>";
+    QInputDialog input(this);
+    bool isFnameInserted = false;
+    m_fname = "";
+
+    input.setWindowTitle("xKrypt - insert");
+    input.setWindowIcon(QIcon(QPixmap(":/assets/file.ico")));
+    input.setLabelText(QString::fromStdString(text));
+    input.setFixedSize(500, 200);
+    input.setModal(true);
+    if(input.exec()) {
+        m_fname = input.textValue().toStdString();
+        isFnameInserted = true;
+    }
+
+    return isFnameInserted;
+}
+bool MainWindow::dialogConfirm(const string& message) {
+    string text = "<td><img src=:/assets/warning.png width=50 height=50/></td><td valign=middle>" + message +  "</td>";
+    QMessageBox msg(this);
+    QPushButton* ok =  msg.addButton("Ok", QMessageBox::AcceptRole);
+    QPushButton* cancel =  msg.addButton("Cancel", QMessageBox::RejectRole);
+    bool isConfirmed = false;
+
+    msg.setWindowTitle("xKrypt - Warning");
+    msg.setWindowIcon(QIcon(QPixmap(":/assets/warning.ico")));
+    msg.setText(QString::fromStdString(text));
+    msg.setDefaultButton(cancel);
+    msg.setEscapeButton(cancel);
+    msg.setModal(true);
+    msg.exec();
+
+    if(msg.clickedButton() == ok) isConfirmed = true;
+
+    return isConfirmed;
+}
+void MainWindow::dialogErrorMessage(const string& message) {
+    string text = "<td><img src=:/assets/error.png width=50 height=50/></td><td valign=middle>" + message + "</td>";
+    QMessageBox msg(this);
+    QPushButton* ok =  msg.addButton("Ok", QMessageBox::AcceptRole);
+
+    msg.setWindowTitle("xKrypt - Error");
+    msg.setWindowIcon(QIcon(QPixmap(":/assets/error.ico")));
+    msg.setText(QString::fromStdString(text));
+    msg.setDefaultButton(ok);
+    msg.setEscapeButton(ok);
+    msg.setModal(true);
+    msg.exec();
+}
+void MainWindow::dialogNoKeyMessage(const string& message) {
+    // Cannot [encrypt | decrypt] - No key loaded!\nPlease generate or import key and retry.
+    string text = "<td><img src=:/assets/error.png width=50 height=50/></td><td valign=middle>" + message + "</td>";
+    QMessageBox msg(this);
+    QPushButton* ok =  msg.addButton("Ok", QMessageBox::AcceptRole);
+
+    msg.setWindowTitle("xKrypt - Error");
+    msg.setWindowIcon(QIcon(QPixmap(":/assets/error.ico")));
+    msg.setText(QString::fromStdString(text));
+    msg.setDefaultButton(ok);
+    msg.setEscapeButton(ok);
+    msg.setModal(true);
+    msg.exec();
+}
+
+void MainWindow::writeKeyBinary(SecByteBlock) {
+}
+void MainWindow::writeKeyHex(SecByteBlock key) {
+    FileSink* fs = new FileSink(m_dir.toStdString().c_str());
+    HexEncoder encoderHex(fs);
+    encoderHex.Put(key, key.size());
+    encoderHex.MessageEnd();
+}
+void MainWindow::writeKeyBase64(SecByteBlock key) {
+    FileSink* fs = new FileSink(m_dir.toStdString().c_str());
+    Base64Encoder encoderBase64(fs);
+    encoderBase64.Put(key, key.size());
+    encoderBase64.MessageEnd();
+}
+string MainWindow::keyToBinary(SecByteBlock) {
+    return "Not implemented yet!";
+
+}
+string MainWindow::keyToBase64(SecByteBlock key) {
+    stringstream ss;
+    FileSink* fs = new FileSink(ss);
+    Base64Encoder encoderBase64(fs);
+
+    encoderBase64.Put(key, key.size());
+    encoderBase64.MessageEnd();
+    return ss.str();
+}
+string MainWindow::keyToHex(SecByteBlock key) {
+    stringstream ss;
+    FileSink* fs = new FileSink(ss);
+    HexEncoder encoderHex(fs);
+
+    encoderHex.Put(key, key.size());
+    encoderHex.MessageEnd();
+    return ss.str();
+}
 
 // slots
 void MainWindow::on_m_encryptBtn_clicked()
@@ -83,39 +214,46 @@ void MainWindow::on_m_decryptSelectFBtn_clicked()
 void MainWindow::on_m_keyMGenerateBtn_clicked()
 {
     SecByteBlock key = m_cipher->generateKey();
-    m_genLoop = true;
-    m_genOverride = false;
+    m_override = false;
+    m_create = false;
+    m_changeDirectory = false;
     m_dir = "";
     m_fname = "";
 
-    if(ui->m_keyMCheckBox->isChecked()) {
-        while(m_genLoop) {
-            if(!m_genOverride) m_dir = QFileDialog::getExistingDirectory(nullptr, "Select saving directory", "");
+    // save key on file
+    if(ui->m_keyMSaveOnF->isChecked()) {
+        while(true) {
+            if(!m_override && !m_create) m_dir = QFileDialog::getExistingDirectory(nullptr, "Select saving directory", "");
             if(!m_dir.isEmpty()) {
-                dialogInsertFilename("Please insert filename");
-                if((!isFileExist(m_fname) || m_genOverride) && !m_fname.empty()) {
-                    FileSink* fs = new FileSink(m_fname.c_str());
-                    Base64Encoder encoderBase64(fs);
-                    encoderBase64.Put(key, key.size());
-                    encoderBase64.MessageEnd();
-                    break;
+                bool canWrite = true;
+                if(!m_override && !m_create && !m_changeDirectory) canWrite = dialogInsertFilename("Please insert filename");
+                if(canWrite) {
+                    string dir = m_dir.toStdString() +  "/" + m_fname;
+                    if(!isFileExist(dir) || m_override) {
+                        m_dir =  QString::fromStdString(dir);
+                        writeKeyBase64(key);
+                        break;
+                    }
+                    else {
+                        QMessageBox::ButtonRole role = dialogFileExists("File already exists! What you want to do?");
+                        if(role == QMessageBox::AcceptRole)  { m_changeDirectory = true; continue; }
+                        if(role == QMessageBox::ApplyRole) { m_override = true; continue; }
+                        if(role == QMessageBox::ActionRole) { m_create = true; continue; }
+                        if(role == QMessageBox::RejectRole) break;
+                    }
                 }
-                else if(m_fname.empty()) break;
-                else dialogFileExists("File already exists! What you want to do?");
+                else break;
             }
-            else m_genLoop = false;
+            else break;
         }
     }
 
-    stringstream ss;
-    FileSink* fs = new FileSink(ss);
-    Base64Encoder encoderBase64(fs);
+    // show key on window output
+    if(ui->m_keyMshowKey->isChecked())
+        ui->m_keyMKeyLoaded->setPlainText(QString::fromStdString(keyToBase64(key)));
 
-    encoderBase64.Put(key, key.size());
-    encoderBase64.MessageEnd();
-
-    ui->m_keyMKeyLoaded->setPlainText(QString::fromStdString(ss.str()));
-    if(ui->m_keyMCheckBox->isChecked()) ui->m_keyMCheckBox->setChecked(false);
+    ui->m_keyMSaveOnF->setChecked(false);
+    ui->m_keyMshowKey->setChecked(true);
 }
 void MainWindow::on_m_keyMImportBtn_clicked()
 {
@@ -145,7 +283,6 @@ void MainWindow::setMode(const QString& mode) {
     delete m_cipher;
     int keyLength = ui->m_keyMKeys->currentText().toInt();
 
-
     // aes modes
     if(mode == AesGCM::ModeName) m_cipher = new AesGCM(keyLength);
     if(mode == AesGCM::ModeName) m_cipher = new AesGCM(keyLength);
@@ -169,102 +306,4 @@ void MainWindow::setKey(const int keyLength) {
     default: break;
     }
 }
-
-bool MainWindow::isFileExist(std::string filename) {
-    return std::fstream(filename).good();
-}
-void MainWindow::dialogFileExists(const string& message) {
-    string text = "<td><img src=:/assets/warning.png width=50 height=50/></td><td valign=middle>" + message + "</td>";
-    QMessageBox msg(this);
-    QPushButton* changeDirectory =  msg.addButton("Change directory", QMessageBox::AcceptRole);
-    QPushButton* override =  msg.addButton("Override file", QMessageBox::ActionRole);
-    QPushButton* rename =  msg.addButton("Rename file", QMessageBox::ActionRole);
-    QPushButton* cancel =  msg.addButton("cancel", QMessageBox::RejectRole);
-
-    cancel->setVisible(false);
-    msg.setWindowTitle("xKrypt - Warning");
-    msg.setWindowIcon(QIcon(QPixmap(":/assets/warning.ico")));
-    msg.setText(QString::fromStdString(text));
-    msg.setDefaultButton(changeDirectory);
-    msg.setEscapeButton(cancel);
-    msg.setModal(true);
-    msg.exec();
-
-    if(msg.clickedButton() == changeDirectory) {
-        return;
-    }
-    else if(msg.clickedButton() == override) {
-        m_genOverride = true;
-        dialogWarning("Are you sure you want to override file?");
-    }
-    else if(msg.clickedButton() == rename) {
-        dialogInsertFilename("Please insert filename");
-    }
-    else if(msg.clickedButton() == cancel) {
-        m_genLoop = false;
-    }
-}
-void MainWindow::dialogInsertFilename(const string& message) {
-    string text = "<td><img src=:/assets/file.png width=50 height=50/></td><td valign=middle>" + message + "</td>";
-    QInputDialog input(this);
-    m_fname = "";
-
-    input.setWindowTitle("xKrypt - insert");
-    input.setWindowIcon(QIcon(QPixmap(":/assets/file.ico")));
-    input.setLabelText(QString::fromStdString(text));
-    input.setFixedSize(500, 200);
-    input.setModal(true);
-    if(input.exec()) {
-        m_fname = m_dir.toStdString() + "/" + input.textValue().toStdString();
-    }
-}
-void MainWindow::dialogWarning(const string& message) {
-    string text = "<td><img src=:/assets/warning.png width=50 height=50/></td><td valign=middle>" + message +  "</td>";
-    QMessageBox msg(this);
-    QPushButton* ok =  msg.addButton("Ok", QMessageBox::AcceptRole);
-    QPushButton* cancel =  msg.addButton("Cancel", QMessageBox::RejectRole);
-
-    msg.setWindowTitle("xKrypt - Warning");
-    msg.setWindowIcon(QIcon(QPixmap(":/assets/warning.ico")));
-    msg.setText(QString::fromStdString(text));
-    msg.setDefaultButton(cancel);
-    msg.setEscapeButton(cancel);
-    msg.setModal(true);
-    msg.exec();
-
-    if(msg.clickedButton() == ok) m_genOverride = true;
-    else if (msg.clickedButton() == cancel) {
-        m_genOverride = false;
-        m_genLoop = false;
-    }
-}
-void MainWindow::dialogError(const string& message) {
-    string text = "<td><img src=:/assets/error.png width=50 height=50/></td><td valign=middle>" + message + "</td>";
-    QMessageBox msg(this);
-    QPushButton* ok =  msg.addButton("Ok", QMessageBox::AcceptRole);
-
-    msg.setWindowTitle("xKrypt - Error");
-    msg.setWindowIcon(QIcon(QPixmap(":/assets/error.ico")));
-    msg.setText(QString::fromStdString(text));
-    msg.setDefaultButton(ok);
-    msg.setEscapeButton(ok);
-    msg.setModal(true);
-    msg.exec();
-}
-void MainWindow::dialogNoKeyError(const string& message) {
-    // Cannot [encrypt | decrypt] - No key loaded!\nPlease generate or import key and retry.
-    string text = "<td><img src=:/assets/error.png width=50 height=50/></td><td valign=middle>" + message + "</td>";
-    QMessageBox msg(this);
-    QPushButton* ok =  msg.addButton("Ok", QMessageBox::AcceptRole);
-
-    msg.setWindowTitle("xKrypt - Error");
-    msg.setWindowIcon(QIcon(QPixmap(":/assets/error.ico")));
-    msg.setText(QString::fromStdString(text));
-    msg.setDefaultButton(ok);
-    msg.setEscapeButton(ok);
-    msg.setModal(true);
-    msg.exec();
-
-}
-
 

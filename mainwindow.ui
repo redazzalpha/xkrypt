@@ -236,7 +236,7 @@ Import key or generate one from selected algorithm.
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout">
          <item>
-          <widget class="QCheckBox" name="m_keyMCheckBox">
+          <widget class="QCheckBox" name="m_keyMSaveOnF">
            <property name="maximumSize">
             <size>
              <width>100</width>
@@ -245,6 +245,19 @@ Import key or generate one from selected algorithm.
            </property>
            <property name="text">
             <string>save on file</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="m_keyMshowKey">
+           <property name="text">
+            <string>show key</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+           <property name="tristate">
+            <bool>false</bool>
            </property>
           </widget>
          </item>
