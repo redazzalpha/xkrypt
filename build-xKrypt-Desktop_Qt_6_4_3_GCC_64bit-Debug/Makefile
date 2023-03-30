@@ -986,10 +986,10 @@ moc_mainwindow.cpp: ../mainwindow.h \
 		../aescbc.h \
 		../aeseax.h \
 		../keygen.h \
+		../enums.h \
 		../rsassa.h \
 		../cipherrsa.h \
 		../rsaoeap.h \
-		../enums.h \
 		../kactionkeyMgr.h \
 		../kactionpage.h \
 		../kactionbase.h \
@@ -2619,7 +2619,8 @@ kactionquit.o: ../kactionquit.cpp ../kactionquit.h \
 		../../../../Qt/6.4.3/gcc_64/include/QtWidgets/qtabwidget.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o kactionquit.o ../kactionquit.cpp
 
-keygen.o: ../keygen.cpp ../keygen.h
+keygen.o: ../keygen.cpp ../keygen.h \
+		../enums.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o keygen.o ../keygen.cpp
 
 main.o: ../main.cpp ../mainwindow.h \
@@ -2700,10 +2701,10 @@ main.o: ../main.cpp ../mainwindow.h \
 		../aescbc.h \
 		../aeseax.h \
 		../keygen.h \
+		../enums.h \
 		../rsassa.h \
 		../cipherrsa.h \
 		../rsaoeap.h \
-		../enums.h \
 		../kactionkeyMgr.h \
 		../kactionpage.h \
 		../kactionbase.h \
@@ -2886,10 +2887,10 @@ mainwindow.o: ../mainwindow.cpp ui_mainwindow.h \
 		../aescbc.h \
 		../aeseax.h \
 		../keygen.h \
+		../enums.h \
 		../rsassa.h \
 		../cipherrsa.h \
 		../rsaoeap.h \
-		../enums.h \
 		../kactionkeyMgr.h \
 		../kactionpage.h \
 		../kactionbase.h \

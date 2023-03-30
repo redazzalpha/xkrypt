@@ -12,7 +12,7 @@ CipherAes::CipherAes() {}
 // destructor
 CipherAes::~CipherAes() {};
 
-// methods
+// virtual methods
 QString CipherAes::getAlgName() const {
     return CipherAes::AlgName;
 }

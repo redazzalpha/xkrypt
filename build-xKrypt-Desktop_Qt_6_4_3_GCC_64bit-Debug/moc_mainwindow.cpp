@@ -31,10 +31,10 @@ struct qt_meta_stringdata_MainWindow_t {
     char stringdata1[24];
     char stringdata2[1];
     char stringdata3[24];
-    char stringdata4[31];
-    char stringdata5[31];
-    char stringdata6[29];
-    char stringdata7[27];
+    char stringdata4[23];
+    char stringdata5[23];
+    char stringdata6[26];
+    char stringdata7[24];
     char stringdata8[13];
     char stringdata9[4];
     char stringdata10[8];
@@ -52,33 +52,33 @@ struct qt_meta_stringdata_MainWindow_t {
 Q_CONSTINIT static const qt_meta_stringdata_MainWindow_t qt_meta_stringdata_MainWindow = {
     {
         QT_MOC_LITERAL(0, 10),  // "MainWindow"
-        QT_MOC_LITERAL(11, 23),  // "on_m_encryptBtn_clicked"
+        QT_MOC_LITERAL(11, 23),  // "on_m_encEncrypt_clicked"
         QT_MOC_LITERAL(35, 0),  // ""
-        QT_MOC_LITERAL(36, 23),  // "on_m_decryptBtn_clicked"
-        QT_MOC_LITERAL(60, 30),  // "on_m_encryptSelectFBtn_clicked"
-        QT_MOC_LITERAL(91, 30),  // "on_m_decryptSelectFBtn_clicked"
-        QT_MOC_LITERAL(122, 28),  // "on_m_keyMGenerateBtn_clicked"
-        QT_MOC_LITERAL(151, 26),  // "on_m_keyMImportBtn_clicked"
-        QT_MOC_LITERAL(178, 12),  // "setAlgorithm"
-        QT_MOC_LITERAL(191, 3),  // "alg"
-        QT_MOC_LITERAL(195, 7),  // "setMode"
-        QT_MOC_LITERAL(203, 4),  // "mode"
-        QT_MOC_LITERAL(208, 12),  // "setKeyLength"
-        QT_MOC_LITERAL(221, 5),  // "index"
-        QT_MOC_LITERAL(227, 14),  // "setKeyEncoding"
-        QT_MOC_LITERAL(242, 7),  // "showKey"
-        QT_MOC_LITERAL(250, 9),  // "isChecked"
-        QT_MOC_LITERAL(260, 8),  // "colorKey"
-        QT_MOC_LITERAL(269, 8)   // "flushKey"
+        QT_MOC_LITERAL(36, 23),  // "on_m_decDecrypt_clicked"
+        QT_MOC_LITERAL(60, 22),  // "on_m_encImport_clicked"
+        QT_MOC_LITERAL(83, 22),  // "on_m_decImport_clicked"
+        QT_MOC_LITERAL(106, 25),  // "on_m_keyMGenerate_clicked"
+        QT_MOC_LITERAL(132, 23),  // "on_m_keyMImport_clicked"
+        QT_MOC_LITERAL(156, 12),  // "setAlgorithm"
+        QT_MOC_LITERAL(169, 3),  // "alg"
+        QT_MOC_LITERAL(173, 7),  // "setMode"
+        QT_MOC_LITERAL(181, 4),  // "mode"
+        QT_MOC_LITERAL(186, 12),  // "setKeyLength"
+        QT_MOC_LITERAL(199, 5),  // "index"
+        QT_MOC_LITERAL(205, 14),  // "setKeyEncoding"
+        QT_MOC_LITERAL(220, 7),  // "showKey"
+        QT_MOC_LITERAL(228, 9),  // "isChecked"
+        QT_MOC_LITERAL(238, 8),  // "colorKey"
+        QT_MOC_LITERAL(247, 8)   // "flushKey"
     },
     "MainWindow",
-    "on_m_encryptBtn_clicked",
+    "on_m_encEncrypt_clicked",
     "",
-    "on_m_decryptBtn_clicked",
-    "on_m_encryptSelectFBtn_clicked",
-    "on_m_decryptSelectFBtn_clicked",
-    "on_m_keyMGenerateBtn_clicked",
-    "on_m_keyMImportBtn_clicked",
+    "on_m_decDecrypt_clicked",
+    "on_m_encImport_clicked",
+    "on_m_decImport_clicked",
+    "on_m_keyMGenerate_clicked",
+    "on_m_keyMImport_clicked",
     "setAlgorithm",
     "alg",
     "setMode",
@@ -149,17 +149,17 @@ Q_CONSTINIT const QMetaObject MainWindow::staticMetaObject = { {
     qt_incomplete_metaTypeArray<qt_meta_stringdata_MainWindow_t,
         // Q_OBJECT / Q_GADGET
         QtPrivate::TypeAndForceComplete<MainWindow, std::true_type>,
-        // method 'on_m_encryptBtn_clicked'
+        // method 'on_m_encEncrypt_clicked'
         QtPrivate::TypeAndForceComplete<void, std::false_type>,
-        // method 'on_m_decryptBtn_clicked'
+        // method 'on_m_decDecrypt_clicked'
         QtPrivate::TypeAndForceComplete<void, std::false_type>,
-        // method 'on_m_encryptSelectFBtn_clicked'
+        // method 'on_m_encImport_clicked'
         QtPrivate::TypeAndForceComplete<void, std::false_type>,
-        // method 'on_m_decryptSelectFBtn_clicked'
+        // method 'on_m_decImport_clicked'
         QtPrivate::TypeAndForceComplete<void, std::false_type>,
-        // method 'on_m_keyMGenerateBtn_clicked'
+        // method 'on_m_keyMGenerate_clicked'
         QtPrivate::TypeAndForceComplete<void, std::false_type>,
-        // method 'on_m_keyMImportBtn_clicked'
+        // method 'on_m_keyMImport_clicked'
         QtPrivate::TypeAndForceComplete<void, std::false_type>,
         // method 'setAlgorithm'
         QtPrivate::TypeAndForceComplete<void, std::false_type>,
@@ -175,7 +175,7 @@ Q_CONSTINIT const QMetaObject MainWindow::staticMetaObject = { {
         QtPrivate::TypeAndForceComplete<const int, std::false_type>,
         // method 'showKey'
         QtPrivate::TypeAndForceComplete<void, std::false_type>,
-        QtPrivate::TypeAndForceComplete<bool, std::false_type>,
+        QtPrivate::TypeAndForceComplete<const bool, std::false_type>,
         // method 'colorKey'
         QtPrivate::TypeAndForceComplete<void, std::false_type>,
         // method 'flushKey'
@@ -190,12 +190,12 @@ void MainWindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         auto *_t = static_cast<MainWindow *>(_o);
         (void)_t;
         switch (_id) {
-        case 0: _t->on_m_encryptBtn_clicked(); break;
-        case 1: _t->on_m_decryptBtn_clicked(); break;
-        case 2: _t->on_m_encryptSelectFBtn_clicked(); break;
-        case 3: _t->on_m_decryptSelectFBtn_clicked(); break;
-        case 4: _t->on_m_keyMGenerateBtn_clicked(); break;
-        case 5: _t->on_m_keyMImportBtn_clicked(); break;
+        case 0: _t->on_m_encEncrypt_clicked(); break;
+        case 1: _t->on_m_decDecrypt_clicked(); break;
+        case 2: _t->on_m_encImport_clicked(); break;
+        case 3: _t->on_m_decImport_clicked(); break;
+        case 4: _t->on_m_keyMGenerate_clicked(); break;
+        case 5: _t->on_m_keyMImport_clicked(); break;
         case 6: _t->setAlgorithm((*reinterpret_cast< std::add_pointer_t<QString>>(_a[1]))); break;
         case 7: _t->setMode((*reinterpret_cast< std::add_pointer_t<QString>>(_a[1]))); break;
         case 8: _t->setKeyLength((*reinterpret_cast< std::add_pointer_t<int>>(_a[1]))); break;

@@ -27,7 +27,7 @@ public slots:
     virtual void onActionClick() = 0;
 
 signals:
-    void setStackPage(int page);
+    void setStackPage(const int page);
     void quit();
 };
 

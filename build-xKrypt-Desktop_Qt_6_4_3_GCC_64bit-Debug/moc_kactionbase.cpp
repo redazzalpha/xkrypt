@@ -96,7 +96,7 @@ Q_CONSTINIT const QMetaObject KActionBase::staticMetaObject = { {
         QtPrivate::TypeAndForceComplete<KActionBase, std::true_type>,
         // method 'setStackPage'
         QtPrivate::TypeAndForceComplete<void, std::false_type>,
-        QtPrivate::TypeAndForceComplete<int, std::false_type>,
+        QtPrivate::TypeAndForceComplete<const int, std::false_type>,
         // method 'quit'
         QtPrivate::TypeAndForceComplete<void, std::false_type>,
         // method 'onActionClick'
@@ -119,7 +119,7 @@ void KActionBase::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id,
     } else if (_c == QMetaObject::IndexOfMethod) {
         int *result = reinterpret_cast<int *>(_a[0]);
         {
-            using _t = void (KActionBase::*)(int );
+            using _t = void (KActionBase::*)(const int );
             if (_t _q_method = &KActionBase::setStackPage; *reinterpret_cast<_t *>(_a[1]) == _q_method) {
                 *result = 0;
                 return;
@@ -166,7 +166,7 @@ int KActionBase::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 }
 
 // SIGNAL 0
-void KActionBase::setStackPage(int _t1)
+void KActionBase::setStackPage(const int _t1)
 {
     void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(std::addressof(_t1))) };
     QMetaObject::activate(this, &staticMetaObject, 0, _a);
