@@ -44,26 +44,30 @@ MainWindow::~MainWindow()
 
 // methods
 void MainWindow::init() {
-    ui->m_keyMAlgs->addItems(*m_algorithms);
-    ui->m_keyMModes->addItems(*m_aesModes);
-    ui->m_keyMKeyLength->addItems(*m_aesKeys);
-    ui->m_keyMKeyEncoding->addItems(*m_encodings);
+    ui->m_encAlgs->addItems(*m_algorithms);
+    ui->m_encModes->addItems(*m_aesModes);
+    ui->m_decAlgs->addItems(*m_algorithms);
+    ui->m_decModes->addItems(*m_aesModes);
+    ui->m_keyMLength->addItems(*m_aesKeys);
+    ui->m_keyMEncoding->addItems(*m_encodings);
 }
 void MainWindow::connectItems() {
     // connect comboboxes
-    QObject::connect(ui->m_keyMAlgs, &QComboBox::textActivated, this, &MainWindow::setAlgorithm);
-    QObject::connect(ui->m_keyMModes, &QComboBox::textActivated, this, &MainWindow::setMode);
-    QObject::connect(ui->m_keyMKeyLength, &QComboBox::activated, this, &MainWindow::setKeyLength);
-    QObject::connect(ui->m_keyMKeyEncoding, &QComboBox::activated, this, &MainWindow::setKeyEncoding);
+    QObject::connect(ui->m_encAlgs, &QComboBox::textActivated, this, &MainWindow::setAlgorithm);
+    QObject::connect(ui->m_encModes, &QComboBox::textActivated, this, &MainWindow::setMode);
+    QObject::connect(ui->m_decAlgs, &QComboBox::textActivated, this, &MainWindow::setAlgorithm);
+    QObject::connect(ui->m_decModes, &QComboBox::textActivated, this, &MainWindow::setMode);
+    QObject::connect(ui->m_keyMLength, &QComboBox::activated, this, &MainWindow::setKeyLength);
+    QObject::connect(ui->m_keyMEncoding, &QComboBox::activated, this, &MainWindow::setKeyEncoding);
 
     // connect checkboxes
     QObject::connect(ui->m_keyMshowKey, &QCheckBox::clicked, this, &MainWindow::showKey);
 
     // connect buttons
-    QObject::connect(ui->m_keyMFlushBtn, &QPushButton::clicked, this, &MainWindow::flushKey);
+    QObject::connect(ui->m_keyMFlush, &QPushButton::clicked, this, &MainWindow::flushKey);
 
     // connect plain texts
-    QObject::connect(ui->m_keyMKeyLoaded, &QPlainTextEdit::textChanged, this, &MainWindow::colorKey);
+    QObject::connect(ui->m_keyMLoaded, &QPlainTextEdit::textChanged, this, &MainWindow::colorKey);
 
     // connect actions
     foreach (KActionBase* action, m_actions) {
@@ -252,38 +256,38 @@ string MainWindow::keyTo(SecByteBlock key) {
 }
 
 // slots
-void MainWindow::on_m_encryptBtn_clicked()
+void MainWindow::on_m_encEncrypt_clicked()
 {
 //    m_keygen->isKeyLoaded()?
 //        m_cipher->encrypt():
 //        dialogNoKeyMessage("encrypt");
 }
-void MainWindow::on_m_decryptBtn_clicked()
+void MainWindow::on_m_decDecrypt_clicked()
 {
 //    m_keygen->isKeyLoaded()?
 //        m_cipher->decrypt():
 //        dialogNoKeyMessage("decrypt");
 }
-void MainWindow::on_m_encryptSelectFBtn_clicked()
+void MainWindow::on_m_encImport_clicked()
 {
     QString fileName = QFileDialog::getOpenFileName(this,"file(s) to encrypt", "", "All Files (*)");
 }
-void MainWindow::on_m_decryptSelectFBtn_clicked()
+void MainWindow::on_m_decImport_clicked()
 {
     QString fileName = QFileDialog::getOpenFileName(this,"file(s) to decrypt", "", "All Files (*)");
 }
-void MainWindow::on_m_keyMGenerateBtn_clicked()
+void MainWindow::on_m_keyMGenerate_clicked()
 {
     SecByteBlock key = m_keygen->generateKey();
 
     if(ui->m_keyMSaveOnF->isChecked()) saveOnFile(key);
 
-    ui->m_keyMKeyLoaded->setPlainText(QString::fromStdString(keyTo(key)));
+    ui->m_keyMLoaded->setPlainText(QString::fromStdString(keyTo(key)));
 
     ui->m_keyMSaveOnF->setChecked(false);
     dialogSuccessMessage("key " + std::to_string(m_keygen->getKeyLength()) + " bits has been successfully generated");
 }
-void MainWindow::on_m_keyMImportBtn_clicked()
+void MainWindow::on_m_keyMImport_clicked()
 {
     QString fileName = QFileDialog::getOpenFileName(this,"Import key", "", "All Files (*)");
 }
@@ -291,25 +295,25 @@ void MainWindow::on_m_keyMImportBtn_clicked()
 void MainWindow::setAlgorithm(const QString& alg) {
 
     delete m_cipher;
-    ui->m_keyMModes->clear();
-    ui->m_keyMKeyLength->clear();
+    ui->m_encModes->clear();
+    ui->m_keyMLength->clear();
 
     if(alg == CipherAes::AlgName){
-        ui->m_keyMKeyLength->currentText().toInt();
+        ui->m_keyMLength->currentText().toInt();
         m_cipher = new AesGCM;
-        ui->m_keyMModes->addItems(*m_aesModes);
-        ui->m_keyMKeyLength->addItems(*m_aesKeys);
-        ui->m_keyMKeyLength->setVisible(true);
+        ui->m_encModes->addItems(*m_aesModes);
+        ui->m_keyMLength->addItems(*m_aesKeys);
+        ui->m_keyMLength->setVisible(true);
     }
     if(alg == CipherRsa::AlgName) {
         m_cipher = new RsaOEAP;
-        ui->m_keyMModes->addItems(*m_rsaModes);
-        ui->m_keyMKeyLength->setVisible(false);
+        ui->m_encModes->addItems(*m_rsaModes);
+        ui->m_keyMLength->setVisible(false);
     }
 }
 void MainWindow::setMode(const QString& mode) {
     delete m_cipher;
-    ui->m_keyMKeyLength->currentText().toInt();
+    ui->m_keyMLength->currentText().toInt();
 
     // aes modes
     if(mode == AesGCM::ModeName) m_cipher = new AesGCM;
@@ -347,24 +351,24 @@ void MainWindow::setKeyEncoding(const int index) {
     }
 }
 void MainWindow::showKey(const bool isChecked) {
-    bool isEmpty = ui->m_keyMKeyLoaded->toPlainText() == QString::fromStdString(NO_KEY_LOADED);
+    bool isEmpty = ui->m_keyMLoaded->toPlainText() == QString::fromStdString(NO_KEY_LOADED);
     if(isChecked) {
-        if(isEmpty) ui->m_keyMKeyLoaded->setStyleSheet("background-color:rgba(0,0,0,0);color:red;");
-        else ui->m_keyMKeyLoaded->setStyleSheet("background-color:rgba(0,0,0,0);");
+        if(isEmpty) ui->m_keyMLoaded->setStyleSheet("background-color:rgba(0,0,0,0);color:red;");
+        else ui->m_keyMLoaded->setStyleSheet("background-color:rgba(0,0,0,0);");
     }
-    else ui->m_keyMKeyLoaded->setStyleSheet("background-color:rgba(0,0,0,0); color:rgba(0,0,0,0)");
+    else ui->m_keyMLoaded->setStyleSheet("background-color:rgba(0,0,0,0); color:rgba(0,0,0,0)");
 }
 void MainWindow::colorKey() {
-    bool isEmpty = ui->m_keyMKeyLoaded->toPlainText() == QString::fromStdString(NO_KEY_LOADED);
+    bool isEmpty = ui->m_keyMLoaded->toPlainText() == QString::fromStdString(NO_KEY_LOADED);
     if(ui->m_keyMshowKey->isChecked()) {
-        if(isEmpty) ui->m_keyMKeyLoaded->setStyleSheet("background-color:rgba(0,0,0,0);color:red;");
-        else ui->m_keyMKeyLoaded->setStyleSheet("background-color:rgba(0,0,0,0);");
+        if(isEmpty) ui->m_keyMLoaded->setStyleSheet("background-color:rgba(0,0,0,0);color:red;");
+        else ui->m_keyMLoaded->setStyleSheet("background-color:rgba(0,0,0,0);");
     }
-    else ui->m_keyMKeyLoaded->setStyleSheet("background-color:rgba(0,0,0,0); color:rgba(0,0,0,0)");
+    else ui->m_keyMLoaded->setStyleSheet("background-color:rgba(0,0,0,0); color:rgba(0,0,0,0)");
 }
 void MainWindow::flushKey() {
     m_keygen->flushKey();
-    ui->m_keyMKeyLoaded->setPlainText(NO_KEY_LOADED);
+    ui->m_keyMLoaded->setPlainText(NO_KEY_LOADED);
     ui->m_keyMshowKey->setChecked(true);
     colorKey();
 }

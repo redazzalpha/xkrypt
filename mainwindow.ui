@@ -35,7 +35,7 @@
     <property name="currentIndex">
      <number>0</number>
     </property>
-    <widget class="QWidget" name="m_keyMPage">
+    <widget class="QWidget" name="m_pageKeyM">
      <widget class="QWidget" name="verticalLayoutWidget">
       <property name="geometry">
        <rect>
@@ -47,7 +47,7 @@
       </property>
       <layout class="QVBoxLayout" name="vlayout">
        <item>
-        <widget class="QLabel" name="m_keyMIntro">
+        <widget class="QLabel" name="m_label">
          <property name="text">
           <string>Key manager section.
 Import key or generate one from selected algorithm.
@@ -63,7 +63,7 @@ Import key or generate one from selected algorithm.
         </widget>
        </item>
        <item>
-        <spacer name="verticalSpacer_3">
+        <spacer name="spacer">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
          </property>
@@ -89,7 +89,7 @@ Import key or generate one from selected algorithm.
         </widget>
        </item>
        <item>
-        <spacer name="verticalSpacer_5">
+        <spacer name="spacer_15">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
          </property>
@@ -102,7 +102,7 @@ Import key or generate one from selected algorithm.
         </spacer>
        </item>
        <item>
-        <widget class="QPushButton" name="m_keyMImportBtn">
+        <widget class="QPushButton" name="m_keyMImport">
          <property name="maximumSize">
           <size>
            <width>120</width>
@@ -115,7 +115,7 @@ Import key or generate one from selected algorithm.
         </widget>
        </item>
        <item>
-        <spacer name="verticalSpacer">
+        <spacer name="spacer_2">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
          </property>
@@ -135,7 +135,7 @@ Import key or generate one from selected algorithm.
         </widget>
        </item>
        <item>
-        <spacer name="verticalSpacer_4">
+        <spacer name="spacer_3">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
          </property>
@@ -166,7 +166,7 @@ Import key or generate one from selected algorithm.
         </widget>
        </item>
        <item>
-        <spacer name="verticalSpacer_6">
+        <spacer name="spacer_16">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
          </property>
@@ -203,7 +203,7 @@ Import key or generate one from selected algorithm.
             </widget>
            </item>
            <item>
-            <spacer name="horizontalSpacer_2">
+            <spacer name="spacer_4">
              <property name="orientation">
               <enum>Qt::Horizontal</enum>
              </property>
@@ -220,7 +220,7 @@ Import key or generate one from selected algorithm.
          <item>
           <layout class="QHBoxLayout" name="hlayout_6">
            <item>
-            <widget class="QComboBox" name="m_keyMKeyLength">
+            <widget class="QComboBox" name="m_keyMLength">
              <property name="minimumSize">
               <size>
                <width>70</width>
@@ -230,7 +230,7 @@ Import key or generate one from selected algorithm.
             </widget>
            </item>
            <item>
-            <widget class="QComboBox" name="m_keyMKeyEncoding">
+            <widget class="QComboBox" name="m_keyMEncoding">
              <property name="minimumSize">
               <size>
                <width>70</width>
@@ -240,7 +240,7 @@ Import key or generate one from selected algorithm.
             </widget>
            </item>
            <item>
-            <widget class="QPushButton" name="m_keyMGenerateBtn">
+            <widget class="QPushButton" name="m_keyMGenerate">
              <property name="maximumSize">
               <size>
                <width>120</width>
@@ -253,7 +253,7 @@ Import key or generate one from selected algorithm.
             </widget>
            </item>
            <item>
-            <spacer name="horizontalSpacer_3">
+            <spacer name="spacer_5">
              <property name="orientation">
               <enum>Qt::Horizontal</enum>
              </property>
@@ -270,7 +270,7 @@ Import key or generate one from selected algorithm.
          <item>
           <layout class="QHBoxLayout" name="hlayout_7">
            <item>
-            <widget class="QPushButton" name="m_keyMFlushBtn">
+            <widget class="QPushButton" name="m_keyMFlush">
              <property name="maximumSize">
               <size>
                <width>120</width>
@@ -283,7 +283,7 @@ Import key or generate one from selected algorithm.
             </widget>
            </item>
            <item>
-            <spacer name="horizontalSpacer_4">
+            <spacer name="spacer_6">
              <property name="orientation">
               <enum>Qt::Horizontal</enum>
              </property>
@@ -328,7 +328,7 @@ Import key or generate one from selected algorithm.
           </widget>
          </item>
          <item>
-          <spacer name="horizontalSpacer">
+          <spacer name="spacer_13">
            <property name="orientation">
             <enum>Qt::Horizontal</enum>
            </property>
@@ -343,7 +343,7 @@ Import key or generate one from selected algorithm.
         </layout>
        </item>
        <item>
-        <spacer name="verticalSpacer_2">
+        <spacer name="spacer_14">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
          </property>
@@ -376,7 +376,7 @@ Import key or generate one from selected algorithm.
         </widget>
        </item>
        <item>
-        <widget class="QPlainTextEdit" name="m_keyMKeyLoaded">
+        <widget class="QPlainTextEdit" name="m_keyMLoaded">
          <property name="autoFillBackground">
           <bool>false</bool>
          </property>
@@ -409,7 +409,7 @@ Import key or generate one from selected algorithm.
       </layout>
      </widget>
     </widget>
-    <widget class="QWidget" name="m_encryptPage">
+    <widget class="QWidget" name="m_pageEnc">
      <widget class="QWidget" name="verticalLayoutWidget_6">
       <property name="geometry">
        <rect>
@@ -421,40 +421,16 @@ Import key or generate one from selected algorithm.
       </property>
       <layout class="QVBoxLayout" name="vlayout_3">
        <item>
-        <widget class="QPlainTextEdit" name="m_encryptIntro">
-         <property name="autoFillBackground">
-          <bool>false</bool>
-         </property>
-         <property name="styleSheet">
-          <string notr="true">background-color: rgba(0, 0, 0, 0);</string>
-         </property>
-         <property name="frameShape">
-          <enum>QFrame::NoFrame</enum>
-         </property>
-         <property name="frameShadow">
-          <enum>QFrame::Plain</enum>
-         </property>
-         <property name="tabChangesFocus">
-          <bool>false</bool>
-         </property>
-         <property name="readOnly">
-          <bool>true</bool>
-         </property>
-         <property name="plainText">
+        <widget class="QLabel" name="m_label_6">
+         <property name="text">
           <string>Encrypt manager section.
-Select file(s) to Encrypt.
+Select file(s) to Decrypt.
 </string>
-         </property>
-         <property name="textInteractionFlags">
-          <set>Qt::NoTextInteraction</set>
-         </property>
-         <property name="backgroundVisible">
-          <bool>false</bool>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QPlainTextEdit" name="m_encryptKeyLoaded">
+        <widget class="QPlainTextEdit" name="m_encLoaded">
          <property name="autoFillBackground">
           <bool>false</bool>
          </property>
@@ -485,14 +461,14 @@ Select file(s) to Encrypt.
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="m_encryptSelectFBtn">
+        <widget class="QPushButton" name="m_encImport">
          <property name="text">
           <string>Select file(s)</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QPlainTextEdit" name="m_encryptSelectedF">
+        <widget class="QPlainTextEdit" name="m_encSelected">
          <property name="autoFillBackground">
           <bool>false</bool>
          </property>
@@ -552,20 +528,17 @@ Select file(s) to Encrypt.
          <item>
           <layout class="QHBoxLayout" name="hlayout_4">
            <item>
-            <widget class="QComboBox" name="m_keyMAlgs_2"/>
+            <widget class="QComboBox" name="m_encAlgs"/>
            </item>
            <item>
-            <widget class="QComboBox" name="m_keyMModes_2"/>
-           </item>
-           <item>
-            <widget class="QComboBox" name="m_keyMKeys_2"/>
+            <widget class="QComboBox" name="m_encModes"/>
            </item>
           </layout>
          </item>
         </layout>
        </item>
        <item>
-        <widget class="QPushButton" name="m_encryptBtn">
+        <widget class="QPushButton" name="m_encEncrypt">
          <property name="text">
           <string>Encrypt</string>
          </property>
@@ -574,7 +547,7 @@ Select file(s) to Encrypt.
       </layout>
      </widget>
     </widget>
-    <widget class="QWidget" name="m_decryptPage">
+    <widget class="QWidget" name="m_pageDec">
      <widget class="QWidget" name="verticalLayoutWidget_5">
       <property name="geometry">
        <rect>
@@ -586,40 +559,16 @@ Select file(s) to Encrypt.
       </property>
       <layout class="QVBoxLayout" name="vlayout_2">
        <item>
-        <widget class="QPlainTextEdit" name="m_decryptIntro">
-         <property name="autoFillBackground">
-          <bool>false</bool>
-         </property>
-         <property name="styleSheet">
-          <string notr="true">background-color: rgba(0, 0, 0, 0);</string>
-         </property>
-         <property name="frameShape">
-          <enum>QFrame::NoFrame</enum>
-         </property>
-         <property name="frameShadow">
-          <enum>QFrame::Plain</enum>
-         </property>
-         <property name="tabChangesFocus">
-          <bool>false</bool>
-         </property>
-         <property name="readOnly">
-          <bool>true</bool>
-         </property>
-         <property name="plainText">
+        <widget class="QLabel" name="m_label_2">
+         <property name="text">
           <string>Decrypt manager section.
 Select file(s) to Decrypt.
 </string>
          </property>
-         <property name="textInteractionFlags">
-          <set>Qt::NoTextInteraction</set>
-         </property>
-         <property name="backgroundVisible">
-          <bool>false</bool>
-         </property>
         </widget>
        </item>
        <item>
-        <widget class="QPlainTextEdit" name="m_decryptLoadedKey">
+        <widget class="QPlainTextEdit" name="m_decLoaded">
          <property name="autoFillBackground">
           <bool>false</bool>
          </property>
@@ -650,14 +599,14 @@ Select file(s) to Decrypt.
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="m_decryptSelectFBtn">
+        <widget class="QPushButton" name="m_decImport">
          <property name="text">
           <string>Select file(s)</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QPlainTextEdit" name="m_decryptSelectedF">
+        <widget class="QPlainTextEdit" name="m_decSelected">
          <property name="autoFillBackground">
           <bool>false</bool>
          </property>
@@ -717,17 +666,17 @@ Select file(s) to Decrypt.
          <item>
           <layout class="QHBoxLayout" name="hlayout_2">
            <item>
-            <widget class="QComboBox" name="m_keyMAlgs"/>
+            <widget class="QComboBox" name="m_decAlgs"/>
            </item>
            <item>
-            <widget class="QComboBox" name="m_keyMModes"/>
+            <widget class="QComboBox" name="m_decModes"/>
            </item>
           </layout>
          </item>
         </layout>
        </item>
        <item>
-        <widget class="QPushButton" name="m_decryptBtn">
+        <widget class="QPushButton" name="m_decDecrypt">
          <property name="text">
           <string>Decrypt</string>
          </property>

@@ -97,12 +97,12 @@ private:
     std::string keyTo(CryptoPP::SecByteBlock key);
 
 private slots:
-    void on_m_encryptBtn_clicked();
-    void on_m_decryptBtn_clicked();
-    void on_m_encryptSelectFBtn_clicked();
-    void on_m_decryptSelectFBtn_clicked();
-    void on_m_keyMGenerateBtn_clicked();
-    void on_m_keyMImportBtn_clicked();
+    void on_m_encEncrypt_clicked();
+    void on_m_decDecrypt_clicked();
+    void on_m_encImport_clicked();
+    void on_m_decImport_clicked();
+    void on_m_keyMGenerate_clicked();
+    void on_m_keyMImport_clicked();
 
     void setAlgorithm(const QString& alg);
     void setMode(const QString& mode);
