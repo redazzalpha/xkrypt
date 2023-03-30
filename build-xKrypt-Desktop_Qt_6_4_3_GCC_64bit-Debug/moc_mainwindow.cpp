@@ -175,7 +175,7 @@ Q_CONSTINIT const QMetaObject MainWindow::staticMetaObject = { {
         QtPrivate::TypeAndForceComplete<const int, std::false_type>,
         // method 'showKey'
         QtPrivate::TypeAndForceComplete<void, std::false_type>,
-        QtPrivate::TypeAndForceComplete<bool, std::false_type>,
+        QtPrivate::TypeAndForceComplete<const bool, std::false_type>,
         // method 'colorKey'
         QtPrivate::TypeAndForceComplete<void, std::false_type>,
         // method 'flushKey'

@@ -13,10 +13,11 @@ AesCBC::AesCBC() {}
 // destructor
 AesCBC::~AesCBC() {};
 
-// methods
+// virtual methods
 QString AesCBC::getModeName() const {
     return AesCBC::ModeName;
 }
+
 void AesCBC::decrypt(SecByteBlock key, SecByteBlock iv){
     try
     {

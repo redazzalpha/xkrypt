@@ -22,6 +22,7 @@ public:
     // methods
     virtual QString getAlgName() const final;
     virtual QString getModeName() const override = 0;
+
     virtual void encrypt(CryptoPP::SecByteBlock key, CryptoPP::SecByteBlock iv) override = 0;
     virtual void decrypt(CryptoPP::SecByteBlock key, CryptoPP::SecByteBlock iv) override = 0;
 };

@@ -24,8 +24,14 @@ public:
     // methods
     virtual QString getAlgName() const = 0;
     virtual QString getModeName() const = 0;
+
     virtual void encrypt(CryptoPP::SecByteBlock key, CryptoPP::SecByteBlock iv) = 0;
     virtual void decrypt(CryptoPP::SecByteBlock key, CryptoPP::SecByteBlock iv) = 0;
 };
 
 #endif // CIPHERBASE_H
+
+
+
+
+

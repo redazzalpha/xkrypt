@@ -8,7 +8,7 @@ CipherRsa::CipherRsa(){}
 // destructor
 CipherRsa::~CipherRsa() {};
 
-// methods
+// virtual methods
 QString CipherRsa::getAlgName() const {
     return CipherRsa::AlgName;
 }

@@ -25,6 +25,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     init();
     connectItems();
+    setFixedSize(800, 600);
     setIconSize(QSize(35, 35));
 }
 // destructor
@@ -72,7 +73,7 @@ void MainWindow::connectItems() {
         QObject::connect(action, &KActionBase::setStackPage, ui->m_mainStack, &QStackedWidget::setCurrentIndex);
     }
 }
-bool MainWindow::isFileExist(string filename) {
+bool MainWindow::isFileExist(const string& filename) {
     return std::fstream(filename).good();
 }
 void MainWindow::saveOnFile(SecByteBlock key) {
@@ -345,7 +346,7 @@ void MainWindow::setKeyEncoding(const int index) {
     default: m_encoding = Encoding::HEX;
     }
 }
-void MainWindow::showKey(bool isChecked) {
+void MainWindow::showKey(const bool isChecked) {
     bool isEmpty = ui->m_keyMKeyLoaded->toPlainText() == QString::fromStdString(NO_KEY_LOADED);
     if(isChecked) {
         if(isEmpty) ui->m_keyMKeyLoaded->setStyleSheet("background-color:rgba(0,0,0,0);color:red;");

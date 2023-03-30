@@ -80,9 +80,10 @@ public:
     ~MainWindow();
 
 private:
+    // methods
     void init();
     void connectItems();
-    bool isFileExist(std::string filename);
+    bool isFileExist(const std::string &filename);
     void saveOnFile(CryptoPP::SecByteBlock key);
 
     QMessageBox::ButtonRole dialogFileExists(const std::string& message);
@@ -107,7 +108,7 @@ private slots:
     void setMode(const QString& mode);
     void setKeyLength(const int index);
     void setKeyEncoding(const int index);
-    void showKey(bool isChecked);
+    void showKey(const bool isChecked);
     void colorKey();
     void flushKey();
 };
