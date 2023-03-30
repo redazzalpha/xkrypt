@@ -1,5 +1,5 @@
-#ifndef KEYWRITER_H
-#define KEYWRITER_H
+#ifndef KEYSERIALIZER_H
+#define KEYSERIALIZER_H
 
 #include "enums.h"
 #include "qmainwindow.h"
@@ -8,7 +8,7 @@
 #include <QMessageBox>
 #include <QString>
 
-class KeyWriter final: public QObject{
+class KeySerializer final: public QObject{
 
 private:
     QMainWindow* m_parent;
@@ -22,7 +22,7 @@ private:
 
 public:
     // constructor
-    KeyWriter(QMainWindow* parent);
+    KeySerializer(QMainWindow* parent);
 
     // methods
     void saveOnFile(CryptoPP::SecByteBlock key);
@@ -40,4 +40,4 @@ public slots:
 
 };
 
-#endif // KEYWRITER_H
+#endif // KEYSERIALIZER_H

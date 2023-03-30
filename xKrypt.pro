@@ -23,7 +23,7 @@ SOURCES += \
     kactionpage.cpp \
     kactionquit.cpp \
     keygen.cpp \
-    keywriter.cpp \
+    keyserializer.cpp \
     main.cpp \
     mainwindow.cpp \
     rsaoeap.cpp \
@@ -46,7 +46,7 @@ HEADERS += \
     kactionpage.h \
     kactionquit.h \
     keygen.h \
-    keywriter.h \
+    keyserializer.h \
     mainwindow.h \
     rsaoeap.h \
     rsassa.h

@@ -18,7 +18,7 @@ using namespace CryptoPP;
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
-    ,   m_kw(this)
+    ,   m_ks(this)
 {
     ui->setupUi(this);
     init();
@@ -56,7 +56,7 @@ void MainWindow::connectItems() {
     QObject::connect(ui->m_decAlgs, &QComboBox::textActivated, this, &MainWindow::setAlgorithm);
     QObject::connect(ui->m_decModes, &QComboBox::textActivated, this, &MainWindow::setMode);
     QObject::connect(ui->m_keyMLength, &QComboBox::activated, this, &MainWindow::setKeyLength);
-    QObject::connect(ui->m_keyMEncoding, &QComboBox::activated, &m_kw, &KeyWriter::setKeyEncoding);
+    QObject::connect(ui->m_keyMEncoding, &QComboBox::activated, &m_ks, &KeySerializer::setKeyEncoding);
 
     // connect checkboxes
     QObject::connect(ui->m_keyMshowKey, &QCheckBox::clicked, this, &MainWindow::showKey);
@@ -151,9 +151,9 @@ void MainWindow::on_m_keyMGenerate_clicked()
 {
     SecByteBlock key = m_keygen->generateKey();
 
-    if(ui->m_keyMSaveOnF->isChecked()) m_kw.saveOnFile(key);
+    if(ui->m_keyMSaveOnF->isChecked()) m_ks.saveOnFile(key);
 
-    ui->m_keyMLoaded->setPlainText(QString::fromStdString(m_kw.keyToString(key)));
+    ui->m_keyMLoaded->setPlainText(QString::fromStdString(m_ks.keyToString(key)));
 
     ui->m_keyMSaveOnF->setChecked(false);
     dialogSuccessMessage("key " + std::to_string(m_keygen->getKeyLength()) + " bits has been successfully generated");

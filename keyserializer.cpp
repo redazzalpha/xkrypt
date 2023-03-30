@@ -1,4 +1,4 @@
-#include "keywriter.h"
+#include "keyserializer.h"
 #include "base64.h"
 #include "files.h"
 #include "hex.h"
@@ -11,10 +11,10 @@ using namespace CryptoPP;
 using namespace std;
 
 // constructors
-KeyWriter::KeyWriter(QMainWindow* parent): m_parent(parent){};
+KeySerializer::KeySerializer(QMainWindow* parent): m_parent(parent){};
 
 // methods
-void KeyWriter::saveOnFile(SecByteBlock key) {
+void KeySerializer::saveOnFile(SecByteBlock key) {
     m_override = false;
     m_create = false;
     m_changeDirectory = false;
@@ -46,10 +46,10 @@ void KeyWriter::saveOnFile(SecByteBlock key) {
         else break;
     }
 }
-bool KeyWriter::isFileExist(const string& filename) {
+bool KeySerializer::isFileExist(const string& filename) {
     return std::fstream(filename).good();
 }
-void KeyWriter::keyToFile(SecByteBlock key) {
+void KeySerializer::keyToFile(SecByteBlock key) {
     FileSink* fs = new FileSink(m_dir.toStdString().c_str());
     BufferedTransformation* encoder;
 
@@ -66,7 +66,7 @@ void KeyWriter::keyToFile(SecByteBlock key) {
     delete encoder;
     encoder = nullptr;
 }
-string KeyWriter::keyToString(SecByteBlock key) {
+string KeySerializer::keyToString(SecByteBlock key) {
     stringstream ss;
     FileSink* fs = new FileSink(ss);
     BufferedTransformation* encoder;
@@ -86,7 +86,7 @@ string KeyWriter::keyToString(SecByteBlock key) {
 
     return ss.str();
 }
-QMessageBox::ButtonRole KeyWriter::dialogFileExists(const string& message) {
+QMessageBox::ButtonRole KeySerializer::dialogFileExists(const string& message) {
     string text =
         "<td><img src=:/assets/warning.png width=50 height=50/></td><td valign=middle>" +
         message +
@@ -116,7 +116,7 @@ QMessageBox::ButtonRole KeyWriter::dialogFileExists(const string& message) {
         return QMessageBox::RejectRole;
     return QMessageBox::RejectRole;
 }
-bool KeyWriter::dialogInsertFilename(const string& message) {
+bool KeySerializer::dialogInsertFilename(const string& message) {
     string text =
         "<td><img src=:/assets/file.png width=50 height=50/></td><td valign=middle>" +
         message +
@@ -137,7 +137,7 @@ bool KeyWriter::dialogInsertFilename(const string& message) {
 
     return isFnameInserted;
 }
-bool KeyWriter::dialogConfirm(const string& message) {
+bool KeySerializer::dialogConfirm(const string& message) {
     string text =
         "<td><img src=:/assets/warning.png width=50 height=50/></td><td valign=middle>" +
         message +
@@ -161,7 +161,7 @@ bool KeyWriter::dialogConfirm(const string& message) {
 }
 
 // slots
-void KeyWriter::setKeyEncoding(const int index) {
+void KeySerializer::setKeyEncoding(const int index) {
     switch(index) {
     case Encoding::HEX : m_encoding = Encoding::HEX; break;
     case Encoding::BASE64 : m_encoding = Encoding::BASE64; break;
