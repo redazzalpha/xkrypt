@@ -86,13 +86,44 @@ string KeySerializer::keyToString(SecByteBlock key, Encoding encoding) {
 
     return ss.str();
 }
-SecByteBlock KeySerializer::importKey() {
+SecByteBlock KeySerializer::importKey(Encoding encoding) {
     m_dir = QFileDialog::getOpenFileName(m_parent,"Import key", "", "All Files (*)");
-//    FileSink* fs = new FileSink(m_dir.toStdString().c_str());
-//    BufferedTransformation* encoder;
+    SecByteBlock key;
 
-    SecByteBlock f;
-    return f;
+    if(!m_dir.isEmpty()) {
+        BufferedTransformation* decoder;
+        string decoded;
+
+        switch(encoding) {
+        case Encoding::HEX : decoder = new HexDecoder; break;
+        case Encoding::BASE64 : decoder = new Base64Decoder; break;
+        case Encoding::BINARY : decoder = new Base64Decoder; break;
+        default : decoder = new HexDecoder;
+        }
+
+        string line;
+        ostringstream os;
+
+        ifstream f(m_dir.toStdString());
+        if(f.good()) {
+
+            while (getline (f, line)) os << line;
+            f.close();
+
+            decoder->Put((CryptoPP::byte*)os.str().data(), os.str().size());
+            decoder->MessageEnd();
+
+            word64 size = decoder->MaxRetrievable();
+            if(size && size <= SIZE_MAX) {
+                decoded.resize(size);
+                decoder->Get((CryptoPP::byte*)&decoded[0], decoded.size());
+            }
+
+            key = SecByteBlock((CryptoPP::byte*)&decoded[0], decoded.size());
+        }
+    }
+
+    return key;
 }
 
 // private methods
@@ -169,21 +200,3 @@ bool KeySerializer::dialogConfirm(const string& message) {
 
     return isConfirmed;
 }
-
-// slots
-//void KeySerializer::setKeyEncoding(const int index) {
-//    switch(index) {
-//    case Encoding::HEX : m_encoding = Encoding::HEX; break;
-//    case Encoding::BASE64 : m_encoding = Encoding::BASE64; break;
-//    case Encoding::BINARY : m_encoding = Encoding::BINARY; break;
-//    default: m_encoding = Encoding::HEX;
-//    }
-//}
-//void KeySerializer::setKeyEncodingF(const int index) {
-//    switch(index) {
-//    case Encoding::HEX : m_encodingF = Encoding::HEX; break;
-//    case Encoding::BASE64 : m_encodingF = Encoding::BASE64; break;
-//    case Encoding::BINARY : m_encodingF = Encoding::BINARY; break;
-//    default: m_encodingF = Encoding::HEX;
-//    }
-//}

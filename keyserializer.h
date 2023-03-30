@@ -28,7 +28,7 @@ public:
     // methods
     void saveOnFile(CryptoPP::SecByteBlock key, Encoding encoding);
     std::string keyToString(CryptoPP::SecByteBlock key, Encoding encoding);
-    CryptoPP::SecByteBlock importKey();
+    CryptoPP::SecByteBlock importKey(Encoding encoding);
 
 private:
     void keyToFile(CryptoPP::SecByteBlock key, Encoding encoding);
@@ -36,11 +36,6 @@ private:
     QMessageBox::ButtonRole dialogFileExists(const std::string& message);
     bool dialogInsertFilename(const std::string& message);
     bool dialogConfirm(const std::string& message);
-
-public slots:
-//    void setKeyEncoding(const int index);
-//    void setKeyEncodingF(const int index);
-
 };
 
 #endif // KEYSERIALIZER_H

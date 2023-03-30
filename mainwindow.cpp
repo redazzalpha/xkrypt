@@ -163,10 +163,12 @@ void MainWindow::on_m_keyMImport_clicked()
 {
     Encoding encoding = static_cast<Encoding>(ui->m_keyMEncodingI->currentIndex());
 
-    m_keygen->setKey(m_ks.importKey());
-    if(m_keygen->isKeyLoaded())
-        m_ks.keyToString(m_keygen->getKey(), encoding);
-
+    m_keygen->setKey(m_ks.importKey(encoding));
+    if(m_keygen->isKeyLoaded()) {
+        string keyStr = m_ks.keyToString(m_keygen->getKey(), encoding);
+        ui->m_keyMLoaded->setPlainText( QString::fromStdString(keyStr));
+        colorKey();
+    }
 }
 
 void MainWindow::setAlgorithm(const QString& alg) {

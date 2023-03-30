@@ -129,7 +129,7 @@ Import key or generate one from selected algorithm.
             </size>
            </property>
            <property name="text">
-            <string>Select file(s)</string>
+            <string>Import</string>
            </property>
           </widget>
          </item>
