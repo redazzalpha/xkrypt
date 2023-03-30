@@ -102,17 +102,51 @@ Import key or generate one from selected algorithm.
         </spacer>
        </item>
        <item>
-        <widget class="QPushButton" name="m_keyMImport">
-         <property name="maximumSize">
-          <size>
-           <width>120</width>
-           <height>16777215</height>
-          </size>
-         </property>
+        <widget class="QLabel" name="label_11">
          <property name="text">
-          <string>Select file(s)</string>
+          <string>Encoding</string>
          </property>
         </widget>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="hlayout_8">
+         <item>
+          <widget class="QComboBox" name="m_keyMEncodingI">
+           <property name="minimumSize">
+            <size>
+             <width>70</width>
+             <height>0</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="m_keyMImport">
+           <property name="maximumSize">
+            <size>
+             <width>120</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>Select file(s)</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="spacer_7">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
        </item>
        <item>
         <spacer name="spacer_2">
@@ -230,7 +264,7 @@ Import key or generate one from selected algorithm.
             </widget>
            </item>
            <item>
-            <widget class="QComboBox" name="m_keyMEncoding">
+            <widget class="QComboBox" name="m_keyMEncodingG">
              <property name="minimumSize">
               <size>
                <width>70</width>

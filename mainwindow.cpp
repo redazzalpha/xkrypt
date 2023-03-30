@@ -40,14 +40,15 @@ MainWindow::~MainWindow()
         delete action;
 }
 
-// methods
+// private methods
 void MainWindow::init() {
     ui->m_encAlgs->addItems(*m_algorithms);
     ui->m_encModes->addItems(*m_aesModes);
     ui->m_decAlgs->addItems(*m_algorithms);
     ui->m_decModes->addItems(*m_aesModes);
     ui->m_keyMLength->addItems(*m_aesKeys);
-    ui->m_keyMEncoding->addItems(*m_encodings);
+    ui->m_keyMEncodingI->addItems(*m_encodings);
+    ui->m_keyMEncodingG->addItems(*m_encodings);
 }
 void MainWindow::connectItems() {
     // connect comboboxes
@@ -56,7 +57,6 @@ void MainWindow::connectItems() {
     QObject::connect(ui->m_decAlgs, &QComboBox::textActivated, this, &MainWindow::setAlgorithm);
     QObject::connect(ui->m_decModes, &QComboBox::textActivated, this, &MainWindow::setMode);
     QObject::connect(ui->m_keyMLength, &QComboBox::activated, this, &MainWindow::setKeyLength);
-    QObject::connect(ui->m_keyMEncoding, &QComboBox::activated, &m_ks, &KeySerializer::setKeyEncoding);
 
     // connect checkboxes
     QObject::connect(ui->m_keyMshowKey, &QCheckBox::clicked, this, &MainWindow::showKey);
@@ -150,17 +150,23 @@ void MainWindow::on_m_decImport_clicked()
 void MainWindow::on_m_keyMGenerate_clicked()
 {
     SecByteBlock key = m_keygen->generateKey();
+    Encoding encoding = static_cast<Encoding>(ui->m_keyMEncodingG->currentIndex());
 
-    if(ui->m_keyMSaveOnF->isChecked()) m_ks.saveOnFile(key);
+    if(ui->m_keyMSaveOnF->isChecked()) m_ks.saveOnFile(key,  encoding);
 
-    ui->m_keyMLoaded->setPlainText(QString::fromStdString(m_ks.keyToString(key)));
+    ui->m_keyMLoaded->setPlainText(QString::fromStdString(m_ks.keyToString(key, encoding)));
 
     ui->m_keyMSaveOnF->setChecked(false);
     dialogSuccessMessage("key " + std::to_string(m_keygen->getKeyLength()) + " bits has been successfully generated");
 }
 void MainWindow::on_m_keyMImport_clicked()
 {
-    QString fileName = QFileDialog::getOpenFileName(this,"Import key", "", "All Files (*)");
+    Encoding encoding = static_cast<Encoding>(ui->m_keyMEncodingI->currentIndex());
+
+    m_keygen->setKey(m_ks.importKey());
+    if(m_keygen->isKeyLoaded())
+        m_ks.keyToString(m_keygen->getKey(), encoding);
+
 }
 
 void MainWindow::setAlgorithm(const QString& alg) {

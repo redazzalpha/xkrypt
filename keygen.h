@@ -18,8 +18,11 @@ public:
     KeyGen(KeyLength keyLength);
 
     // methods
+    void setKey(CryptoPP::SecByteBlock key);
     void setKeyLength(KeyLength keyLength = KeyLength::LENGTH_DEFAULT);
+    CryptoPP::SecByteBlock getKey();
     int getKeyLength();
+
     CryptoPP::SecByteBlock generateKey();
     bool isKeyLoaded() const;
     void flushKey();

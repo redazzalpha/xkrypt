@@ -14,7 +14,7 @@ using namespace std;
 KeySerializer::KeySerializer(QMainWindow* parent): m_parent(parent){};
 
 // methods
-void KeySerializer::saveOnFile(SecByteBlock key) {
+void KeySerializer::saveOnFile(SecByteBlock key, Encoding encoding) {
     m_override = false;
     m_create = false;
     m_changeDirectory = false;
@@ -30,7 +30,7 @@ void KeySerializer::saveOnFile(SecByteBlock key) {
                 string dir = m_dir.toStdString() +  "/" + m_fname;
                 if(!isFileExist(dir) || m_override) {
                     m_dir =  QString::fromStdString(dir);
-                    keyToFile(key);
+                    keyToFile(key, encoding);
                     break;
                 }
                 else {
@@ -49,11 +49,11 @@ void KeySerializer::saveOnFile(SecByteBlock key) {
 bool KeySerializer::isFileExist(const string& filename) {
     return std::fstream(filename).good();
 }
-void KeySerializer::keyToFile(SecByteBlock key) {
+void KeySerializer::keyToFile(SecByteBlock key, Encoding encoding) {
     FileSink* fs = new FileSink(m_dir.toStdString().c_str());
     BufferedTransformation* encoder;
 
-    switch(m_encoding) {
+    switch(encoding) {
     case Encoding::HEX : encoder = new HexEncoder(fs); break;
     case Encoding::BASE64 : encoder = new Base64Encoder(fs); break;
     case Encoding::BINARY : encoder = new Base64Encoder(fs); break;
@@ -66,12 +66,12 @@ void KeySerializer::keyToFile(SecByteBlock key) {
     delete encoder;
     encoder = nullptr;
 }
-string KeySerializer::keyToString(SecByteBlock key) {
+string KeySerializer::keyToString(SecByteBlock key, Encoding encoding) {
     stringstream ss;
     FileSink* fs = new FileSink(ss);
     BufferedTransformation* encoder;
 
-    switch(m_encoding) {
+    switch(encoding) {
     case Encoding::HEX : encoder = new HexEncoder(fs); break;
     case Encoding::BASE64 : encoder = new Base64Encoder(fs); break;
     case Encoding::BINARY : encoder = new Base64Encoder(fs); break;
@@ -86,6 +86,16 @@ string KeySerializer::keyToString(SecByteBlock key) {
 
     return ss.str();
 }
+SecByteBlock KeySerializer::importKey() {
+    m_dir = QFileDialog::getOpenFileName(m_parent,"Import key", "", "All Files (*)");
+//    FileSink* fs = new FileSink(m_dir.toStdString().c_str());
+//    BufferedTransformation* encoder;
+
+    SecByteBlock f;
+    return f;
+}
+
+// private methods
 QMessageBox::ButtonRole KeySerializer::dialogFileExists(const string& message) {
     string text =
         "<td><img src=:/assets/warning.png width=50 height=50/></td><td valign=middle>" +
@@ -161,11 +171,19 @@ bool KeySerializer::dialogConfirm(const string& message) {
 }
 
 // slots
-void KeySerializer::setKeyEncoding(const int index) {
-    switch(index) {
-    case Encoding::HEX : m_encoding = Encoding::HEX; break;
-    case Encoding::BASE64 : m_encoding = Encoding::BASE64; break;
-    case Encoding::BINARY : m_encoding = Encoding::BINARY; break;
-    default: m_encoding = Encoding::HEX;
-    }
-}
+//void KeySerializer::setKeyEncoding(const int index) {
+//    switch(index) {
+//    case Encoding::HEX : m_encoding = Encoding::HEX; break;
+//    case Encoding::BASE64 : m_encoding = Encoding::BASE64; break;
+//    case Encoding::BINARY : m_encoding = Encoding::BINARY; break;
+//    default: m_encoding = Encoding::HEX;
+//    }
+//}
+//void KeySerializer::setKeyEncodingF(const int index) {
+//    switch(index) {
+//    case Encoding::HEX : m_encodingF = Encoding::HEX; break;
+//    case Encoding::BASE64 : m_encodingF = Encoding::BASE64; break;
+//    case Encoding::BINARY : m_encodingF = Encoding::BINARY; break;
+//    default: m_encodingF = Encoding::HEX;
+//    }
+//}
