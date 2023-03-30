@@ -4,7 +4,7 @@
 #include "aesgcm.h"
 #include "aescbc.h"
 #include "aeseax.h"
-#include "filewriter.h"
+#include "keywriter.h"
 #include "keygen.h"
 #include "rsassa.h"
 #include "rsaoeap.h"
@@ -28,7 +28,7 @@ class MainWindow : public QMainWindow {
 
 private:
     Ui::MainWindow *ui;
-    FileWriter m_fw;
+    KeyWriter m_kw;
 
     KeyGen* m_keygen = new KeyGen;
     CipherBase* m_cipher = new AesGCM;
@@ -79,6 +79,9 @@ private:
     void init();
     void connectItems();
 
+    void dialogSuccessMessage(const std::string& message);
+    void dialogErrorMessage(const std::string& message);
+    void dialogNoKeyMessage(const std::string& action);
 
 private slots:
     void on_m_encEncrypt_clicked();

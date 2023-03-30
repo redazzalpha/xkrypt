@@ -18,7 +18,7 @@ using namespace CryptoPP;
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
-    ,   m_fw(this)
+    ,   m_kw(this)
 {
     ui->setupUi(this);
     init();
@@ -56,7 +56,7 @@ void MainWindow::connectItems() {
     QObject::connect(ui->m_decAlgs, &QComboBox::textActivated, this, &MainWindow::setAlgorithm);
     QObject::connect(ui->m_decModes, &QComboBox::textActivated, this, &MainWindow::setMode);
     QObject::connect(ui->m_keyMLength, &QComboBox::activated, this, &MainWindow::setKeyLength);
-    QObject::connect(ui->m_keyMEncoding, &QComboBox::activated, &m_fw, &FileWriter::setKeyEncoding);
+    QObject::connect(ui->m_keyMEncoding, &QComboBox::activated, &m_kw, &KeyWriter::setKeyEncoding);
 
     // connect checkboxes
     QObject::connect(ui->m_keyMshowKey, &QCheckBox::clicked, this, &MainWindow::showKey);
@@ -74,6 +74,56 @@ void MainWindow::connectItems() {
         QObject::connect(action, &KActionBase::quit, this, &QMainWindow::close);
         QObject::connect(action, &KActionBase::setStackPage, ui->m_mainStack, &QStackedWidget::setCurrentIndex);
     }
+}
+
+void MainWindow::dialogSuccessMessage(const string& message) {
+    string text =
+        "<td><img src=:/assets/success.png width=50 height=50/></td><td valign=middle>" +
+        message +
+        "</td>";
+    QMessageBox msg(this);
+    QPushButton* ok =  msg.addButton("Ok", QMessageBox::AcceptRole);
+
+    msg.setWindowTitle("xKrypt - Success");
+    msg.setWindowIcon(QIcon(QPixmap(":/assets/error.ico")));
+    msg.setText(QString::fromStdString(text));
+    msg.setDefaultButton(ok);
+    msg.setEscapeButton(ok);
+    msg.setModal(true);
+    msg.exec();
+}
+void MainWindow::dialogErrorMessage(const string& message) {
+    string text =
+        "<td><img src=:/assets/error.png width=50 height=50/></td><td valign=middle>" +
+        message +
+        "</td>";
+    QMessageBox msg(this);
+    QPushButton* ok =  msg.addButton("Ok", QMessageBox::AcceptRole);
+
+    msg.setWindowTitle("xKrypt - Error");
+    msg.setWindowIcon(QIcon(QPixmap(":/assets/error.ico")));
+    msg.setText(QString::fromStdString(text));
+    msg.setDefaultButton(ok);
+    msg.setEscapeButton(ok);
+    msg.setModal(true);
+    msg.exec();
+}
+void MainWindow::dialogNoKeyMessage(const string& action) {
+    string text =
+        "<td><img src=:/assets/error.png width=50 height=50/></td>"
+        "<td valign=middle>Cannot " +
+        action +
+        " - No key loaded!<br />Please generate or import key and retry</td>";
+    QMessageBox msg(this);
+    QPushButton* ok =  msg.addButton("Ok", QMessageBox::AcceptRole);
+
+    msg.setWindowTitle("xKrypt - Error");
+    msg.setWindowIcon(QIcon(QPixmap(":/assets/error.ico")));
+    msg.setText(QString::fromStdString(text));
+    msg.setDefaultButton(ok);
+    msg.setEscapeButton(ok);
+    msg.setModal(true);
+    msg.exec();
 }
 
 // slots
@@ -101,12 +151,12 @@ void MainWindow::on_m_keyMGenerate_clicked()
 {
     SecByteBlock key = m_keygen->generateKey();
 
-    if(ui->m_keyMSaveOnF->isChecked()) m_fw.saveOnFile(key);
+    if(ui->m_keyMSaveOnF->isChecked()) m_kw.saveOnFile(key);
 
-    ui->m_keyMLoaded->setPlainText(QString::fromStdString(m_fw.keyToString(key)));
+    ui->m_keyMLoaded->setPlainText(QString::fromStdString(m_kw.keyToString(key)));
 
     ui->m_keyMSaveOnF->setChecked(false);
-    m_fw.dialogSuccessMessage("key " + std::to_string(m_keygen->getKeyLength()) + " bits has been successfully generated");
+    dialogSuccessMessage("key " + std::to_string(m_keygen->getKeyLength()) + " bits has been successfully generated");
 }
 void MainWindow::on_m_keyMImport_clicked()
 {

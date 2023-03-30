@@ -15,7 +15,6 @@ SOURCES += \
     cipheraes.cpp \
     cipherbase.cpp \
     cipherrsa.cpp \
-    filewriter.cpp \
     kaction.cpp \
     kactionbase.cpp \
     kactiondecrypt.cpp \
@@ -24,6 +23,7 @@ SOURCES += \
     kactionpage.cpp \
     kactionquit.cpp \
     keygen.cpp \
+    keywriter.cpp \
     main.cpp \
     mainwindow.cpp \
     rsaoeap.cpp \
@@ -38,7 +38,6 @@ HEADERS += \
     cipherrsa.h \
     defines.h \
     enums.h \
-    filewriter.h \
     kaction.h \
     kactionbase.h \
     kactiondecrypt.h \
@@ -47,6 +46,7 @@ HEADERS += \
     kactionpage.h \
     kactionquit.h \
     keygen.h \
+    keywriter.h \
     mainwindow.h \
     rsaoeap.h \
     rsassa.h
