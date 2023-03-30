@@ -32,6 +32,7 @@ private:
     bool m_create = false;
     bool m_changeDirectory = false;
     std::string m_fname = "";
+    Encoding m_encoding = Encoding::HEX;
     QString m_dir;
 
     KeyGen* m_keygen = new KeyGen;
@@ -50,23 +51,26 @@ private:
         RsaSSA::ModeName,
     };
     QList<QString>* m_aesKeys = new QList<QString>{
-        QString::number(Key::KEYLENGTH_DEFAULT),
-        QString::number(Key::KEYLENGTH_32),
-        QString::number(Key::KEYLENGTH_64),
-        QString::number(Key::KEYLENGTH_128),
-        QString::number(Key::KEYLENGTH_256),
-        QString::number(Key::KEYLENGTH_512),
-        QString::number(Key::KEYLENGTH_1024),
-        QString::number(Key::KEYLENGTH_2048),
+        QString::number(KeyLength::LENGTH_DEFAULT),
+        QString::number(KeyLength::LENGTH_32),
+        QString::number(KeyLength::LENGTH_64),
+        QString::number(KeyLength::LENGTH_128),
+        QString::number(KeyLength::LENGTH_256),
+        QString::number(KeyLength::LENGTH_512),
+        QString::number(KeyLength::LENGTH_1024),
+        QString::number(KeyLength::LENGTH_2048),
     };
-
+    QList<QString>* m_encodings = new QList<QString>{
+        "Hex",
+        "Base64",
+        "Binary",
+    };
     QList<KActionBase*> m_actions = QList<KActionBase*> {
         new KActionKeyMgr(),
         new KActionEncrypt(),
         new KActionDecrypt(),
         new KActionQuit(),
     };
-
 
 public:
     // constructors
@@ -76,6 +80,7 @@ public:
     ~MainWindow();
 
 private:
+    void init();
     void connectItems();
     bool isFileExist(std::string filename);
     void saveOnFile(CryptoPP::SecByteBlock key);
@@ -87,12 +92,8 @@ private:
     void dialogErrorMessage(const std::string& message);
     void dialogNoKeyMessage(const std::string& action);
 
-    void writeKeyBinary(CryptoPP::SecByteBlock key);
-    void writeKeyHex(CryptoPP::SecByteBlock key);
-    void writeKeyBase64(CryptoPP::SecByteBlock key);
-    std::string keyToBinary(CryptoPP::SecByteBlock key);
-    std::string keyToHex(CryptoPP::SecByteBlock key);
-    std::string keyToBase64(CryptoPP::SecByteBlock key);
+    void writeKey(CryptoPP::SecByteBlock key);
+    std::string keyTo(CryptoPP::SecByteBlock key);
 
 private slots:
     void on_m_encryptBtn_clicked();
@@ -105,6 +106,7 @@ private slots:
     void setAlgorithm(const QString& alg);
     void setMode(const QString& mode);
     void setKeyLength(const int index);
+    void setKeyEncoding(const int index);
     void showKey(bool isChecked);
     void colorKey();
     void flushKey();

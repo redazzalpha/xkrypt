@@ -5,10 +5,10 @@ using namespace CryptoPP;
 
 // constructors
 KeyGen::KeyGen() {}
-KeyGen::KeyGen(int keyLength): m_keyLength(keyLength) {}
+KeyGen::KeyGen(KeyLength keyLength): m_keyLength(keyLength) {}
 
 // methods
-void KeyGen::setKeyLength(int keyLength) {
+void KeyGen::setKeyLength(KeyLength keyLength) {
     m_keyLength = keyLength;
 }
 int KeyGen::getKeyLength() {

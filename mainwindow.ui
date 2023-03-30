@@ -84,7 +84,7 @@ Import key or generate one from selected algorithm.
           </font>
          </property>
          <property name="text">
-          <string>Import key:</string>
+          <string>Import key</string>
          </property>
         </widget>
        </item>
@@ -158,7 +158,7 @@ Import key or generate one from selected algorithm.
           </font>
          </property>
          <property name="text">
-          <string>Generate key:</string>
+          <string>Generate key</string>
          </property>
          <property name="margin">
           <number>0</number>
@@ -181,16 +181,56 @@ Import key or generate one from selected algorithm.
        <item>
         <layout class="QVBoxLayout" name="vlayout_5">
          <item>
-          <widget class="QLabel" name="label_13">
-           <property name="text">
-            <string>key (bits):</string>
-           </property>
-          </widget>
+          <layout class="QHBoxLayout" name="hlayout_5">
+           <item>
+            <widget class="QLabel" name="label_13">
+             <property name="minimumSize">
+              <size>
+               <width>70</width>
+               <height>0</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>key (bits)</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="label_4">
+             <property name="text">
+              <string>Encoding</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_2">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
          </item>
          <item>
-          <layout class="QHBoxLayout" name="horizontalLayout">
+          <layout class="QHBoxLayout" name="hlayout_6">
            <item>
             <widget class="QComboBox" name="m_keyMKeyLength">
+             <property name="minimumSize">
+              <size>
+               <width>70</width>
+               <height>0</height>
+              </size>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QComboBox" name="m_keyMKeyEncoding">
              <property name="minimumSize">
               <size>
                <width>70</width>
@@ -213,6 +253,23 @@ Import key or generate one from selected algorithm.
             </widget>
            </item>
            <item>
+            <spacer name="horizontalSpacer_3">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="hlayout_7">
+           <item>
             <widget class="QPushButton" name="m_keyMFlushBtn">
              <property name="maximumSize">
               <size>
@@ -226,7 +283,7 @@ Import key or generate one from selected algorithm.
             </widget>
            </item>
            <item>
-            <spacer name="horizontalSpacer_2">
+            <spacer name="horizontalSpacer_4">
              <property name="orientation">
               <enum>Qt::Horizontal</enum>
              </property>
@@ -306,6 +363,19 @@ Import key or generate one from selected algorithm.
         </widget>
        </item>
        <item>
+        <widget class="QLabel" name="label_3">
+         <property name="font">
+          <font>
+           <bold>true</bold>
+           <underline>true</underline>
+          </font>
+         </property>
+         <property name="text">
+          <string>Loaded key</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QPlainTextEdit" name="m_keyMKeyLoaded">
          <property name="autoFillBackground">
           <bool>false</bool>
@@ -329,7 +399,7 @@ Import key or generate one from selected algorithm.
           <string>no key loaded !</string>
          </property>
          <property name="textInteractionFlags">
-          <set>Qt::NoTextInteraction</set>
+          <set>Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
          </property>
          <property name="backgroundVisible">
           <bool>false</bool>

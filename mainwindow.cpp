@@ -5,7 +5,6 @@
 #include "base64.h"
 #include "hex.h"
 #include "files.h"
-#include "aes.h"
 #include <QToolButton>
 #include <QPushButton>
 #include <QLabel>
@@ -24,15 +23,9 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-
-    ui->m_keyMAlgs->addItems(*m_algorithms);
-    ui->m_keyMModes->addItems(*m_aesModes);
-    ui->m_keyMKeyLength->addItems(*m_aesKeys);
-
+    init();
     connectItems();
     setIconSize(QSize(35, 35));
-
-
 }
 // destructor
 MainWindow::~MainWindow()
@@ -43,16 +36,24 @@ MainWindow::~MainWindow()
     delete m_aesModes;
     delete m_rsaModes;
     delete m_algorithms;
+    delete m_encodings;
     foreach(KActionBase* action, m_actions)
         delete action;
 }
 
 // methods
+void MainWindow::init() {
+    ui->m_keyMAlgs->addItems(*m_algorithms);
+    ui->m_keyMModes->addItems(*m_aesModes);
+    ui->m_keyMKeyLength->addItems(*m_aesKeys);
+    ui->m_keyMKeyEncoding->addItems(*m_encodings);
+}
 void MainWindow::connectItems() {
     // connect comboboxes
     QObject::connect(ui->m_keyMAlgs, &QComboBox::textActivated, this, &MainWindow::setAlgorithm);
     QObject::connect(ui->m_keyMModes, &QComboBox::textActivated, this, &MainWindow::setMode);
     QObject::connect(ui->m_keyMKeyLength, &QComboBox::activated, this, &MainWindow::setKeyLength);
+    QObject::connect(ui->m_keyMKeyEncoding, &QComboBox::activated, this, &MainWindow::setKeyEncoding);
 
     // connect checkboxes
     QObject::connect(ui->m_keyMshowKey, &QCheckBox::clicked, this, &MainWindow::showKey);
@@ -90,7 +91,7 @@ void MainWindow::saveOnFile(SecByteBlock key) {
                 string dir = m_dir.toStdString() +  "/" + m_fname;
                 if(!isFileExist(dir) || m_override) {
                     m_dir =  QString::fromStdString(dir);
-                    writeKeyBase64(key);
+                    writeKey(key);
                     break;
                 }
                 else {
@@ -106,6 +107,7 @@ void MainWindow::saveOnFile(SecByteBlock key) {
         else break;
     }
 }
+
 QMessageBox::ButtonRole MainWindow::dialogFileExists(const string& message) {
     string text = "<td><img src=:/assets/warning.png width=50 height=50/></td><td valign=middle>" + message + "</td>";
     QMessageBox msg(this);
@@ -210,41 +212,41 @@ void MainWindow::dialogNoKeyMessage(const string& action) {
     msg.exec();
 }
 
-void MainWindow::writeKeyBinary(SecByteBlock) {
-}
-void MainWindow::writeKeyHex(SecByteBlock key) {
+void MainWindow::writeKey(SecByteBlock key) {
     FileSink* fs = new FileSink(m_dir.toStdString().c_str());
-    HexEncoder encoderHex(fs);
-    encoderHex.Put(key, key.size());
-    encoderHex.MessageEnd();
-}
-void MainWindow::writeKeyBase64(SecByteBlock key) {
-    FileSink* fs = new FileSink(m_dir.toStdString().c_str());
-    Base64Encoder encoderBase64(fs);
-    encoderBase64.Put(key, key.size());
-    encoderBase64.MessageEnd();
-}
-string MainWindow::keyToBinary(SecByteBlock) {
-    return "Not implemented yet!";
+    BufferedTransformation* encoder;
 
+    switch(m_encoding) {
+    case Encoding::HEX : encoder = new HexEncoder(fs); break;
+    case Encoding::BASE64 : encoder = new Base64Encoder(fs); break;
+    case Encoding::BINARY : encoder = new Base64Encoder(fs); break;
+    default : encoder = new HexEncoder(fs);
+    }
+
+    encoder->Put(key, key.size());
+    encoder->MessageEnd();
+
+    delete encoder;
+    encoder = nullptr;
 }
-string MainWindow::keyToBase64(SecByteBlock key) {
+string MainWindow::keyTo(SecByteBlock key) {
     stringstream ss;
     FileSink* fs = new FileSink(ss);
-    Base64Encoder encoderBase64(fs);
+    BufferedTransformation* encoder;
 
-    encoderBase64.Put(key, key.size());
-    encoderBase64.MessageEnd();
+    switch(m_encoding) {
+    case Encoding::HEX : encoder = new HexEncoder(fs); break;
+    case Encoding::BASE64 : encoder = new Base64Encoder(fs); break;
+    case Encoding::BINARY : encoder = new Base64Encoder(fs); break;
+    default : encoder = new HexEncoder(fs);
+    }
 
-    return ss.str();
-}
-string MainWindow::keyToHex(SecByteBlock key) {
-    stringstream ss;
-    FileSink* fs = new FileSink(ss);
-    HexEncoder encoderHex(fs);
+    encoder->Put(key, key.size());
+    encoder->MessageEnd();
 
-    encoderHex.Put(key, key.size());
-    encoderHex.MessageEnd();
+    delete encoder;
+    encoder = nullptr;
+
     return ss.str();
 }
 
@@ -275,13 +277,10 @@ void MainWindow::on_m_keyMGenerateBtn_clicked()
 
     if(ui->m_keyMSaveOnF->isChecked()) saveOnFile(key);
 
-    ui->m_keyMKeyLoaded->setPlainText(QString::fromStdString(keyToBase64(key)));
+    ui->m_keyMKeyLoaded->setPlainText(QString::fromStdString(keyTo(key)));
 
     ui->m_keyMSaveOnF->setChecked(false);
-    dialogSuccessMessage("The key has been successfully generated");
-
-
-
+    dialogSuccessMessage("key " + std::to_string(m_keygen->getKeyLength()) + " bits has been successfully generated");
 }
 void MainWindow::on_m_keyMImportBtn_clicked()
 {
@@ -295,7 +294,7 @@ void MainWindow::setAlgorithm(const QString& alg) {
     ui->m_keyMKeyLength->clear();
 
     if(alg == CipherAes::AlgName){
-        int keyLength = ui->m_keyMKeyLength->currentText().toInt();
+        ui->m_keyMKeyLength->currentText().toInt();
         m_cipher = new AesGCM;
         ui->m_keyMModes->addItems(*m_aesModes);
         ui->m_keyMKeyLength->addItems(*m_aesKeys);
@@ -309,7 +308,7 @@ void MainWindow::setAlgorithm(const QString& alg) {
 }
 void MainWindow::setMode(const QString& mode) {
     delete m_cipher;
-    int keyLength = ui->m_keyMKeyLength->currentText().toInt();
+    ui->m_keyMKeyLength->currentText().toInt();
 
     // aes modes
     if(mode == AesGCM::ModeName) m_cipher = new AesGCM;
@@ -327,15 +326,23 @@ void MainWindow::setMode(const QString& mode) {
 }
 void MainWindow::setKeyLength(const int index) {
     switch(index) {
-    case 0 : m_keygen->setKeyLength(Key::KEYLENGTH_DEFAULT); break;
-    case 1 : m_keygen->setKeyLength(Key::KEYLENGTH_32); break;
-    case 2 : m_keygen->setKeyLength(Key::KEYLENGTH_64); break;
-    case 3 : m_keygen->setKeyLength(Key::KEYLENGTH_128); break;
-    case 4 : m_keygen->setKeyLength(Key::KEYLENGTH_256); break;
-    case 5 : m_keygen->setKeyLength(Key::KEYLENGTH_512); break;
-    case 6 : m_keygen->setKeyLength(Key::KEYLENGTH_1024); break;
-    case 7 : m_keygen->setKeyLength(Key::KEYLENGTH_2048); break;
-    default: m_keygen->setKeyLength(Key::KEYLENGTH_DEFAULT);
+    case 0 : m_keygen->setKeyLength(KeyLength::LENGTH_DEFAULT); break;
+    case 1 : m_keygen->setKeyLength(KeyLength::LENGTH_32); break;
+    case 2 : m_keygen->setKeyLength(KeyLength::LENGTH_64); break;
+    case 3 : m_keygen->setKeyLength(KeyLength::LENGTH_128); break;
+    case 4 : m_keygen->setKeyLength(KeyLength::LENGTH_256); break;
+    case 5 : m_keygen->setKeyLength(KeyLength::LENGTH_512); break;
+    case 6 : m_keygen->setKeyLength(KeyLength::LENGTH_1024); break;
+    case 7 : m_keygen->setKeyLength(KeyLength::LENGTH_2048); break;
+    default: m_keygen->setKeyLength(KeyLength::LENGTH_DEFAULT);
+    }
+}
+void MainWindow::setKeyEncoding(const int index) {
+    switch(index) {
+    case Encoding::HEX : m_encoding = Encoding::HEX; break;
+    case Encoding::BASE64 : m_encoding = Encoding::BASE64; break;
+    case Encoding::BINARY : m_encoding = Encoding::BINARY; break;
+    default: m_encoding = Encoding::HEX;
     }
 }
 void MainWindow::showKey(bool isChecked) {
@@ -357,4 +364,6 @@ void MainWindow::colorKey() {
 void MainWindow::flushKey() {
     m_keygen->flushKey();
     ui->m_keyMKeyLoaded->setPlainText(NO_KEY_LOADED);
+    ui->m_keyMshowKey->setChecked(true);
+    colorKey();
 }
