@@ -4,6 +4,7 @@
 #include "aesgcm.h"
 #include "aescbc.h"
 #include "aeseax.h"
+#include "filewriter.h"
 #include "keygen.h"
 #include "rsassa.h"
 #include "rsaoeap.h"
@@ -27,13 +28,7 @@ class MainWindow : public QMainWindow {
 
 private:
     Ui::MainWindow *ui;
-    bool m_loop = true;
-    bool m_override = false;
-    bool m_create = false;
-    bool m_changeDirectory = false;
-    std::string m_fname = "";
-    Encoding m_encoding = Encoding::HEX;
-    QString m_dir;
+    FileWriter m_fw;
 
     KeyGen* m_keygen = new KeyGen;
     CipherBase* m_cipher = new AesGCM;
@@ -83,18 +78,7 @@ private:
     // methods
     void init();
     void connectItems();
-    bool isFileExist(const std::string &filename);
-    void saveOnFile(CryptoPP::SecByteBlock key);
 
-    QMessageBox::ButtonRole dialogFileExists(const std::string& message);
-    bool dialogInsertFilename(const std::string& message);
-    bool dialogConfirm(const std::string& message);
-    void dialogSuccessMessage(const std::string& message);
-    void dialogErrorMessage(const std::string& message);
-    void dialogNoKeyMessage(const std::string& action);
-
-    void writeKey(CryptoPP::SecByteBlock key);
-    std::string keyTo(CryptoPP::SecByteBlock key);
 
 private slots:
     void on_m_encEncrypt_clicked();
@@ -107,7 +91,6 @@ private slots:
     void setAlgorithm(const QString& alg);
     void setMode(const QString& mode);
     void setKeyLength(const int index);
-    void setKeyEncoding(const int index);
     void showKey(const bool isChecked);
     void colorKey();
     void flushKey();
