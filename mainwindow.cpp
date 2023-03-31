@@ -1,4 +1,5 @@
 #include "./ui_mainwindow.h"
+#include "kexcept.h"
 #include "mainwindow.h"
 #include "enums.h"
 #include "defines.h"
@@ -163,14 +164,22 @@ void MainWindow::on_m_keyMGenerate_clicked()
 void MainWindow::on_m_keyMImport_clicked()
 {
     Encoding encoding = static_cast<Encoding>(ui->m_keyMEncodingI->currentIndex());
+    try {
+        m_keygen->setKey(m_ks.importKey(encoding));
 
-    m_keygen->setKey(m_ks.importKey(encoding));
-    if(m_keygen->isKeyLoaded()) {
-        string keyStr = m_ks.keyToString(m_keygen->getKey(), encoding);
-        ui->m_keyMLoaded->setPlainText( QString::fromStdString(keyStr));
-        colorKey();
-        dialogSuccessMessage("The key has been successfully imported");
+        if(m_keygen->isKeyLoaded()) {
+            string keyStr = m_ks.keyToString(m_keygen->getKey(), encoding);
+            ui->m_keyMLoaded->setPlainText( QString::fromStdString(keyStr));
+            colorKey();
+            dialogSuccessMessage("The key has been successfully imported");
+        }
     }
+    catch(UnsupportedEncoding& e) {
+//        dialogErrorMessage("Seems like you are trying to import Base 64 key<br />but encoding is set on Hex!<br /> Try encoding Binary or Base 64");
+        dialogErrorMessage(e.what());
+
+    }
+
 }
 
 void MainWindow::setAlgorithm(const QString& alg) {
