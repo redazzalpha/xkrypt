@@ -98,7 +98,7 @@ private slots:
     void setAlgorithm(const QString& alg);
     void setMode(const QString& mode);
     void setKeyLength(const int index);
-    void showKey(const bool isChecked);
+    void hideKey(const bool isChecked);
     void colorKey();
     void flushKey();
 };

@@ -1,8 +1,3 @@
-<<<<<<< HEAD
-#include "./ui_mainwindow.h"
-#include "kexcept.h"
-=======
->>>>>>> slave
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
 #include "kexcept.h"
@@ -70,7 +65,7 @@ void MainWindow::connectItems() {
     QObject::connect(ui->m_keyMLength, &QComboBox::activated, this, &MainWindow::setKeyLength);
 
     // connect checkboxes
-    QObject::connect(ui->m_keyMshowKey, &QCheckBox::clicked, this, &MainWindow::showKey);
+    QObject::connect(ui->m_keyMshowKey, &QCheckBox::clicked, this, &MainWindow::hideKey);
 
     // connect buttons
     QObject::connect(ui->m_keyMFlush, &QPushButton::clicked, this, &MainWindow::flushKey);
@@ -206,11 +201,7 @@ void MainWindow::on_m_keyMImport_clicked()
 
         if(m_keygen->isKeyLoaded()) {
             string keyStr = m_ks.keyToString(m_keygen->getKey(), encoding);
-<<<<<<< HEAD
-            ui->m_keyMLoaded->setPlainText( QString::fromStdString(keyStr));
-=======
             setKeyLoadedText(QString::fromStdString(keyStr));
->>>>>>> slave
             colorKey();
             dialogSuccessMessage("The key has been successfully imported");
         }
@@ -220,7 +211,6 @@ void MainWindow::on_m_keyMImport_clicked()
         dialogErrorMessage(e.what());
 
     }
-
 }
 
 void MainWindow::setAlgorithm(const QString& alg) {
@@ -273,28 +263,30 @@ void MainWindow::setKeyLength(const int index) {
     default: m_keygen->setKeyLength(KeyLength::LENGTH_DEFAULT);
     }
 }
-void MainWindow::showKey(const bool isChecked) {
+void MainWindow::hideKey(const bool isChecked) {
     bool isEmpty = ui->m_keyMLoaded->toPlainText() == QString::fromStdString(NO_KEY_LOADED);
     if(isChecked) {
+        setKeyLoadedStyle("background-color:rgba(0,0,0,0); color:rgba(0,0,0,0)");
+        setKeyLoadedSelectable(false);
+    }
+    else {
         if(isEmpty) setKeyLoadedStyle("background-color:rgba(0,0,0,0);color:red;");
         else setKeyLoadedStyle("background-color:rgba(0,0,0,0);");
         setKeyLoadedSelectable(true);
-    }
-    else {
-        setKeyLoadedStyle("background-color:rgba(0,0,0,0); color:rgba(0,0,0,0)");
-        setKeyLoadedSelectable(false);
     }
 }
 void MainWindow::colorKey() {
     bool isEmpty = ui->m_keyMLoaded->toPlainText() == QString::fromStdString(NO_KEY_LOADED);
     if(ui->m_keyMshowKey->isChecked())
+        setKeyLoadedStyle("background-color:rgba(0,0,0,0); color:rgba(0,0,0,0)");
+    else {
         if(isEmpty) setKeyLoadedStyle("background-color:rgba(0,0,0,0);color:red;");
         else setKeyLoadedStyle("background-color:rgba(0,0,0,0);");
-    else setKeyLoadedStyle("background-color:rgba(0,0,0,0); color:rgba(0,0,0,0)");
+    }
 }
 void MainWindow::flushKey() {
     m_keygen->flushKey();
-    ui->m_keyMshowKey->setChecked(true);
+    ui->m_keyMshowKey->setChecked(false);
     setKeyLoadedText(NO_KEY_LOADED);
     colorKey();
 }
