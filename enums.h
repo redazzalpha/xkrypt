@@ -17,8 +17,8 @@ enum KeyLength {
     LENGTH_2048 = 2048,
 };
 enum Encoding {
-    HEX,
     BASE64,
+    HEX,
     BINARY,
 };
 

@@ -14,6 +14,7 @@
 using namespace std;
 using namespace CryptoPP;
 
+
 // constructors
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -168,6 +169,7 @@ void MainWindow::on_m_keyMImport_clicked()
         string keyStr = m_ks.keyToString(m_keygen->getKey(), encoding);
         ui->m_keyMLoaded->setPlainText( QString::fromStdString(keyStr));
         colorKey();
+        dialogSuccessMessage("The key has been successfully imported");
     }
 }
 

@@ -17,8 +17,8 @@ QString RsaSSA::getModeName() const {
     return RsaSSA::ModeName;
 }
 
-void RsaSSA::encrypt(SecByteBlock, SecByteBlock){std::cout << "cipher Rsa ssa encrypt" << std::endl;}
-void RsaSSA::decrypt(SecByteBlock, SecByteBlock){std::cout << "cipher Rsa ssa decrypt" << std::endl;}
+void RsaSSA::encrypt(SecByteBlock key, SecByteBlock iv){std::cout << "cipher Rsa ssa encrypt" << std::endl;}
+void RsaSSA::decrypt(SecByteBlock key, SecByteBlock iv){std::cout << "cipher Rsa ssa decrypt" << std::endl;}
 
 
 

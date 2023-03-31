@@ -56,8 +56,8 @@ private:
         QString::number(KeyLength::LENGTH_2048),
     };
     QList<QString>* m_encodings = new QList<QString>{
-        "Hex",
         "Base64",
+        "Hex",
         "Binary",
     };
     QList<KActionBase*> m_actions = QList<KActionBase*> {

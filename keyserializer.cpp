@@ -51,20 +51,21 @@ bool KeySerializer::isFileExist(const string& filename) {
 }
 void KeySerializer::keyToFile(SecByteBlock key, Encoding encoding) {
     FileSink* fs = new FileSink(m_dir.toStdString().c_str());
-    BufferedTransformation* encoder;
+    BufferedTransformation* encoder = nullptr;;
 
     switch(encoding) {
-    case Encoding::HEX : encoder = new HexEncoder(fs); break;
     case Encoding::BASE64 : encoder = new Base64Encoder(fs); break;
-    case Encoding::BINARY : encoder = new Base64Encoder(fs); break;
+    case Encoding::HEX : encoder = new HexEncoder(fs); break;
+    case Encoding::BINARY : StringSource(key.BytePtr(), key.size(), true, fs); break;
     default : encoder = new HexEncoder(fs);
     }
 
-    encoder->Put(key, key.size());
-    encoder->MessageEnd();
-
-    delete encoder;
-    encoder = nullptr;
+    if(encoding != Encoding::BINARY) {
+        encoder->Put(key, key.size());
+        encoder->MessageEnd();
+        delete encoder;
+        encoder = nullptr;
+    }
 }
 string KeySerializer::keyToString(SecByteBlock key, Encoding encoding) {
     stringstream ss;
@@ -72,17 +73,19 @@ string KeySerializer::keyToString(SecByteBlock key, Encoding encoding) {
     BufferedTransformation* encoder;
 
     switch(encoding) {
-    case Encoding::HEX : encoder = new HexEncoder(fs); break;
     case Encoding::BASE64 : encoder = new Base64Encoder(fs); break;
-    case Encoding::BINARY : encoder = new Base64Encoder(fs); break;
+    case Encoding::HEX : encoder = new HexEncoder(fs); break;
+    case Encoding::BINARY : StringSource(key.BytePtr(), key.size(), true, fs); break;
     default : encoder = new HexEncoder(fs);
     }
 
-    encoder->Put(key, key.size());
-    encoder->MessageEnd();
+    if(encoding != Encoding::BINARY) {
+        encoder->Put(key, key.size());
+        encoder->MessageEnd();
 
-    delete encoder;
-    encoder = nullptr;
+        delete encoder;
+        encoder = nullptr;
+    }
 
     return ss.str();
 }
@@ -91,38 +94,33 @@ SecByteBlock KeySerializer::importKey(Encoding encoding) {
     SecByteBlock key;
 
     if(!m_dir.isEmpty()) {
-        BufferedTransformation* decoder;
-        string decoded;
-
-        switch(encoding) {
-        case Encoding::HEX : decoder = new HexDecoder; break;
-        case Encoding::BASE64 : decoder = new Base64Decoder; break;
-        case Encoding::BINARY : decoder = new Base64Decoder; break;
-        default : decoder = new HexDecoder;
-        }
-
-        string line;
-        ostringstream os;
-
-        ifstream f(m_dir.toStdString());
+        ifstream f(m_dir.toStdString(), std::ios::binary | std::ios::in);
         if(f.good()) {
+            BufferedTransformation* decoder = new Base64Decoder;
+            string decoded, line;
+            ostringstream os;
+            std::vector<char> bytes((std::istreambuf_iterator<char>(f)), (std::istreambuf_iterator<char>()));
 
-            while (getline (f, line)) os << line;
-            f.close();
-
-            decoder->Put((CryptoPP::byte*)os.str().data(), os.str().size());
-            decoder->MessageEnd();
-
-            word64 size = decoder->MaxRetrievable();
-            if(size && size <= SIZE_MAX) {
-                decoded.resize(size);
-                decoder->Get((CryptoPP::byte*)&decoded[0], decoded.size());
+            switch(encoding) {
+            case Encoding::BASE64 : decoder = new Base64Decoder; break;
+            case Encoding::HEX : decoder = new HexDecoder; break;
+            case Encoding::BINARY : key = SecByteBlock((CryptoPP::byte*)&bytes[0], bytes.size()); break;
+            default : decoder = new HexDecoder;
             }
 
-            key = SecByteBlock((CryptoPP::byte*)&decoded[0], decoded.size());
+            if(encoding != Encoding::BINARY) {
+                decoder->Put((CryptoPP::byte*)&bytes[0], bytes.size());
+                decoder->MessageEnd();
+                word64 size = decoder->MaxRetrievable();
+                if(size && size <= SIZE_MAX) {
+                    decoded.resize(size);
+                    decoder->Get((CryptoPP::byte*)&decoded[0], decoded.size());
+                }
+                key = SecByteBlock((CryptoPP::byte*)&decoded[0], decoded.size());
+            }
+            f.close();
         }
     }
-
     return key;
 }
 

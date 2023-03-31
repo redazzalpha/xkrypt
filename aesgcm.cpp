@@ -15,6 +15,6 @@ QString AesGCM::getModeName() const {
     return AesGCM::AlgName;
 }
 
-void AesGCM::encrypt(SecByteBlock, SecByteBlock){std::cout << "cipher Aes gcm encrypt" << std::endl;}
-void AesGCM::decrypt(SecByteBlock, SecByteBlock){std::cout << "cipher Aes gcm decrypt" << std::endl;}
+void AesGCM::encrypt(SecByteBlock key, SecByteBlock iv){std::cout << "cipher Aes gcm encrypt" << std::endl;}
+void AesGCM::decrypt(SecByteBlock key, SecByteBlock iv){std::cout << "cipher Aes gcm decrypt" << std::endl;}
 
