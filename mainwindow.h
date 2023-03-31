@@ -76,12 +76,15 @@ public:
 
 private:
     // methods
-    void init();
+    void uiInit();
     void connectItems();
 
     void dialogSuccessMessage(const std::string& message);
     void dialogErrorMessage(const std::string& message);
     void dialogNoKeyMessage(const std::string& action);
+
+    void setKeyLoadedStyle(const QString &style);
+    void setKeyLoadedText(const QString &keyStr);
 
 private slots:
     void on_m_encEncrypt_clicked();

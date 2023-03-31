@@ -1,6 +1,6 @@
+#include "mainwindow.h"
 #include "./ui_mainwindow.h"
 #include "kexcept.h"
-#include "mainwindow.h"
 #include "enums.h"
 #include "defines.h"
 #include <QToolButton>
@@ -22,8 +22,7 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
     ,   m_ks(this)
 {
-    ui->setupUi(this);
-    init();
+    uiInit();
     connectItems();
     setFixedSize(800, 600);
     setIconSize(QSize(35, 35));
@@ -43,7 +42,8 @@ MainWindow::~MainWindow()
 }
 
 // private methods
-void MainWindow::init() {
+void MainWindow::uiInit() {
+    ui->setupUi(this);
     ui->m_encAlgs->addItems(*m_algorithms);
     ui->m_encModes->addItems(*m_aesModes);
     ui->m_decAlgs->addItems(*m_algorithms);
@@ -51,6 +51,10 @@ void MainWindow::init() {
     ui->m_keyMLength->addItems(*m_aesKeys);
     ui->m_keyMEncodingI->addItems(*m_encodings);
     ui->m_keyMEncodingG->addItems(*m_encodings);
+    ui->m_encTab->setTabText(0, "File");
+    ui->m_encTab->setTabText(1, "Text");
+    ui->m_decTab->setTabText(0, "File");
+    ui->m_decTab->setTabText(1, "Text");
 }
 void MainWindow::connectItems() {
     // connect comboboxes
@@ -68,6 +72,8 @@ void MainWindow::connectItems() {
 
     // connect plain texts
     QObject::connect(ui->m_keyMLoaded, &QPlainTextEdit::textChanged, this, &MainWindow::colorKey);
+    QObject::connect(ui->m_encLoaded, &QPlainTextEdit::textChanged, this, &MainWindow::colorKey);
+    QObject::connect(ui->m_decLoaded, &QPlainTextEdit::textChanged, this, &MainWindow::colorKey);
 
     // connect actions
     foreach (KActionBase* action, m_actions) {
@@ -128,6 +134,17 @@ void MainWindow::dialogNoKeyMessage(const string& action) {
     msg.exec();
 }
 
+void MainWindow::setKeyLoadedStyle(const QString& style) {
+    ui->m_keyMLoaded->setStyleSheet(style);
+    ui->m_encLoaded->setStyleSheet(style);
+    ui->m_decLoaded->setStyleSheet(style);
+}
+void MainWindow::setKeyLoadedText(const QString& keyStr) {
+    ui->m_keyMLoaded->setPlainText(keyStr);
+    ui->m_encLoaded->setPlainText(keyStr);
+    ui->m_decLoaded->setPlainText(keyStr);
+}
+
 // slots
 void MainWindow::on_m_encEncrypt_clicked()
 {
@@ -154,9 +171,10 @@ void MainWindow::on_m_keyMGenerate_clicked()
     SecByteBlock key = m_keygen->generateKey();
     Encoding encoding = static_cast<Encoding>(ui->m_keyMEncodingG->currentIndex());
 
-    if(ui->m_keyMSaveOnF->isChecked()) m_ks.saveOnFile(key,  encoding);
+    if(ui->m_keyMSaveOnF->isChecked())
+        m_ks.saveOnFile(key,  encoding);
 
-    ui->m_keyMLoaded->setPlainText(QString::fromStdString(m_ks.keyToString(key, encoding)));
+    setKeyLoadedText(QString::fromStdString(m_ks.keyToString(key, encoding)));
 
     ui->m_keyMSaveOnF->setChecked(false);
     dialogSuccessMessage("key " + std::to_string(m_keygen->getKeyLength()) + " bits has been successfully generated");
@@ -169,7 +187,7 @@ void MainWindow::on_m_keyMImport_clicked()
 
         if(m_keygen->isKeyLoaded()) {
             string keyStr = m_ks.keyToString(m_keygen->getKey(), encoding);
-            ui->m_keyMLoaded->setPlainText( QString::fromStdString(keyStr));
+            setKeyLoadedText(QString::fromStdString(keyStr));
             colorKey();
             dialogSuccessMessage("The key has been successfully imported");
         }
@@ -235,22 +253,21 @@ void MainWindow::setKeyLength(const int index) {
 void MainWindow::showKey(const bool isChecked) {
     bool isEmpty = ui->m_keyMLoaded->toPlainText() == QString::fromStdString(NO_KEY_LOADED);
     if(isChecked) {
-        if(isEmpty) ui->m_keyMLoaded->setStyleSheet("background-color:rgba(0,0,0,0);color:red;");
-        else ui->m_keyMLoaded->setStyleSheet("background-color:rgba(0,0,0,0);");
+        if(isEmpty) setKeyLoadedStyle("background-color:rgba(0,0,0,0);color:red;");
+        else setKeyLoadedStyle("background-color:rgba(0,0,0,0);");
     }
-    else ui->m_keyMLoaded->setStyleSheet("background-color:rgba(0,0,0,0); color:rgba(0,0,0,0)");
+    else setKeyLoadedStyle("background-color:rgba(0,0,0,0); color:rgba(0,0,0,0)");
 }
 void MainWindow::colorKey() {
     bool isEmpty = ui->m_keyMLoaded->toPlainText() == QString::fromStdString(NO_KEY_LOADED);
-    if(ui->m_keyMshowKey->isChecked()) {
-        if(isEmpty) ui->m_keyMLoaded->setStyleSheet("background-color:rgba(0,0,0,0);color:red;");
-        else ui->m_keyMLoaded->setStyleSheet("background-color:rgba(0,0,0,0);");
-    }
-    else ui->m_keyMLoaded->setStyleSheet("background-color:rgba(0,0,0,0); color:rgba(0,0,0,0)");
+    if(ui->m_keyMshowKey->isChecked())
+        if(isEmpty) setKeyLoadedStyle("background-color:rgba(0,0,0,0);color:red;");
+        else setKeyLoadedStyle("background-color:rgba(0,0,0,0);");
+    else setKeyLoadedStyle("background-color:rgba(0,0,0,0); color:rgba(0,0,0,0)");
 }
 void MainWindow::flushKey() {
     m_keygen->flushKey();
-    ui->m_keyMLoaded->setPlainText(NO_KEY_LOADED);
     ui->m_keyMshowKey->setChecked(true);
+    setKeyLoadedText(NO_KEY_LOADED);
     colorKey();
 }
