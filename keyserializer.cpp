@@ -4,6 +4,7 @@
 #include "hex.h"
 #include "qinputdialog.h"
 #include "qpushbutton.h"
+#include "kexcept.h"
 #include <QFileDialog>
 #include <fstream>
 
@@ -89,7 +90,7 @@ string KeySerializer::keyToString(SecByteBlock key, Encoding encoding) {
 
     return ss.str();
 }
-SecByteBlock KeySerializer::importKey(Encoding encoding) {
+SecByteBlock KeySerializer::importKey(Encoding encoding) noexcept(false)  {
     m_dir = QFileDialog::getOpenFileName(m_parent,"Import key", "", "All Files (*)");
     SecByteBlock key;
 
@@ -109,6 +110,11 @@ SecByteBlock KeySerializer::importKey(Encoding encoding) {
             }
 
             if(encoding != Encoding::BINARY) {
+                bool hex = isHex(bytes), base64 = isBase64(bytes);
+
+                if(encoding == Encoding::BASE64 && !(base64 || hex)) throw UnsupportedEncoding("-- error: Unsupported encoding! Try Binary encoding.");
+                if(encoding == Encoding::HEX && !hex) throw UnsupportedEncoding("-- error: Unsupported encoding! Try Binary or Base64 encoding.");
+
                 decoder->Put((CryptoPP::byte*)&bytes[0], bytes.size());
                 decoder->MessageEnd();
                 word64 size = decoder->MaxRetrievable();
@@ -197,4 +203,22 @@ bool KeySerializer::dialogConfirm(const string& message) {
     if(msg.clickedButton() == ok) isConfirmed = true;
 
     return isConfirmed;
+}
+bool KeySerializer::isBase64(const vector<char> bytes) {
+    int fsize = bytes.size();
+    stringstream ss;
+    ss << bytes[fsize-2] << bytes[fsize-3];
+    return ss.str() == "==";
+}
+bool KeySerializer::isHex(const vector<char> bytes) {
+    bool hex = true;
+
+    for(char c : bytes) {
+        c = std::toupper(c);
+        if(!(c >= 48 && c <= 57) && !(c >= 65 && c <= 70)) {
+            hex = false;
+            break;
+        }
+    }
+    return hex;
 }

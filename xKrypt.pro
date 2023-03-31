@@ -22,6 +22,7 @@ SOURCES += \
     kactionkeyMgr.cpp \
     kactionpage.cpp \
     kactionquit.cpp \
+    kexcept.cpp \
     keygen.cpp \
     keyserializer.cpp \
     main.cpp \
@@ -45,6 +46,7 @@ HEADERS += \
     kactionkeyMgr.h \
     kactionpage.h \
     kactionquit.h \
+    kexcept.h \
     keygen.h \
     keyserializer.h \
     mainwindow.h \
