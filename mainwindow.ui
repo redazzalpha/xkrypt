@@ -544,7 +544,7 @@
             <string>no key loaded</string>
            </property>
            <property name="textInteractionFlags">
-            <set>Qt::NoTextInteraction</set>
+            <set>Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
            </property>
            <property name="backgroundVisible">
             <bool>false</bool>
@@ -866,7 +866,7 @@
             <string>no key loaded</string>
            </property>
            <property name="textInteractionFlags">
-            <set>Qt::NoTextInteraction</set>
+            <set>Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
            </property>
            <property name="backgroundVisible">
             <bool>false</bool>

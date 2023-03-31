@@ -144,6 +144,20 @@ void MainWindow::setKeyLoadedText(const QString& keyStr) {
     ui->m_encLoaded->setPlainText(keyStr);
     ui->m_decLoaded->setPlainText(keyStr);
 }
+void MainWindow::setKeyLoadedSelectable(const bool selectable) {
+
+
+    if(selectable) {
+        ui->m_keyMLoaded->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard);
+        ui->m_encLoaded->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard);
+        ui->m_decLoaded->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard);
+    }
+    else {
+        ui->m_keyMLoaded->setTextInteractionFlags(Qt::NoTextInteraction);
+        ui->m_encLoaded->setTextInteractionFlags(Qt::NoTextInteraction);
+        ui->m_decLoaded->setTextInteractionFlags(Qt::NoTextInteraction);
+    }
+}
 
 // slots
 void MainWindow::on_m_encEncrypt_clicked()
@@ -255,8 +269,12 @@ void MainWindow::showKey(const bool isChecked) {
     if(isChecked) {
         if(isEmpty) setKeyLoadedStyle("background-color:rgba(0,0,0,0);color:red;");
         else setKeyLoadedStyle("background-color:rgba(0,0,0,0);");
+        setKeyLoadedSelectable(true);
     }
-    else setKeyLoadedStyle("background-color:rgba(0,0,0,0); color:rgba(0,0,0,0)");
+    else {
+        setKeyLoadedStyle("background-color:rgba(0,0,0,0); color:rgba(0,0,0,0)");
+        setKeyLoadedSelectable(false);
+    }
 }
 void MainWindow::colorKey() {
     bool isEmpty = ui->m_keyMLoaded->toPlainText() == QString::fromStdString(NO_KEY_LOADED);

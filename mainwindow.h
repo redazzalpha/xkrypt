@@ -85,6 +85,7 @@ private:
 
     void setKeyLoadedStyle(const QString &style);
     void setKeyLoadedText(const QString &keyStr);
+    void setKeyLoadedSelectable(const bool selectable);
 
 private slots:
     void on_m_encEncrypt_clicked();
