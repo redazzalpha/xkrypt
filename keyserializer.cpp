@@ -207,8 +207,13 @@ bool KeySerializer::dialogConfirm(const string& message) {
 bool KeySerializer::isBase64(const vector<char> bytes) {
     int fsize = bytes.size();
     stringstream ss;
+<<<<<<< HEAD
     ss << bytes[fsize-2] << bytes[fsize-3];
     return ss.str() == "==";
+=======
+    ss << bytes[fsize-2];
+    return ss.str() == "=";
+>>>>>>> slave
 }
 bool KeySerializer::isHex(const vector<char> bytes) {
     bool hex = true;
