@@ -13,6 +13,7 @@ CipherAes::CipherAes() {}
 CipherAes::~CipherAes() {};
 
 // virtual methods
-QString CipherAes::getAlgName() const {
+QString CipherAes::getAlgName() const
+{
     return CipherAes::AlgName;
 }

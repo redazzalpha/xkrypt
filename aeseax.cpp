@@ -15,6 +15,12 @@ QString AesEAX::getModeName() const {
     return AesEAX::ModeName;
 }
 
-void AesEAX::encrypt(SecByteBlock key, SecByteBlock iv){std::cout << "cipher Aes eax encrypt" << std::endl;}
-void AesEAX::decrypt(SecByteBlock key, SecByteBlock iv){std::cout << "cipher Aes eax decrypt" << std::endl;}
+void AesEAX::encrypt(SecByteBlock key, SecByteBlock iv)
+{
+    std::cout << "cipher Aes eax encrypt" << std::endl;
+}
+void AesEAX::decrypt(SecByteBlock key, SecByteBlock iv)
+{
+    std::cout << "cipher Aes eax decrypt" << std::endl;
+}
 

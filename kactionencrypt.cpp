@@ -9,4 +9,7 @@ KActionEncrypt::KActionEncrypt(): KActionPage("encrypt manager", IMG_ENCRYPT_MAN
 KActionEncrypt::~KActionEncrypt(){}
 
 // slots
-void KActionEncrypt::onActionClick() { emit setStackPage(Page::encrypt); }
+void KActionEncrypt::onActionClick()
+{
+    emit setStackPage(Page::encrypt);
+}

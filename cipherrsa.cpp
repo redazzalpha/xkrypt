@@ -9,6 +9,7 @@ CipherRsa::CipherRsa(){}
 CipherRsa::~CipherRsa() {};
 
 // virtual methods
-QString CipherRsa::getAlgName() const {
+QString CipherRsa::getAlgName() const
+{
     return CipherRsa::AlgName;
 }

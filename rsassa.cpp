@@ -13,12 +13,19 @@ RsaSSA::RsaSSA() {}
 RsaSSA::~RsaSSA() {};
 
 // virtual methods
-QString RsaSSA::getModeName() const {
+QString RsaSSA::getModeName() const
+{
     return RsaSSA::ModeName;
 }
 
-void RsaSSA::encrypt(SecByteBlock key, SecByteBlock iv){std::cout << "cipher Rsa ssa encrypt" << std::endl;}
-void RsaSSA::decrypt(SecByteBlock key, SecByteBlock iv){std::cout << "cipher Rsa ssa decrypt" << std::endl;}
+void RsaSSA::encrypt(SecByteBlock key, SecByteBlock iv)
+{
+    std::cout << "cipher Rsa ssa encrypt" << std::endl;
+}
+void RsaSSA::decrypt(SecByteBlock key, SecByteBlock iv)
+{
+    std::cout << "cipher Rsa ssa decrypt" << std::endl;
+}
 
 
 

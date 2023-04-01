@@ -12,11 +12,18 @@ RsaOEAP::RsaOEAP() {}
 RsaOEAP::~RsaOEAP() {};
 
 // methods
-QString RsaOEAP::getModeName() const {
+QString RsaOEAP::getModeName() const
+{
     return RsaOEAP::ModeName;
 }
-void RsaOEAP::encrypt(SecByteBlock key, SecByteBlock iv){std::cout << "cipher Rsa oeap encrypt" << std::endl;}
-void RsaOEAP::decrypt(SecByteBlock key, SecByteBlock iv){std::cout << "cipher Rsa oeap decrypt" << std::endl;}
+void RsaOEAP::decrypt(SecByteBlock key, SecByteBlock iv)
+{
+    std::cout << "cipher Rsa oeap decrypt" << std::endl;
+}
+void RsaOEAP::encrypt(SecByteBlock key, SecByteBlock iv)
+{
+    std::cout << "cipher Rsa oeap encrypt" << std::endl;
+}
 
 
 

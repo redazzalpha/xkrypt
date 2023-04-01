@@ -8,4 +8,7 @@ KActionQuit::KActionQuit(): KAction("quit", IMG_QUIT) {}
 KActionQuit::~KActionQuit(){}
 
 // slots
-void KActionQuit::onActionClick() { emit quit(); }
+void KActionQuit::onActionClick()
+{
+    emit quit();
+}

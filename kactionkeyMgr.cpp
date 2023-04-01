@@ -9,4 +9,7 @@ KActionKeyMgr::KActionKeyMgr(): KActionPage("key manager", IMG_KEY_MANAGER) {}
 KActionKeyMgr::~KActionKeyMgr(){}
 
 // slots
-void KActionKeyMgr::onActionClick() { emit setStackPage(Page::generate); }
+void KActionKeyMgr::onActionClick()
+{
+    emit setStackPage(Page::generate);
+}

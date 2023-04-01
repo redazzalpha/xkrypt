@@ -9,4 +9,7 @@ KActionDecrypt::KActionDecrypt(): KActionPage("decrypt manager", IMG_DECRYPT_MAN
 KActionDecrypt::~KActionDecrypt(){}
 
 // slots
-void KActionDecrypt::onActionClick() { emit setStackPage(Page::decrypt); }
+void KActionDecrypt::onActionClick()
+{
+    emit setStackPage(Page::decrypt);
+}
