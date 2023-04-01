@@ -1,5 +1,6 @@
 #include "keyserializer.h"
 #include "base64.h"
+#include "defines.h"
 #include "files.h"
 #include "hex.h"
 #include "qinputdialog.h"
@@ -15,7 +16,8 @@ using namespace std;
 KeySerializer::KeySerializer(QMainWindow* parent): m_parent(parent){};
 
 // methods
-void KeySerializer::saveOnFile(SecByteBlock key, Encoding encoding) {
+void KeySerializer::saveOnFile(SecByteBlock key, Encoding encoding)
+{
     m_override = false;
     m_create = false;
     m_changeDirectory = false;
@@ -47,10 +49,12 @@ void KeySerializer::saveOnFile(SecByteBlock key, Encoding encoding) {
         else break;
     }
 }
-bool KeySerializer::isFileExist(const string& filename) {
+bool KeySerializer::isFileExist(const string& filename)
+{
     return std::fstream(filename).good();
 }
-void KeySerializer::keyToFile(SecByteBlock key, Encoding encoding) {
+void KeySerializer::keyToFile(SecByteBlock key, Encoding encoding)
+{
     FileSink* fs = new FileSink(m_dir.toStdString().c_str());
     BufferedTransformation* encoder = nullptr;;
 
@@ -68,7 +72,8 @@ void KeySerializer::keyToFile(SecByteBlock key, Encoding encoding) {
         encoder = nullptr;
     }
 }
-string KeySerializer::keyToString(SecByteBlock key, Encoding encoding) {
+string KeySerializer::keyToString(SecByteBlock key, Encoding encoding)
+{
     stringstream ss;
     FileSink* fs = new FileSink(ss);
     BufferedTransformation* encoder;
@@ -90,7 +95,8 @@ string KeySerializer::keyToString(SecByteBlock key, Encoding encoding) {
 
     return ss.str();
 }
-SecByteBlock KeySerializer::importKey(Encoding encoding) noexcept(false)  {
+SecByteBlock KeySerializer::importKey(Encoding encoding) noexcept(false)
+{
     m_dir = QFileDialog::getOpenFileName(m_parent,"Import key", "", "All Files (*)");
     SecByteBlock key;
 
@@ -131,11 +137,9 @@ SecByteBlock KeySerializer::importKey(Encoding encoding) noexcept(false)  {
 }
 
 // private methods
-QMessageBox::ButtonRole KeySerializer::dialogFileExists(const string& message) {
-    string text =
-        "<td><img src=:/assets/warning.png width=50 height=50/></td><td valign=middle>" +
-        message +
-        "</td>";
+QMessageBox::ButtonRole KeySerializer::dialogFileExists(const string& message)
+{
+    string text = MESSAGE_FILE_EXISTS_START + message + MESSAGE_FILE_EXISTS_END;
     QMessageBox msg(m_parent);
     QPushButton* changeDirectory =  msg.addButton("Change directory", QMessageBox::AcceptRole);
     QPushButton* override =  msg.addButton("Override file", QMessageBox::ApplyRole);
@@ -144,7 +148,7 @@ QMessageBox::ButtonRole KeySerializer::dialogFileExists(const string& message) {
 
     cancel->setVisible(false);
     msg.setWindowTitle("xKrypt - Warning");
-    msg.setWindowIcon(QIcon(QPixmap(":/assets/warning.ico")));
+    msg.setWindowIcon(QIcon(QPixmap(ICON_WARNING)));
     msg.setText(QString::fromStdString(text));
     msg.setDefaultButton(changeDirectory);
     msg.setEscapeButton(cancel);
@@ -162,16 +166,13 @@ QMessageBox::ButtonRole KeySerializer::dialogFileExists(const string& message) {
     return QMessageBox::RejectRole;
 }
 bool KeySerializer::dialogInsertFilename(const string& message) {
-    string text =
-        "<td><img src=:/assets/file.png width=50 height=50/></td><td valign=middle>" +
-        message +
-        "</td>";
+    string text = MESSAGE_INSERT_FNAME_START + message + MESSAGE_INSERT_FNAME_END;
     QInputDialog input(m_parent);
     bool isFnameInserted = false;
     m_fname = "";
 
     input.setWindowTitle("xKrypt - insert");
-    input.setWindowIcon(QIcon(QPixmap(":/assets/file.ico")));
+    input.setWindowIcon(QIcon(QPixmap(ICON_FILE)));
     input.setLabelText(QString::fromStdString(text));
     input.setFixedSize(500, 200);
     input.setModal(true);
@@ -182,18 +183,16 @@ bool KeySerializer::dialogInsertFilename(const string& message) {
 
     return isFnameInserted;
 }
-bool KeySerializer::dialogConfirm(const string& message) {
-    string text =
-        "<td><img src=:/assets/warning.png width=50 height=50/></td><td valign=middle>" +
-        message +
-        "</td>";
+bool KeySerializer::dialogConfirm(const string& message)
+{
+    string text = MESSAGE_CONFIRM_START + message + MESSAGE_CONFIRM_END;
     QMessageBox msg(m_parent);
     QPushButton* ok =  msg.addButton("Ok", QMessageBox::AcceptRole);
     QPushButton* cancel =  msg.addButton("Cancel", QMessageBox::RejectRole);
     bool isConfirmed = false;
 
     msg.setWindowTitle("xKrypt - Warning");
-    msg.setWindowIcon(QIcon(QPixmap(":/assets/warning.ico")));
+    msg.setWindowIcon(QIcon(QPixmap(ICON_WARNING)));
     msg.setText(QString::fromStdString(text));
     msg.setDefaultButton(cancel);
     msg.setEscapeButton(cancel);
@@ -204,13 +203,15 @@ bool KeySerializer::dialogConfirm(const string& message) {
 
     return isConfirmed;
 }
-bool KeySerializer::isBase64(const vector<char> bytes) {
+bool KeySerializer::isBase64(const vector<char> bytes)
+{
     int fsize = bytes.size();
     stringstream ss;
     ss << bytes[fsize-2];
     return ss.str() == "=";
 }
-bool KeySerializer::isHex(const vector<char> bytes) {
+bool KeySerializer::isHex(const vector<char> bytes)
+{
     bool hex = true;
 
     for(char c : bytes) {

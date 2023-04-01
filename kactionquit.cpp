@@ -1,7 +1,8 @@
 #include "kactionquit.h"
+#include "defines.h"
 
 // constructors
-KActionQuit::KActionQuit(): KAction("quit", ":/assets/quit.png") {}
+KActionQuit::KActionQuit(): KAction("quit", IMG_QUIT) {}
 
 // destructor
 KActionQuit::~KActionQuit(){}

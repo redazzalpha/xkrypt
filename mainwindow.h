@@ -83,15 +83,18 @@ private:
     void dialogErrorMessage(const std::string& message);
     void dialogNoKeyMessage(const std::string& action);
 
+    void keyLoadedSelectable(const Qt::TextInteractionFlags flags);
     void setKeyLoadedStyle(const QString &style);
     void setKeyLoadedText(const QString &keyStr);
     void setKeyLoadedSelectable(const bool selectable);
 
 private slots:
-    void on_m_encEncrypt_clicked();
-    void on_m_decDecrypt_clicked();
-    void on_m_encImport_clicked();
-    void on_m_decImport_clicked();
+    void on_m_encTabFileEncrypt_clicked();
+    void on_m_decTabFileDecrypt_clicked();
+    void on_m_encTabFileImport_clicked();
+    void on_m_decTabFileImport_clicked();
+    void on_m_encTabTextReset_clicked();
+    void on_m_decTabTextReset_clicked();
     void on_m_keyMGenerate_clicked();
     void on_m_keyMImport_clicked();
 

@@ -1,8 +1,9 @@
 #include "kactionkeyMgr.h"
+#include "defines.h"
 #include "enums.h"
 
 // constructors
-KActionKeyMgr::KActionKeyMgr(): KActionPage("key manager", ":/assets/key.png") {}
+KActionKeyMgr::KActionKeyMgr(): KActionPage("key manager", IMG_KEY_MANAGER) {}
 
 // destructor
 KActionKeyMgr::~KActionKeyMgr(){}

@@ -37,45 +37,57 @@ MainWindow::~MainWindow()
     delete m_rsaModes;
     delete m_algorithms;
     delete m_encodings;
-    foreach(KActionBase* action, m_actions)
-        delete action;
+    foreach(KActionBase* action, m_actions) delete action;
 }
 
 // private methods
-void MainWindow::uiInit() {
+void MainWindow::uiInit()
+{
     ui->setupUi(this);
-    ui->m_encAlgs->addItems(*m_algorithms);
-    ui->m_encModes->addItems(*m_aesModes);
-    ui->m_decAlgs->addItems(*m_algorithms);
-    ui->m_decModes->addItems(*m_aesModes);
+
+    ui->m_encTab->setTabText(0, TAB_NAME_FILE);
+    ui->m_encTab->setTabText(1, TAB_NAME_TEXT);
+    ui->m_decTab->setTabText(0, TAB_NAME_FILE);
+    ui->m_decTab->setTabText(1, TAB_NAME_TEXT);
+
+    ui->m_encTabFileAlgs->addItems(*m_algorithms);
+    ui->m_encTabFileModes->addItems(*m_aesModes);
+    ui->m_decTabFileAlgs->addItems(*m_algorithms);
+    ui->m_decTabFileModes->addItems(*m_aesModes);
+
+    ui->m_encTabTextAlgs->addItems(*m_algorithms);
+    ui->m_encTabTextModes->addItems(*m_aesModes);
+    ui->m_decTabTextAlgs->addItems(*m_algorithms);
+    ui->m_decTabTextModes->addItems(*m_aesModes);
+
     ui->m_keyMLength->addItems(*m_aesKeys);
     ui->m_keyMEncodingI->addItems(*m_encodings);
     ui->m_keyMEncodingG->addItems(*m_encodings);
-    ui->m_encTab->setTabText(0, "File");
-    ui->m_encTab->setTabText(1, "Text");
-    ui->m_decTab->setTabText(0, "File");
-    ui->m_decTab->setTabText(1, "Text");
 }
-void MainWindow::connectItems() {
+void MainWindow::connectItems()
+{
     // connect comboboxes
-    QObject::connect(ui->m_encAlgs, &QComboBox::textActivated, this, &MainWindow::setAlgorithm);
-    QObject::connect(ui->m_encModes, &QComboBox::textActivated, this, &MainWindow::setMode);
-    QObject::connect(ui->m_decAlgs, &QComboBox::textActivated, this, &MainWindow::setAlgorithm);
-    QObject::connect(ui->m_decModes, &QComboBox::textActivated, this, &MainWindow::setMode);
+    QObject::connect(ui->m_encTabFileAlgs, &QComboBox::textActivated, this, &MainWindow::setAlgorithm);
+    QObject::connect(ui->m_encTabFileModes, &QComboBox::textActivated, this, &MainWindow::setMode);
+    QObject::connect(ui->m_decTabFileAlgs, &QComboBox::textActivated, this, &MainWindow::setAlgorithm);
+    QObject::connect(ui->m_decTabFileModes, &QComboBox::textActivated, this, &MainWindow::setMode);
+    QObject::connect(ui->m_encTabTextAlgs, &QComboBox::textActivated, this, &MainWindow::setAlgorithm);
+    QObject::connect(ui->m_encTabTextModes, &QComboBox::textActivated, this, &MainWindow::setMode);
+    QObject::connect(ui->m_decTabTextAlgs, &QComboBox::textActivated, this, &MainWindow::setAlgorithm);
+    QObject::connect(ui->m_decTabTextModes, &QComboBox::textActivated, this, &MainWindow::setMode);
+
     QObject::connect(ui->m_keyMLength, &QComboBox::activated, this, &MainWindow::setKeyLength);
 
     // connect checkboxes
-    QObject::connect(ui->m_keyMshowKey, &QCheckBox::clicked, this, &MainWindow::hideKey);
+    QObject::connect(ui->m_keyMHide, &QCheckBox::clicked, this, &MainWindow::hideKey);
 
     // connect buttons
     QObject::connect(ui->m_keyMFlush, &QPushButton::clicked, this, &MainWindow::flushKey);
 
     // connect plain texts
     QObject::connect(ui->m_keyMLoaded, &QPlainTextEdit::textChanged, this, &MainWindow::colorKey);
-    QObject::connect(ui->m_encLoaded, &QPlainTextEdit::textChanged, this, &MainWindow::colorKey);
-    QObject::connect(ui->m_decLoaded, &QPlainTextEdit::textChanged, this, &MainWindow::colorKey);
 
-    // connect actions
+    // create and connect actions
     foreach (KActionBase* action, m_actions) {
         ui->m_toolBar->addAction(action);
         QObject::connect(action, &QAction::triggered, action, &KActionBase::onActionClick);
@@ -84,49 +96,42 @@ void MainWindow::connectItems() {
     }
 }
 
-void MainWindow::dialogSuccessMessage(const string& message) {
-    string text =
-        "<td><img src=:/assets/success.png width=50 height=50/></td><td valign=middle>" +
-        message +
-        "</td>";
+void MainWindow::dialogSuccessMessage(const string& message)
+{
+    string text = MESSAGE_SUCCESS_START+ message + MESSAGE_SUCCESS_END;
     QMessageBox msg(this);
     QPushButton* ok =  msg.addButton("Ok", QMessageBox::AcceptRole);
 
     msg.setWindowTitle("xKrypt - Success");
-    msg.setWindowIcon(QIcon(QPixmap(":/assets/error.ico")));
+    msg.setWindowIcon(QIcon(QPixmap(ICON_ERROR)));
     msg.setText(QString::fromStdString(text));
     msg.setDefaultButton(ok);
     msg.setEscapeButton(ok);
     msg.setModal(true);
     msg.exec();
 }
-void MainWindow::dialogErrorMessage(const string& message) {
-    string text =
-        "<td><img src=:/assets/error.png width=50 height=50/></td><td valign=middle>" +
-        message +
-        "</td>";
+void MainWindow::dialogErrorMessage(const string& message)
+{
+    string text = MESSAGE_ERROR_START+ message + MESSAGE_ERROR_END;
     QMessageBox msg(this);
     QPushButton* ok =  msg.addButton("Ok", QMessageBox::AcceptRole);
 
     msg.setWindowTitle("xKrypt - Error");
-    msg.setWindowIcon(QIcon(QPixmap(":/assets/error.ico")));
+    msg.setWindowIcon(QIcon(QPixmap(ICON_ERROR)));
     msg.setText(QString::fromStdString(text));
     msg.setDefaultButton(ok);
     msg.setEscapeButton(ok);
     msg.setModal(true);
     msg.exec();
 }
-void MainWindow::dialogNoKeyMessage(const string& action) {
-    string text =
-        "<td><img src=:/assets/error.png width=50 height=50/></td>"
-        "<td valign=middle>Cannot " +
-        action +
-        " - No key loaded!<br />Please generate or import key and retry</td>";
+void MainWindow::dialogNoKeyMessage(const string& action)
+{
+    string text = MESSAGE_NOKEY_START+ action + MESSAGE_NOKEY_END;
     QMessageBox msg(this);
     QPushButton* ok =  msg.addButton("Ok", QMessageBox::AcceptRole);
 
     msg.setWindowTitle("xKrypt - Error");
-    msg.setWindowIcon(QIcon(QPixmap(":/assets/error.ico")));
+    msg.setWindowIcon(QIcon(QPixmap(ICON_ERROR)));
     msg.setText(QString::fromStdString(text));
     msg.setDefaultButton(ok);
     msg.setEscapeButton(ok);
@@ -134,52 +139,63 @@ void MainWindow::dialogNoKeyMessage(const string& action) {
     msg.exec();
 }
 
-void MainWindow::setKeyLoadedStyle(const QString& style) {
+void MainWindow::keyLoadedSelectable(const Qt::TextInteractionFlags flags)
+{
+    ui->m_keyMLoaded->setTextInteractionFlags(flags);
+    ui->m_encTabFileLoaded->setTextInteractionFlags(flags);
+    ui->m_decTabFileLoaded->setTextInteractionFlags(flags);
+    ui->m_encTabTextLoaded->setTextInteractionFlags(flags);
+}
+void MainWindow::setKeyLoadedStyle(const QString& style)
+{
     ui->m_keyMLoaded->setStyleSheet(style);
-    ui->m_encLoaded->setStyleSheet(style);
-    ui->m_decLoaded->setStyleSheet(style);
+    ui->m_encTabFileLoaded->setStyleSheet(style);
+    ui->m_decTabFileLoaded->setStyleSheet(style);
+    ui->m_encTabTextLoaded->setStyleSheet(style);
 }
-void MainWindow::setKeyLoadedText(const QString& keyStr) {
+void MainWindow::setKeyLoadedText(const QString& keyStr)
+{
     ui->m_keyMLoaded->setPlainText(keyStr);
-    ui->m_encLoaded->setPlainText(keyStr);
-    ui->m_decLoaded->setPlainText(keyStr);
+    ui->m_encTabFileLoaded->setPlainText(keyStr);
+    ui->m_decTabFileLoaded->setPlainText(keyStr);
+    ui->m_encTabTextLoaded->setPlainText(keyStr);
 }
-void MainWindow::setKeyLoadedSelectable(const bool selectable) {
-
-
-    if(selectable) {
-        ui->m_keyMLoaded->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard);
-        ui->m_encLoaded->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard);
-        ui->m_decLoaded->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard);
-    }
-    else {
-        ui->m_keyMLoaded->setTextInteractionFlags(Qt::NoTextInteraction);
-        ui->m_encLoaded->setTextInteractionFlags(Qt::NoTextInteraction);
-        ui->m_decLoaded->setTextInteractionFlags(Qt::NoTextInteraction);
-    }
+void MainWindow::setKeyLoadedSelectable(const bool selectable)
+{
+    if(selectable)keyLoadedSelectable(Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard);
+    else keyLoadedSelectable(Qt::NoTextInteraction);
 }
 
 // slots
-void MainWindow::on_m_encEncrypt_clicked()
+void MainWindow::on_m_encTabFileEncrypt_clicked()
 {
 //    m_keygen->isKeyLoaded()?
 //        m_cipher->encrypt():
 //        dialogNoKeyMessage("encrypt");
 }
-void MainWindow::on_m_decDecrypt_clicked()
+void MainWindow::on_m_decTabFileDecrypt_clicked()
 {
 //    m_keygen->isKeyLoaded()?
 //        m_cipher->decrypt():
 //        dialogNoKeyMessage("decrypt");
 }
-void MainWindow::on_m_encImport_clicked()
+void MainWindow::on_m_encTabFileImport_clicked()
 {
     QString fileName = QFileDialog::getOpenFileName(this,"file(s) to encrypt", "", "All Files (*)");
 }
-void MainWindow::on_m_decImport_clicked()
+void MainWindow::on_m_decTabFileImport_clicked()
 {
     QString fileName = QFileDialog::getOpenFileName(this,"file(s) to decrypt", "", "All Files (*)");
 }
+void MainWindow::on_m_encTabTextReset_clicked()
+{
+    ui->m_encTabTextField->setPlainText("");
+}
+void MainWindow::on_m_decTabTextReset_clicked()
+{
+    ui->m_decTabTextField->setPlainText("");
+}
+
 void MainWindow::on_m_keyMGenerate_clicked()
 {
     SecByteBlock key = m_keygen->generateKey();
@@ -198,7 +214,6 @@ void MainWindow::on_m_keyMImport_clicked()
     Encoding encoding = static_cast<Encoding>(ui->m_keyMEncodingI->currentIndex());
     try {
         m_keygen->setKey(m_ks.importKey(encoding));
-
         if(m_keygen->isKeyLoaded()) {
             string keyStr = m_ks.keyToString(m_keygen->getKey(), encoding);
             setKeyLoadedText(QString::fromStdString(keyStr));
@@ -207,35 +222,33 @@ void MainWindow::on_m_keyMImport_clicked()
         }
     }
     catch(UnsupportedEncoding& e) {
-//        dialogErrorMessage("Seems like you are trying to import Base 64 key<br />but encoding is set on Hex!<br /> Try encoding Binary or Base 64");
         dialogErrorMessage(e.what());
-
     }
 }
 
-void MainWindow::setAlgorithm(const QString& alg) {
-
+void MainWindow::setAlgorithm(const QString& alg)
+{
     delete m_cipher;
-    ui->m_encModes->clear();
+    ui->m_encTabFileModes->clear();
     ui->m_keyMLength->clear();
 
     if(alg == CipherAes::AlgName){
-        ui->m_keyMLength->currentText().toInt();
+//        ui->m_keyMLength->currentText().toInt();
         m_cipher = new AesGCM;
-        ui->m_encModes->addItems(*m_aesModes);
+        ui->m_encTabFileModes->addItems(*m_aesModes);
         ui->m_keyMLength->addItems(*m_aesKeys);
         ui->m_keyMLength->setVisible(true);
     }
     if(alg == CipherRsa::AlgName) {
         m_cipher = new RsaOEAP;
-        ui->m_encModes->addItems(*m_rsaModes);
+        ui->m_encTabFileModes->addItems(*m_rsaModes);
         ui->m_keyMLength->setVisible(false);
     }
 }
-void MainWindow::setMode(const QString& mode) {
+void MainWindow::setMode(const QString& mode)
+{
     delete m_cipher;
-    ui->m_keyMLength->currentText().toInt();
-
+//    ui->m_keyMLength->currentText().toInt();
     // aes modes
     if(mode == AesGCM::ModeName) m_cipher = new AesGCM;
     if(mode == AesGCM::ModeName) m_cipher = new AesGCM;
@@ -250,7 +263,8 @@ void MainWindow::setMode(const QString& mode) {
     if(mode == RsaOEAP::ModeName) m_cipher = new RsaOEAP;
     if(mode == RsaSSA::ModeName) m_cipher = new RsaSSA;
 }
-void MainWindow::setKeyLength(const int index) {
+void MainWindow::setKeyLength(const int index)
+{
     switch(index) {
     case 0 : m_keygen->setKeyLength(KeyLength::LENGTH_DEFAULT); break;
     case 1 : m_keygen->setKeyLength(KeyLength::LENGTH_32); break;
@@ -263,30 +277,35 @@ void MainWindow::setKeyLength(const int index) {
     default: m_keygen->setKeyLength(KeyLength::LENGTH_DEFAULT);
     }
 }
-void MainWindow::hideKey(const bool isChecked) {
+void MainWindow::hideKey(const bool isChecked)
+{
     bool isEmpty = ui->m_keyMLoaded->toPlainText() == QString::fromStdString(NO_KEY_LOADED);
-    if(isChecked) {
-        setKeyLoadedStyle("background-color:rgba(0,0,0,0); color:rgba(0,0,0,0)");
+    if(isChecked && !isEmpty) {
+        setKeyLoadedStyle(STYLE_BLANK);
         setKeyLoadedSelectable(false);
     }
     else {
-        if(isEmpty) setKeyLoadedStyle("background-color:rgba(0,0,0,0);color:red;");
-        else setKeyLoadedStyle("background-color:rgba(0,0,0,0);");
+        if(isEmpty) setKeyLoadedStyle(STYLE_RED);
+        else setKeyLoadedStyle(STYLE_NORMAL);
         setKeyLoadedSelectable(true);
     }
 }
-void MainWindow::colorKey() {
+void MainWindow::colorKey()
+{
     bool isEmpty = ui->m_keyMLoaded->toPlainText() == QString::fromStdString(NO_KEY_LOADED);
-    if(ui->m_keyMshowKey->isChecked())
-        setKeyLoadedStyle("background-color:rgba(0,0,0,0); color:rgba(0,0,0,0)");
+    if(ui->m_keyMHide->isChecked())
+        setKeyLoadedStyle(STYLE_BLANK);
     else {
-        if(isEmpty) setKeyLoadedStyle("background-color:rgba(0,0,0,0);color:red;");
-        else setKeyLoadedStyle("background-color:rgba(0,0,0,0);");
+        if(isEmpty) setKeyLoadedStyle(STYLE_RED);
+        else setKeyLoadedStyle(STYLE_NORMAL);
     }
 }
-void MainWindow::flushKey() {
+void MainWindow::flushKey()
+{
     m_keygen->flushKey();
-    ui->m_keyMshowKey->setChecked(false);
+    ui->m_keyMHide->setChecked(false);
     setKeyLoadedText(NO_KEY_LOADED);
-    colorKey();
 }
+
+
+
