@@ -33,7 +33,7 @@
      <enum>QFrame::NoFrame</enum>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="m_pageKeyM">
      <widget class="QWidget" name="verticalLayoutWidget">
@@ -253,7 +253,7 @@
               <widget class="QComboBox" name="m_keyMEncodingG">
                <property name="minimumSize">
                 <size>
-                 <width>70</width>
+                 <width>90</width>
                  <height>0</height>
                 </size>
                </property>
@@ -491,7 +491,7 @@
        <string notr="true"/>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="m_encTabFile">
        <attribute name="title">
@@ -1034,7 +1034,7 @@
        </rect>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="m_decTabFile">
        <attribute name="title">

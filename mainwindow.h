@@ -4,7 +4,7 @@
 #include "aesgcm.h"
 #include "aescbc.h"
 #include "aeseax.h"
-#include "keyserializer.h"
+#include "kserial.h"
 #include "keygen.h"
 #include "rsassa.h"
 #include "rsaoeap.h"
@@ -28,7 +28,7 @@ class MainWindow : public QMainWindow {
 
 private:
     Ui::MainWindow *ui;
-    KeySerializer m_ks;
+    KSerial m_ks;
 
     KeyGen* m_keygen = new KeyGen;
     CipherBase* m_cipher = new AesGCM;

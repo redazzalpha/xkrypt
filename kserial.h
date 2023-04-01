@@ -1,5 +1,5 @@
-#ifndef KEYSERIALIZER_H
-#define KEYSERIALIZER_H
+#ifndef KSERIAL_H
+#define KSERIAL_H
 
 #include "enums.h"
 #include "qmainwindow.h"
@@ -8,14 +8,12 @@
 #include <QMessageBox>
 #include <QString>
 
-class KeySerializer final: public QObject{
+class KSerial final: public QObject{
 
 private:
     QMainWindow* m_parent;
     std::string m_fname = "";
     QString m_dir;
-//    Encoding m_encoding = Encoding::HEX;
-//    Encoding m_encodingF = Encoding::HEX;
     bool m_loop = true;
     bool m_override = false;
     bool m_create = false;
@@ -23,7 +21,7 @@ private:
 
 public:
     // constructor
-    KeySerializer(QMainWindow* parent);
+    KSerial(QMainWindow* parent);
 
     // methods
     void saveOnFile(CryptoPP::SecByteBlock key, Encoding encoding);
@@ -40,4 +38,4 @@ private:
     bool isHex(const std::vector<char> bytes);
 };
 
-#endif // KEYSERIALIZER_H
+#endif // KSERIAL_H

@@ -145,6 +145,7 @@ void MainWindow::keyLoadedSelectable(const Qt::TextInteractionFlags flags)
     ui->m_encTabFileLoaded->setTextInteractionFlags(flags);
     ui->m_decTabFileLoaded->setTextInteractionFlags(flags);
     ui->m_encTabTextLoaded->setTextInteractionFlags(flags);
+    ui->m_decTabTextLoaded->setTextInteractionFlags(flags);
 }
 void MainWindow::setKeyLoadedStyle(const QString& style)
 {
@@ -152,6 +153,7 @@ void MainWindow::setKeyLoadedStyle(const QString& style)
     ui->m_encTabFileLoaded->setStyleSheet(style);
     ui->m_decTabFileLoaded->setStyleSheet(style);
     ui->m_encTabTextLoaded->setStyleSheet(style);
+    ui->m_decTabTextLoaded->setStyleSheet(style);
 }
 void MainWindow::setKeyLoadedText(const QString& keyStr)
 {
@@ -159,6 +161,7 @@ void MainWindow::setKeyLoadedText(const QString& keyStr)
     ui->m_encTabFileLoaded->setPlainText(keyStr);
     ui->m_decTabFileLoaded->setPlainText(keyStr);
     ui->m_encTabTextLoaded->setPlainText(keyStr);
+    ui->m_decTabTextLoaded->setPlainText(keyStr);
 }
 void MainWindow::setKeyLoadedSelectable(const bool selectable)
 {

@@ -1,4 +1,4 @@
-#include "keyserializer.h"
+#include "kserial.h"
 #include "base64.h"
 #include "defines.h"
 #include "files.h"
@@ -13,10 +13,10 @@ using namespace CryptoPP;
 using namespace std;
 
 // constructors
-KeySerializer::KeySerializer(QMainWindow* parent): m_parent(parent){};
+KSerial::KSerial(QMainWindow* parent): m_parent(parent){};
 
 // methods
-void KeySerializer::saveOnFile(SecByteBlock key, Encoding encoding)
+void KSerial::saveOnFile(SecByteBlock key, Encoding encoding)
 {
     m_override = false;
     m_create = false;
@@ -49,11 +49,11 @@ void KeySerializer::saveOnFile(SecByteBlock key, Encoding encoding)
         else break;
     }
 }
-bool KeySerializer::isFileExist(const string& filename)
+bool KSerial::isFileExist(const string& filename)
 {
     return std::fstream(filename).good();
 }
-void KeySerializer::keyToFile(SecByteBlock key, Encoding encoding)
+void KSerial::keyToFile(SecByteBlock key, Encoding encoding)
 {
     FileSink* fs = new FileSink(m_dir.toStdString().c_str());
     BufferedTransformation* encoder = nullptr;;
@@ -72,7 +72,7 @@ void KeySerializer::keyToFile(SecByteBlock key, Encoding encoding)
         encoder = nullptr;
     }
 }
-string KeySerializer::keyToString(SecByteBlock key, Encoding encoding)
+string KSerial::keyToString(SecByteBlock key, Encoding encoding)
 {
     stringstream ss;
     FileSink* fs = new FileSink(ss);
@@ -95,7 +95,7 @@ string KeySerializer::keyToString(SecByteBlock key, Encoding encoding)
 
     return ss.str();
 }
-SecByteBlock KeySerializer::importKey(Encoding encoding) noexcept(false)
+SecByteBlock KSerial::importKey(Encoding encoding) noexcept(false)
 {
     m_dir = QFileDialog::getOpenFileName(m_parent,"Import key", "", "All Files (*)");
     SecByteBlock key;
@@ -137,7 +137,7 @@ SecByteBlock KeySerializer::importKey(Encoding encoding) noexcept(false)
 }
 
 // private methods
-QMessageBox::ButtonRole KeySerializer::dialogFileExists(const string& message)
+QMessageBox::ButtonRole KSerial::dialogFileExists(const string& message)
 {
     string text = MESSAGE_FILE_EXISTS_START + message + MESSAGE_FILE_EXISTS_END;
     QMessageBox msg(m_parent);
@@ -165,7 +165,7 @@ QMessageBox::ButtonRole KeySerializer::dialogFileExists(const string& message)
         return QMessageBox::RejectRole;
     return QMessageBox::RejectRole;
 }
-bool KeySerializer::dialogInsertFilename(const string& message) {
+bool KSerial::dialogInsertFilename(const string& message) {
     string text = MESSAGE_INSERT_FNAME_START + message + MESSAGE_INSERT_FNAME_END;
     QInputDialog input(m_parent);
     bool isFnameInserted = false;
@@ -183,7 +183,7 @@ bool KeySerializer::dialogInsertFilename(const string& message) {
 
     return isFnameInserted;
 }
-bool KeySerializer::dialogConfirm(const string& message)
+bool KSerial::dialogConfirm(const string& message)
 {
     string text = MESSAGE_CONFIRM_START + message + MESSAGE_CONFIRM_END;
     QMessageBox msg(m_parent);
@@ -203,14 +203,14 @@ bool KeySerializer::dialogConfirm(const string& message)
 
     return isConfirmed;
 }
-bool KeySerializer::isBase64(const vector<char> bytes)
+bool KSerial::isBase64(const vector<char> bytes)
 {
     int fsize = bytes.size();
     stringstream ss;
     ss << bytes[fsize-2];
     return ss.str() == "=";
 }
-bool KeySerializer::isHex(const vector<char> bytes)
+bool KSerial::isHex(const vector<char> bytes)
 {
     bool hex = true;
 

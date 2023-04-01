@@ -24,7 +24,7 @@ SOURCES += \
     kactionquit.cpp \
     kexcept.cpp \
     keygen.cpp \
-    keyserializer.cpp \
+    kserial.cpp \
     main.cpp \
     mainwindow.cpp \
     rsaoeap.cpp \
@@ -48,7 +48,7 @@ HEADERS += \
     kactionquit.h \
     kexcept.h \
     keygen.h \
-    keyserializer.h \
+    kserial.h \
     mainwindow.h \
     rsaoeap.h \
     rsassa.h
