@@ -33,7 +33,7 @@
      <enum>QFrame::NoFrame</enum>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="m_pageKeyM">
      <widget class="QWidget" name="verticalLayoutWidget">
@@ -502,7 +502,7 @@
          <rect>
           <x>10</x>
           <y>10</y>
-          <width>431</width>
+          <width>741</width>
           <height>411</height>
          </rect>
         </property>
@@ -1045,7 +1045,7 @@
          <rect>
           <x>10</x>
           <y>10</y>
-          <width>431</width>
+          <width>741</width>
           <height>411</height>
          </rect>
         </property>
