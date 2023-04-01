@@ -187,6 +187,15 @@ void MainWindow::on_m_decTabFileImport_clicked()
 {
     QString fileName = QFileDialog::getOpenFileName(this,"file(s) to decrypt", "", "All Files (*)");
 }
+
+void MainWindow::on_m_encTabTextEncrypt_clicked()
+{
+    std::cout << " encrypt tab text" << std::endl;
+}
+void MainWindow::on_m_decTabTextDecrypt_clicked()
+{
+    std::cout << " deccrypt tab text" << std::endl;
+}
 void MainWindow::on_m_encTabTextReset_clicked()
 {
     ui->m_encTabTextField->setPlainText("");
@@ -306,6 +315,8 @@ void MainWindow::flushKey()
     ui->m_keyMHide->setChecked(false);
     setKeyLoadedText(NO_KEY_LOADED);
 }
+
+
 
 
 

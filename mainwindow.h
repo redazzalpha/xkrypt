@@ -93,8 +93,12 @@ private slots:
     void on_m_decTabFileDecrypt_clicked();
     void on_m_encTabFileImport_clicked();
     void on_m_decTabFileImport_clicked();
+
+    void on_m_encTabTextEncrypt_clicked();
+    void on_m_decTabTextDecrypt_clicked();
     void on_m_encTabTextReset_clicked();
     void on_m_decTabTextReset_clicked();
+
     void on_m_keyMGenerate_clicked();
     void on_m_keyMImport_clicked();
 

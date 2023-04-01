@@ -33,7 +33,7 @@
      <enum>QFrame::NoFrame</enum>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>2</number>
     </property>
     <widget class="QWidget" name="m_pageKeyM">
      <widget class="QWidget" name="verticalLayoutWidget">
@@ -290,7 +290,7 @@
            </property>
            <property name="sizeHint" stdset="0">
             <size>
-             <width>10</width>
+             <width>30</width>
              <height>20</height>
             </size>
            </property>
@@ -1503,7 +1503,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QPushButton" name="m_decTabTextEncrypt">
+            <widget class="QPushButton" name="m_decTabTextDecrypt">
              <property name="maximumSize">
               <size>
                <width>100</width>
@@ -1511,7 +1511,7 @@
               </size>
              </property>
              <property name="text">
-              <string>Encrypt</string>
+              <string>Decrypt</string>
              </property>
             </widget>
            </item>
