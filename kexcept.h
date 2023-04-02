@@ -9,7 +9,7 @@ private:
 
 public:
     // constructors
-    UnsupportedEncoding(const char* message = "-- error: Unsupported encoding --");
+    UnsupportedEncoding(const char* message = "-- error: Unsupported encoding");
 
     // methods
     virtual const char* what() const noexcept;

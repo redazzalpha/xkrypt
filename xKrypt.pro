@@ -28,8 +28,7 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     rsaoeap.cpp \
-    rsassa.cpp \
-    structures.cpp
+    rsassa.cpp
 
 HEADERS += \
     aescbc.h \
@@ -52,8 +51,7 @@ HEADERS += \
     kserial.h \
     mainwindow.h \
     rsaoeap.h \
-    rsassa.h \
-    structures.h
+    rsassa.h
 
 FORMS += \
     mainwindow.ui

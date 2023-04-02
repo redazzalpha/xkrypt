@@ -1,12 +1,11 @@
 #ifndef KSERIAL_H
 #define KSERIAL_H
 
+#include "keygen.h"
 #include "enums.h"
-#include "qmainwindow.h"
-#include "secblock.h"
-
 #include <QMessageBox>
 #include <QString>
+#include <QMainWindow>
 
 class KSerial final: public QObject{
 
@@ -24,13 +23,13 @@ public:
     KSerial(QMainWindow* parent);
 
     // methods
-    void saveOnFile(CryptoPP::SecByteBlock key, Encoding encoding);
-    std::string keyToString(CryptoPP::SecByteBlock key, Encoding encoding);
-    CryptoPP::SecByteBlock importKey(Encoding encoding) noexcept(false);
+    void saveOnFile(KeyGen& keygen, const Encoding encoding);
+    std::string keyToString(KeyGen& keygen, const Encoding encoding);
+    bool importKeygen(KeyGen *keygen, const Encoding encoding) noexcept(false);
 
 private:
-    void keyToFile(CryptoPP::SecByteBlock key, Encoding encoding);
-    bool isFileExist(const std::string &filename);
+    void keyToFile(KeyGen& keygen, const Encoding encoding);
+    bool isFileExist(const std::string& filename);
     QMessageBox::ButtonRole dialogFileExists(const std::string& message);
     bool dialogInsertFilename(const std::string& message);
     bool dialogConfirm(const std::string& message);

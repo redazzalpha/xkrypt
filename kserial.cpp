@@ -16,7 +16,7 @@ using namespace std;
 KSerial::KSerial(QMainWindow* parent): m_parent(parent){};
 
 // methods
-void KSerial::saveOnFile(SecByteBlock key, Encoding encoding)
+void KSerial::saveOnFile(KeyGen& keygen, const Encoding encoding)
 {
     m_override = false;
     m_create = false;
@@ -33,7 +33,7 @@ void KSerial::saveOnFile(SecByteBlock key, Encoding encoding)
                 string dir = m_dir.toStdString() +  "/" + m_fname;
                 if(!isFileExist(dir) || m_override) {
                     m_dir =  QString::fromStdString(dir);
-                    keyToFile(key, encoding);
+                    keyToFile(keygen, encoding);
                     break;
                 }
                 else {
@@ -49,44 +49,35 @@ void KSerial::saveOnFile(SecByteBlock key, Encoding encoding)
         else break;
     }
 }
-bool KSerial::isFileExist(const string& filename)
-{
-    return std::fstream(filename).good();
-}
-void KSerial::keyToFile(SecByteBlock key, Encoding encoding)
-{
-    FileSink* fs = new FileSink(m_dir.toStdString().c_str());
-    BufferedTransformation* encoder = nullptr;;
-
-    switch(encoding) {
-    case Encoding::BASE64 : encoder = new Base64Encoder(fs); break;
-    case Encoding::HEX : encoder = new HexEncoder(fs); break;
-    case Encoding::BINARY : StringSource(key.BytePtr(), key.size(), true, fs); break;
-    default : encoder = new HexEncoder(fs);
-    }
-
-    if(encoding != Encoding::BINARY) {
-        encoder->Put(key, key.size());
-        encoder->MessageEnd();
-        delete encoder;
-        encoder = nullptr;
-    }
-}
-string KSerial::keyToString(SecByteBlock key, Encoding encoding)
+string KSerial::keyToString(KeyGen& keygen, const Encoding encoding)
 {
     stringstream ss;
     FileSink* fs = new FileSink(ss);
     BufferedTransformation* encoder;
+    size_t size;
+    CryptoPP::byte* destPtr;
 
     switch(encoding) {
-    case Encoding::BASE64 : encoder = new Base64Encoder(fs); break;
-    case Encoding::HEX : encoder = new HexEncoder(fs); break;
-    case Encoding::BINARY : StringSource(key.BytePtr(), key.size(), true, fs); break;
+    case Encoding::BASE64 :
+        encoder = new Base64Encoder(fs);
+        break;
+    case Encoding::HEX :
+        encoder = new HexEncoder(fs);
+        break;
+    case Encoding::BINARY :
+        size = keygen.getIv().size() + keygen.getKey().size();
+        destPtr = new CryptoPP::byte[size];
+        memcpy(destPtr, keygen.getIv().BytePtr(), keygen.getIv().size());
+        memcpy(destPtr + keygen.getIv().size(), keygen.getKey().BytePtr(), keygen.getKey().size());
+        StringSource(destPtr, size, true, fs);
+        delete[] destPtr;
+        break;
     default : encoder = new HexEncoder(fs);
     }
 
     if(encoding != Encoding::BINARY) {
-        encoder->Put(key, key.size());
+        encoder->Put(keygen.getIv().BytePtr(), keygen.getIv().size());
+        encoder->Put(keygen.getKey().BytePtr(), keygen.getKey().size());
         encoder->MessageEnd();
 
         delete encoder;
@@ -95,48 +86,101 @@ string KSerial::keyToString(SecByteBlock key, Encoding encoding)
 
     return ss.str();
 }
-SecByteBlock KSerial::importKey(Encoding encoding) noexcept(false)
+bool KSerial::importKeygen(KeyGen* keygen, const Encoding encoding) noexcept(false)
 {
+    bool imported = false;
     m_dir = QFileDialog::getOpenFileName(m_parent,"Import key", "", "All Files (*)");
-    SecByteBlock key;
 
     if(!m_dir.isEmpty()) {
         ifstream f(m_dir.toStdString(), std::ios::binary | std::ios::in);
         if(f.good()) {
             BufferedTransformation* decoder = new Base64Decoder;
-            string decoded, line;
+            string data, line;
             ostringstream os;
             std::vector<char> bytes((std::istreambuf_iterator<char>(f)), (std::istreambuf_iterator<char>()));
+            CryptoPP::byte* bytesPtr = (CryptoPP::byte*)&bytes[0];
+            int blocksize = AES::BLOCKSIZE;
 
             switch(encoding) {
-            case Encoding::BASE64 : decoder = new Base64Decoder; break;
-            case Encoding::HEX : decoder = new HexDecoder; break;
-            case Encoding::BINARY : key = SecByteBlock((CryptoPP::byte*)&bytes[0], bytes.size()); break;
+            case Encoding::BASE64 :
+                decoder = new Base64Decoder;
+                break;
+            case Encoding::HEX :
+                decoder = new HexDecoder;
+                break;
+            case Encoding::BINARY :
+                keygen->flush();
+                keygen->setIv(SecByteBlock(bytesPtr, blocksize));
+                keygen->setKey(SecByteBlock((CryptoPP::byte*)&bytes[blocksize], bytes.size() - blocksize));
+                imported = true;
+                break;
             default : decoder = new HexDecoder;
             }
 
             if(encoding != Encoding::BINARY) {
                 bool hex = isHex(bytes), base64 = isBase64(bytes);
+                if(encoding == Encoding::BASE64 && !base64 && !hex) throw UnsupportedEncoding();
+                if(encoding == Encoding::HEX && !hex) throw UnsupportedEncoding();
 
-                if(encoding == Encoding::BASE64 && !(base64 || hex)) throw UnsupportedEncoding("-- error: Unsupported encoding! Try Binary encoding.");
-                if(encoding == Encoding::HEX && !hex) throw UnsupportedEncoding("-- error: Unsupported encoding! Try Binary or Base64 encoding.");
-
-                decoder->Put((CryptoPP::byte*)&bytes[0], bytes.size());
+                decoder->Put(bytesPtr, bytes.size());
                 decoder->MessageEnd();
                 word64 size = decoder->MaxRetrievable();
                 if(size && size <= SIZE_MAX) {
-                    decoded.resize(size);
-                    decoder->Get((CryptoPP::byte*)&decoded[0], decoded.size());
+                    data.resize(size);
+                    decoder->Get((CryptoPP::byte*)&data[0], data.size());
                 }
-                key = SecByteBlock((CryptoPP::byte*)&decoded[0], decoded.size());
+                keygen->flush();
+                keygen->setIv(SecByteBlock((CryptoPP::byte*)&data[0], blocksize));
+                keygen->setKey(SecByteBlock((CryptoPP::byte*)&data[blocksize], data.size() - blocksize));
+                imported = true;
             }
+
             f.close();
+            delete decoder;
+            decoder = nullptr;
         }
     }
-    return key;
+    return imported;
 }
 
 // private methods
+void KSerial::keyToFile(KeyGen& keygen, const Encoding encoding)
+{
+    FileSink* fs = new FileSink(m_dir.toStdString().c_str());
+    BufferedTransformation* encoder = nullptr;
+    size_t size;
+    CryptoPP::byte* destPtr;
+
+    switch(encoding) {
+    case Encoding::BASE64 :
+        encoder = new Base64Encoder(fs);
+        break;
+    case Encoding::HEX :
+        encoder = new HexEncoder(fs);
+        break;
+    case Encoding::BINARY :
+        size = keygen.getIv().size() + keygen.getKey().size();
+        destPtr = new CryptoPP::byte[size];
+        memcpy(destPtr, keygen.getIv().BytePtr(), keygen.getIv().size());
+        memcpy(destPtr + keygen.getIv().size(), keygen.getKey().BytePtr(), keygen.getKey().size());
+        StringSource(destPtr, size, true, fs);
+        delete[] destPtr;
+        break;
+    default : encoder = new HexEncoder(fs);
+    }
+
+    if(encoding != Encoding::BINARY) {
+        encoder->Put(keygen.getIv().BytePtr(), keygen.getIv().size());
+        encoder->Put(keygen.getKey().BytePtr(), keygen.getKey().size());
+        encoder->MessageEnd();
+        delete encoder;
+        encoder = nullptr;
+    }
+}
+bool KSerial::isFileExist(const string& filename)
+{
+    return std::fstream(filename).good();
+}
 QMessageBox::ButtonRole KSerial::dialogFileExists(const string& message)
 {
     string text = MESSAGE_FILE_EXISTS_START + message + MESSAGE_FILE_EXISTS_END;

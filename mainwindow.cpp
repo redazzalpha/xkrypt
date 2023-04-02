@@ -15,7 +15,6 @@
 using namespace std;
 using namespace CryptoPP;
 
-
 // constructors
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -83,7 +82,6 @@ void MainWindow::connectItems()
 
     // connect buttons
     QObject::connect(ui->m_keyMFlush, &QPushButton::clicked, this, &MainWindow::flushKey);
-
     // connect plain texts
     QObject::connect(ui->m_keyMLoaded, &QPlainTextEdit::textChanged, this, &MainWindow::colorKey);
 
@@ -95,7 +93,6 @@ void MainWindow::connectItems()
         QObject::connect(action, &KActionBase::setStackPage, ui->m_mainStack, &QStackedWidget::setCurrentIndex);
     }
 }
-
 void MainWindow::dialogSuccessMessage(const string& message)
 {
     string text = MESSAGE_SUCCESS_START+ message + MESSAGE_SUCCESS_END;
@@ -210,24 +207,24 @@ void MainWindow::on_m_decTabTextReset_clicked()
 
 void MainWindow::on_m_keyMGenerate_clicked()
 {
-    SecByteBlock key = m_keygen->generateKey();
+    m_keygen->generateKey();
     Encoding encoding = static_cast<Encoding>(ui->m_keyMEncodingG->currentIndex());
 
     if(ui->m_keyMSaveOnF->isChecked())
-        m_ks.saveOnFile(key,  encoding);
+        m_ks.saveOnFile(*m_keygen,  encoding);
 
-    setKeyLoadedText(QString::fromStdString(m_ks.keyToString(key, encoding)));
+    setKeyLoadedText(QString::fromStdString(m_ks.keyToString(*m_keygen, encoding)));
 
     ui->m_keyMSaveOnF->setChecked(false);
-    dialogSuccessMessage("key " + std::to_string(m_keygen->getKeyLength()) + " bits has been successfully generated");
+    dialogSuccessMessage("key " + std::to_string(m_keygen->getKey().size()) + " bytes has been successfully generated");
 }
 void MainWindow::on_m_keyMImport_clicked()
 {
     Encoding encoding = static_cast<Encoding>(ui->m_keyMEncodingI->currentIndex());
     try {
-        m_keygen->setKey(m_ks.importKey(encoding));
-        if(m_keygen->isKeyLoaded()) {
-            string keyStr = m_ks.keyToString(m_keygen->getKey(), encoding);
+        bool imported = m_ks.importKeygen(m_keygen, encoding);
+        if(m_keygen->isReady() && imported) {
+            string keyStr = m_ks.keyToString(*m_keygen, encoding);
             setKeyLoadedText(QString::fromStdString(keyStr));
             colorKey();
             dialogSuccessMessage("The key has been successfully imported");
@@ -314,7 +311,7 @@ void MainWindow::colorKey()
 }
 void MainWindow::flushKey()
 {
-    m_keygen->flushKey();
+    m_keygen->flush();
     ui->m_keyMHide->setChecked(false);
     setKeyLoadedText(NO_KEY_LOADED);
 }

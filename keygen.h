@@ -19,13 +19,14 @@ public:
 
     // methods
     void setKey(CryptoPP::SecByteBlock key);
+    void setIv(CryptoPP::SecByteBlock iv);
     void setKeyLength(KeyLength keyLength = KeyLength::LENGTH_DEFAULT);
     CryptoPP::SecByteBlock getKey();
-    int getKeyLength();
+    CryptoPP::SecByteBlock getIv();
 
-    CryptoPP::SecByteBlock generateKey();
-    bool isKeyLoaded() const;
-    void flushKey();
+    void generateKey();
+    bool isReady() const;
+    void flush();
 };
 
 #endif // KEYGEN_H
