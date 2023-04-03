@@ -23,9 +23,10 @@ public:
     KSerial(QMainWindow* parent);
 
     // methods
+    std::string encodingToString(const Encoding encoding);
     void saveOnFile(KeyGen& keygen, const Encoding encoding);
-    std::string keyToString(KeyGen& keygen, const Encoding encoding);
     bool importKeygen(KeyGen *keygen, const Encoding encoding) noexcept(false);
+    std::string keyToString(KeyGen& keygen, const Encoding encoding);
 
 private:
     void keyToFile(KeyGen& keygen, const Encoding encoding);
@@ -33,8 +34,8 @@ private:
     QMessageBox::ButtonRole dialogFileExists(const std::string& message);
     bool dialogInsertFilename(const std::string& message);
     bool dialogConfirm(const std::string& message);
-    bool isBase64(const std::vector<char> bytes);
-    bool isHex(const std::vector<char> bytes);
+    bool isBase64(std::vector<char>& bytes);
+    bool isHex(std::vector<char>& bytes);
 };
 
 #endif // KSERIAL_H

@@ -216,7 +216,12 @@ void MainWindow::on_m_keyMGenerate_clicked()
     setKeyLoadedText(QString::fromStdString(m_ks.keyToString(*m_keygen, encoding)));
 
     ui->m_keyMSaveOnF->setChecked(false);
-    dialogSuccessMessage("key " + std::to_string(m_keygen->getKey().size()) + " bytes has been successfully generated");
+
+    string message = "key " + std::to_string(m_keygen->getKey().size()) + " bytes - encoded ";
+    message += m_ks.encodingToString(encoding);
+    message += "<br />has been successfully generated";
+
+    dialogSuccessMessage(message);
 }
 void MainWindow::on_m_keyMImport_clicked()
 {
@@ -227,7 +232,12 @@ void MainWindow::on_m_keyMImport_clicked()
             string keyStr = m_ks.keyToString(*m_keygen, encoding);
             setKeyLoadedText(QString::fromStdString(keyStr));
             colorKey();
-            dialogSuccessMessage("The key has been successfully imported");
+
+            string message = "key " + std::to_string(m_keygen->getKey().size()) + " bytes - encoded ";
+            message += m_ks.encodingToString(encoding);
+            message += "<br />has been successfully imported";
+
+            dialogSuccessMessage(message);
         }
     }
     catch(UnsupportedEncoding& e) {
