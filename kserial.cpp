@@ -76,19 +76,20 @@ bool KSerial::importKeygen(KeyGen* keygen, const Encoding encoding) noexcept(fal
             if(encoding == Encoding::BASE64 && !base64) throw UnsupportedEncoding();
             if(encoding == Encoding::HEX && !hex) throw UnsupportedEncoding();
             if(encoding == Encoding::BINARY && (base64 || hex)) throw UnsupportedEncoding();
+            size_t size = bytes.size();
 
             switch(encoding) {
             case Encoding::BASE64 :
-                StringSource(bytes.data(), true, new Base64Decoder(new StringSink(decoded)));
+                StringSource((CryptoPP::byte*)bytes.data(), size, true, new Base64Decoder(new StringSink(decoded)));
                 break;
             case Encoding::HEX :
-                StringSource(bytes.data(), true, new HexDecoder(new StringSink(decoded)));
+                StringSource((CryptoPP::byte*)bytes.data(), size, true, new HexDecoder(new StringSink(decoded)));
                 break;
             case Encoding::BINARY :
-                StringSource(bytes.data(), true, new StringSink(decoded));
+                StringSource((CryptoPP::byte*)bytes.data(), size, true, new StringSink(decoded));
                 break;
             default :
-                StringSource(bytes.data(), true, new Base64Decoder(new StringSink(decoded)));
+                StringSource((CryptoPP::byte*)bytes.data(), size, true, new Base64Decoder(new StringSink(decoded)));
             }
 
             keygen->flush();
