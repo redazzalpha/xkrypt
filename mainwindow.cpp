@@ -219,7 +219,7 @@ void MainWindow::on_m_keyMGenerate_clicked()
         if(m_ks.saveOnFile(*m_keygen,  encoding)) {
             string message = "key " + std::to_string(m_keygen->getKey().size()) + " bytes - encoded ";
             message += m_ks.encodingToString(encoding);
-            message += "<br />has been successfully written on file";
+            message += "<br />has been successfully written on file<br />" + m_ks.getDir();
             dialogSuccessMessage(message);
         }
     }

@@ -23,6 +23,7 @@ public:
     KSerial(QMainWindow* parent);
 
     // methods
+    std::string getDir();
     std::string encodingToString(const Encoding encoding);
     bool saveOnFile(KeyGen& keygen, const Encoding encoding);
     bool importKeygen(KeyGen *keygen, const Encoding encoding) noexcept(false);

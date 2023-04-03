@@ -17,6 +17,9 @@ using namespace std;
 KSerial::KSerial(QMainWindow* parent): m_parent(parent){};
 
 // methods
+string KSerial::getDir() {
+    return m_dir.toStdString();
+}
 string KSerial::encodingToString(const Encoding encoding)
 {
     string encodingStr;
