@@ -24,7 +24,7 @@ public:
 
     // methods
     std::string encodingToString(const Encoding encoding);
-    void saveOnFile(KeyGen& keygen, const Encoding encoding);
+    bool saveOnFile(KeyGen& keygen, const Encoding encoding);
     bool importKeygen(KeyGen *keygen, const Encoding encoding) noexcept(false);
     std::string keyToString(KeyGen& keygen, const Encoding encoding);
 

@@ -19,7 +19,7 @@ enum KeyLength {
 enum Encoding {
     BASE64,
     HEX,
-    BINARY,
+    NONE,
 };
 
 #endif // ENUMS_H

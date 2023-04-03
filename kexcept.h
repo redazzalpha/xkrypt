@@ -14,5 +14,16 @@ public:
     // methods
     virtual const char* what() const noexcept;
 };
+class UnsupportedKey : public std::exception {
+private:
+    const char* m_message;
+
+public:
+    // constructors
+    UnsupportedKey(const char* message = "-- error: Unsupported key<br /> Must be at least 16 bytes");
+
+    // methods
+    virtual const char* what() const noexcept;
+};
 
 #endif // KEXCEPT_H

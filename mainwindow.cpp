@@ -93,6 +93,12 @@ void MainWindow::connectItems()
         QObject::connect(action, &KActionBase::setStackPage, ui->m_mainStack, &QStackedWidget::setCurrentIndex);
     }
 }
+void MainWindow::generateKey(const Encoding encoding) {
+    m_keygen->generateKey();
+    setKeyLoadedText(QString::fromStdString(m_ks.keyToString(*m_keygen, encoding)));
+    ui->m_keyMSaveOnF->setChecked(false);
+}
+
 void MainWindow::dialogSuccessMessage(const string& message)
 {
     string text = MESSAGE_SUCCESS_START+ message + MESSAGE_SUCCESS_END;
@@ -207,21 +213,17 @@ void MainWindow::on_m_decTabTextReset_clicked()
 
 void MainWindow::on_m_keyMGenerate_clicked()
 {
-    m_keygen->generateKey();
     Encoding encoding = static_cast<Encoding>(ui->m_keyMEncodingG->currentIndex());
-
-    if(ui->m_keyMSaveOnF->isChecked())
-        m_ks.saveOnFile(*m_keygen,  encoding);
-
-    setKeyLoadedText(QString::fromStdString(m_ks.keyToString(*m_keygen, encoding)));
-
-    ui->m_keyMSaveOnF->setChecked(false);
-
-    string message = "key " + std::to_string(m_keygen->getKey().size()) + " bytes - encoded ";
-    message += m_ks.encodingToString(encoding);
-    message += "<br />has been successfully generated";
-
-    dialogSuccessMessage(message);
+    if(ui->m_keyMSaveOnF->isChecked()) {
+        generateKey(encoding);
+        if(m_ks.saveOnFile(*m_keygen,  encoding)) {
+            string message = "key " + std::to_string(m_keygen->getKey().size()) + " bytes - encoded ";
+            message += m_ks.encodingToString(encoding);
+            message += "<br />has been successfully written on file";
+            dialogSuccessMessage(message);
+        }
+    }
+    else generateKey(encoding);
 }
 void MainWindow::on_m_keyMImport_clicked()
 {
@@ -241,6 +243,9 @@ void MainWindow::on_m_keyMImport_clicked()
         }
     }
     catch(UnsupportedEncoding& e) {
+        dialogErrorMessage(e.what());
+    }
+    catch(UnsupportedKey& e) {
         dialogErrorMessage(e.what());
     }
 }

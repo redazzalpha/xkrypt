@@ -58,7 +58,7 @@ private:
     QList<QString>* m_encodings = new QList<QString>{
         "Base64",
         "Hex",
-        "Binary",
+        "None",
     };
     QList<KActionBase*> m_actions = QList<KActionBase*> {
         new KActionKeyMgr(),
@@ -78,6 +78,7 @@ private:
     // methods
     void uiInit();
     void connectItems();
+    void generateKey(const Encoding encoding);
 
     void dialogSuccessMessage(const std::string& message);
     void dialogErrorMessage(const std::string& message);

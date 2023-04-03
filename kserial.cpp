@@ -23,12 +23,13 @@ string KSerial::encodingToString(const Encoding encoding)
     switch(static_cast<int>(encoding))  {
     case Encoding::BASE64: return "Base64";
     case Encoding::HEX: return "Hex";
-    case Encoding::BINARY: return "Binary";
+    case Encoding::NONE: return "None";
     default: return "Base64";
     }
 }
-void KSerial::saveOnFile(KeyGen& keygen, const Encoding encoding)
+bool KSerial::saveOnFile(KeyGen& keygen, const Encoding encoding)
 {
+    bool written = false;
     m_override = false;
     m_create = false;
     m_changeDirectory = false;
@@ -45,6 +46,7 @@ void KSerial::saveOnFile(KeyGen& keygen, const Encoding encoding)
                 if(!isFileExist(dir) || m_override) {
                     m_dir =  QString::fromStdString(dir);
                     keyToFile(keygen, encoding);
+                    written = true;
                     break;
                 }
                 else {
@@ -59,6 +61,7 @@ void KSerial::saveOnFile(KeyGen& keygen, const Encoding encoding)
         }
         else break;
     }
+    return written;
 }
 bool KSerial::importKeygen(KeyGen* keygen, const Encoding encoding) noexcept(false)
 {
@@ -72,11 +75,11 @@ bool KSerial::importKeygen(KeyGen* keygen, const Encoding encoding) noexcept(fal
             int blocksize = AES::BLOCKSIZE;
             std::vector<char> bytes( (istreambuf_iterator<char>(f)), (istreambuf_iterator<char>()));
             bool hex = isHex(bytes), base64 = isBase64(bytes);
+            size_t size = bytes.size();
 
+            if(size < AES::MIN_KEYLENGTH) throw UnsupportedKey();
             if(encoding == Encoding::BASE64 && !base64) throw UnsupportedEncoding();
             if(encoding == Encoding::HEX && !hex) throw UnsupportedEncoding();
-            if(encoding == Encoding::BINARY && (base64 || hex)) throw UnsupportedEncoding();
-            size_t size = bytes.size();
 
             switch(encoding) {
             case Encoding::BASE64 :
@@ -85,7 +88,7 @@ bool KSerial::importKeygen(KeyGen* keygen, const Encoding encoding) noexcept(fal
             case Encoding::HEX :
                 StringSource((CryptoPP::byte*)bytes.data(), size, true, new HexDecoder(new StringSink(decoded)));
                 break;
-            case Encoding::BINARY :
+            case Encoding::NONE :
                 StringSource((CryptoPP::byte*)bytes.data(), size, true, new StringSink(decoded));
                 break;
             default :
@@ -117,7 +120,7 @@ string KSerial::keyToString(KeyGen& keygen, const Encoding encoding)
     case Encoding::HEX :
         StringSource(destPtr, size, true, new HexEncoder(new StringSink(keyIv)));
         break;
-    case Encoding::BINARY :
+    case Encoding::NONE :
         StringSource(destPtr, size, true, new StringSink(keyIv));
         break;
     default :
@@ -144,7 +147,7 @@ void KSerial::keyToFile(KeyGen& keygen, const Encoding encoding)
     case Encoding::HEX :
         StringSource(destPtr, size, true, new HexEncoder(new FileSink(m_dir.toStdString().c_str())));
         break;
-    case Encoding::BINARY :
+    case Encoding::NONE :
         StringSource(destPtr, size, true, new FileSink(m_dir.toStdString().c_str()));
         break;
     default :
