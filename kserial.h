@@ -13,6 +13,7 @@ private:
     QMainWindow* m_parent;
     std::string m_fname = "";
     QString m_dir;
+    Encoding m_encoding;
     bool m_loop = true;
     bool m_override = false;
     bool m_create = false;
@@ -24,9 +25,10 @@ public:
 
     // methods
     std::string getDir();
+    Encoding getEncoding();
     std::string encodingToString(const Encoding encoding);
     bool saveOnFile(KeyGen& keygen, const Encoding encoding);
-    bool importKeygen(KeyGen *keygen, const Encoding encoding) noexcept(false);
+    bool importKeygen(KeyGen *keygen) noexcept(false);
     std::string keyToString(KeyGen& keygen, const Encoding encoding);
 
 private:

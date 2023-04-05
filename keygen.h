@@ -9,7 +9,7 @@ class KeyGen {
 private:
     CryptoPP::AutoSeededRandomPool m_prng;
     CryptoPP::SecByteBlock m_key;
-    CryptoPP::SecByteBlock m_iv = CryptoPP::SecByteBlock(CryptoPP::AES::BLOCKSIZE);
+    CryptoPP::SecByteBlock m_iv;
     KeyLength m_keyLength = KeyLength::LENGTH_DEFAULT;
 
 public:
@@ -21,8 +21,8 @@ public:
     void setKey(CryptoPP::SecByteBlock key);
     void setIv(CryptoPP::SecByteBlock iv);
     void setKeyLength(KeyLength keyLength = KeyLength::LENGTH_DEFAULT);
-    CryptoPP::SecByteBlock getKey();
-    CryptoPP::SecByteBlock getIv();
+    const CryptoPP::SecByteBlock& getKey();
+    const CryptoPP::SecByteBlock& getIv();
 
     void generateKey();
     bool isReady() const;

@@ -229,7 +229,7 @@ void MainWindow::on_m_keyMImport_clicked()
 {
     Encoding encoding = static_cast<Encoding>(ui->m_keyMEncodingI->currentIndex());
     try {
-        bool imported = m_ks.importKeygen(m_keygen, encoding);
+        bool imported = m_ks.importKeygen(m_keygen);
         if(m_keygen->isReady() && imported) {
             string keyStr = m_ks.keyToString(*m_keygen, encoding);
             setKeyLoadedText(QString::fromStdString(keyStr));
@@ -242,10 +242,7 @@ void MainWindow::on_m_keyMImport_clicked()
             dialogSuccessMessage(message);
         }
     }
-    catch(UnsupportedEncoding& e) {
-        dialogErrorMessage(e.what());
-    }
-    catch(UnsupportedKey& e) {
+    catch(exception& e) {
         dialogErrorMessage(e.what());
     }
 }

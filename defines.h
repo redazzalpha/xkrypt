@@ -1,7 +1,9 @@
 #ifndef DEFINES_H
 #define DEFINES_H
 
-#include <iostream>
+#define XKRYPT_REF_SIZE 3
+#define XKRYPT_REF_VERSION 0x01
+#define XKRYPT_REF_MODEL 0x24
 
 #define NO_KEY_LOADED "no key loaded!"
 #define NO_FILE_LOADED "no file loaded!"

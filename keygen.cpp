@@ -4,8 +4,16 @@
 using namespace CryptoPP;
 
 // constructors
-KeyGen::KeyGen() {}
-KeyGen::KeyGen(KeyLength keyLength): m_keyLength(keyLength) {}
+KeyGen::KeyGen()
+{
+    m_key.CleanNew(static_cast<size_t>(IvLength::LENGTH_DEFAULT));
+    m_iv.CleanNew(static_cast<size_t>(IvLength::LENGTH_DEFAULT));
+}
+KeyGen::KeyGen(KeyLength keyLength): m_keyLength(keyLength)
+{
+    m_key.CleanNew(static_cast<size_t>(keyLength));
+    m_iv.CleanNew(static_cast<size_t>(IvLength::LENGTH_DEFAULT));
+}
 
 // methods
 void KeyGen::setKey(CryptoPP::SecByteBlock key)
@@ -22,19 +30,19 @@ void KeyGen::setKeyLength(KeyLength keyLength)
 {
     m_keyLength = keyLength;
 }
-SecByteBlock KeyGen::getKey()
+const SecByteBlock& KeyGen::getKey()
 {
     return m_key;
 }
-SecByteBlock KeyGen::getIv()
+const SecByteBlock& KeyGen::getIv()
 {
     return m_iv;
 }
 
 void KeyGen::generateKey()
 {
-    m_key.CleanNew(m_keyLength);
-    m_iv.CleanNew(AES::BLOCKSIZE);
+    m_key.CleanNew(static_cast<size_t>(m_keyLength));
+    m_iv.CleanNew(static_cast<size_t>(IvLength::LENGTH_DEFAULT));
     m_prng.GenerateBlock(m_key, m_key.size());
     m_prng.GenerateBlock(m_iv, m_iv.size());
 }

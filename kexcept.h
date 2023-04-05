@@ -20,7 +20,40 @@ private:
 
 public:
     // constructors
-    UnsupportedKey(const char* message = "-- error: Unsupported key<br /> Must be at least 16 bytes");
+    UnsupportedKey(const char* message = "-- error: Unsupported key<br /> key too heavy");
+
+    // methods
+    virtual const char* what() const noexcept;
+};
+class UnsupportedData : public std::exception {
+private:
+    const char* m_message;
+
+public:
+    // constructors
+    UnsupportedData(const char* message = "-- error: Unsupported data<br />file is corrupt or unknown");
+
+    // methods
+    virtual const char* what() const noexcept;
+};
+class UnsupportedVersion : public std::exception {
+private:
+    const char* m_message;
+
+public:
+    // constructors
+    UnsupportedVersion(const char* message = "-- error: Unsupported version<br />file is under version or unknown");
+
+    // methods
+    virtual const char* what() const noexcept;
+};
+class UnsupportedModel : public std::exception {
+private:
+    const char* m_message;
+
+public:
+    // constructors
+    UnsupportedModel(const char* message = "-- error: Unsupported model<br />file is corrupt or unknown");
 
     // methods
     virtual const char* what() const noexcept;

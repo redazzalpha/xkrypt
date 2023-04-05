@@ -8,8 +8,8 @@
 #include "kexcept.h"
 #include <QFileDialog>
 #include <fstream>
+#include<vector>
 #include <bits/streambuf_iterator.h>
-
 using namespace CryptoPP;
 using namespace std;
 
@@ -66,101 +66,105 @@ bool KSerial::saveOnFile(KeyGen& keygen, const Encoding encoding)
     }
     return written;
 }
-bool KSerial::importKeygen(KeyGen* keygen, const Encoding encoding) noexcept(false)
+bool KSerial::importKeygen(KeyGen* keygen) noexcept(false)
 {
     bool imported = false;
     m_dir = QFileDialog::getOpenFileName(m_parent,"Import key", "", "All Files (*)");
 
     if(!m_dir.isEmpty()) {
-        ifstream f(m_dir.toStdString(), std::ios::binary | std::ios::in);
+        ifstream f(m_dir.toStdString(), ios::binary | ios::in);
         if(f.good()) {
-            string decoded;
-            int blocksize = AES::BLOCKSIZE;
-            std::vector<char> bytes( (istreambuf_iterator<char>(f)), (istreambuf_iterator<char>()));
-            bool hex = isHex(bytes), base64 = isBase64(bytes);
-            size_t size = bytes.size();
+            size_t ivsize = static_cast<size_t>(IvLength::LENGTH_DEFAULT);
+            string refs, keyiv;
+            FileSource fs(f, false);
 
-            if(size < AES::MIN_KEYLENGTH) throw UnsupportedKey();
-            if(encoding == Encoding::BASE64 && !base64) throw UnsupportedEncoding();
-            if(encoding == Encoding::HEX && !hex) throw UnsupportedEncoding();
+            fs.Attach(new StringSink(refs));
+            fs.Pump(XKRYPT_REF_SIZE);
 
-            switch(encoding) {
-            case Encoding::BASE64 :
-                StringSource((CryptoPP::byte*)bytes.data(), size, true, new Base64Decoder(new StringSink(decoded)));
-                break;
-            case Encoding::HEX :
-                StringSource((CryptoPP::byte*)bytes.data(), size, true, new HexDecoder(new StringSink(decoded)));
-                break;
-            case Encoding::NONE :
-                StringSource((CryptoPP::byte*)bytes.data(), size, true, new StringSink(decoded));
-                break;
-            default :
-                StringSource((CryptoPP::byte*)bytes.data(), size, true, new Base64Decoder(new StringSink(decoded)));
+            if((refs[0] < XKRYPT_REF_VERSION)) throw UnsupportedVersion();
+            if( (refs[1] != XKRYPT_REF_MODEL)) throw UnsupportedModel();
+
+            switch(refs[2]) {
+            case Encoding::BASE64 : fs.Detach(new Base64Decoder); break;
+            case Encoding::HEX : fs.Detach(new HexDecoder); break;
+            case Encoding::NONE : fs.Detach(); break;
+            default : throw UnsupportedEncoding();
             }
 
-            keygen->flush();
-            keygen->setIv(SecByteBlock((CryptoPP::byte*)&decoded[0], blocksize));
-            keygen->setKey(SecByteBlock((CryptoPP::byte*)&decoded[blocksize], decoded.size() - blocksize));
-            f.close();
+            fs.Attach(new StringSink(keyiv));
+            fs.PumpAll();
+
+            keygen->setIv(SecByteBlock((uchar*) &keyiv[0], ivsize));
+            keygen->setKey(SecByteBlock((uchar*) &keyiv[ivsize], keyiv.size() - ivsize));
+
             imported = true;
         }
     }
-
     return imported;
 }
 string KSerial::keyToString(KeyGen& keygen, const Encoding encoding)
-{
-    string keyIv;
-    size_t size = keygen.getIv().size() + keygen.getKey().size();
-    CryptoPP::byte* destPtr = new CryptoPP::byte[size];
-    memcpy(destPtr, keygen.getIv().BytePtr(), keygen.getIv().size());
-    memcpy(destPtr + keygen.getIv().size(), keygen.getKey().BytePtr(), keygen.getKey().size());
+{    
+    StringSource keySource(keygen.getKey().BytePtr(), keygen.getKey().size(), false);
+    string key;
 
     switch(encoding) {
     case Encoding::BASE64 :
-        StringSource(destPtr, size, true, new Base64Encoder(new StringSink(keyIv)));
+        keySource.Attach(new Base64Encoder);
         break;
     case Encoding::HEX :
-        StringSource(destPtr, size, true, new HexEncoder(new StringSink(keyIv)));
-        break;
+        keySource.Attach(new HexEncoder);
     case Encoding::NONE :
-        StringSource(destPtr, size, true, new StringSink(keyIv));
         break;
     default :
-        StringSource(destPtr, size, true, new Base64Encoder(new StringSink(keyIv)));
+        keySource.Attach(new Base64Encoder);
+        break;
     }
-    delete[] destPtr;
-    destPtr = nullptr;
 
-    return keyIv;
+    keySource.Attach(new StringSink(key));
+    keySource.PumpAll();
+    return key;
 }
 
 // private methods
 void KSerial::keyToFile(KeyGen& keygen, const Encoding encoding)
 {
-    size_t size = keygen.getIv().size() + keygen.getKey().size();
-    CryptoPP::byte* destPtr = new CryptoPP::byte[size];
-    memcpy(destPtr, keygen.getIv().BytePtr(), keygen.getIv().size());
-    memcpy(destPtr + keygen.getIv().size(), keygen.getKey().BytePtr(), keygen.getKey().size());
+    std::vector<CryptoPP::byte> xkrypt_refs {
+        XKRYPT_REF_VERSION,
+        XKRYPT_REF_MODEL,
+        (CryptoPP::byte)encoding,
+    };
+    StringSource refsSource(&xkrypt_refs[0], xkrypt_refs.size(),false);
+    StringSource ivSource(keygen.getIv().BytePtr(), keygen.getIv().size(), false);
+    StringSource keySource(keygen.getKey().BytePtr(), keygen.getKey().size(), false);
+    FileSink fs(m_dir.toStdString().c_str(), true);
 
-    switch(encoding) {
-    case Encoding::BASE64 :
-        StringSource(destPtr, size, true, new Base64Encoder(new FileSink(m_dir.toStdString().c_str())));
-        break;
-    case Encoding::HEX :
-        StringSource(destPtr, size, true, new HexEncoder(new FileSink(m_dir.toStdString().c_str())));
-        break;
-    case Encoding::NONE :
-        StringSource(destPtr, size, true, new FileSink(m_dir.toStdString().c_str()));
-        break;
-    default :
-        StringSource(destPtr, size, true, new Base64Encoder(new FileSink(m_dir.toStdString().c_str())));
-    }
-    delete[] destPtr;
+        switch(encoding) {
+        case Encoding::BASE64 :
+            ivSource.Attach(new Base64Encoder);
+            keySource.Attach(new Base64Encoder);
+            break;
+        case Encoding::HEX :
+            ivSource.Attach(new HexEncoder);
+            keySource.Attach(new HexEncoder);
+        case Encoding::NONE :
+            break;
+        default :
+            ivSource.Attach(new Base64Encoder);
+            keySource.Attach(new Base64Encoder);
+            break;
+        }
+
+    refsSource.Attach(new Redirector(fs));
+    ivSource.Attach(new Redirector(fs));
+    keySource.Attach(new Redirector(fs));
+
+    refsSource.PumpAll();
+    ivSource.PumpAll();
+    keySource.PumpAll();
 }
 bool KSerial::isFileExist(const string& filename)
 {
-    return std::fstream(filename).good();
+    return std::fstream(filename, ios::in | ios::binary).good();
 }
 QMessageBox::ButtonRole KSerial::dialogFileExists(const string& message)
 {
@@ -248,3 +252,7 @@ bool KSerial::isHex(vector<char>& bytes)
     }
     return hex;
 }
+
+
+
+
