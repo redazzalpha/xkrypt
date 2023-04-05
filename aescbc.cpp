@@ -4,6 +4,7 @@
 #include "modes.h"
 
 using namespace CryptoPP;
+using namespace std;
 
 const QString AesCBC::ModeName = "CBC";
 
@@ -19,24 +20,23 @@ QString AesCBC::getModeName() const
     return AesCBC::ModeName;
 }
 
-void AesCBC::encrypt(const KeyGen& keygen)
+string AesCBC::encrypt(const KeyGen& keygen, const string& plain)
 {
     try
     {
-
-        std::string cipher = "", plain = "";
-
+        std::string cipher = "";
         const SecByteBlock& key = keygen.getKey();
         const SecByteBlock& iv = keygen.getIv();
 
         CBC_Mode< AES >::Encryption e;
         e.SetKeyWithIV(key.BytePtr(), key.size(), iv.BytePtr());
 
-        StringSink* sk = new StringSink(cipher);
-        StreamTransformationFilter* stf = new StreamTransformationFilter(e, sk);
+        StringSink* ss = new StringSink(cipher);
+        StreamTransformationFilter* stf = new StreamTransformationFilter(e, ss);
         StringSource s(plain, true, stf);
 
         std::cout << "cipher text: " << cipher << std::endl;
+        return cipher;
     }
     catch(const Exception& e)
     {
@@ -44,23 +44,24 @@ void AesCBC::encrypt(const KeyGen& keygen)
         exit(1);
     }
 }
-void AesCBC::decrypt(const KeyGen& keygen)
+string AesCBC::decrypt(const KeyGen& keygen, const string& cipher)
 {
     try
     {
         const SecByteBlock& key = keygen.getKey();
         const SecByteBlock& iv = keygen.getIv();
 
-        std::string cipher = "", plain = "", recovered;
+        std::string recovered;
 
         CBC_Mode< AES >::Decryption d;
         d.SetKeyWithIV(key.BytePtr(), key.size(), iv.BytePtr());
 
         StringSink* sk = new StringSink(recovered);
         StreamTransformationFilter* stf = new StreamTransformationFilter(d,sk);
-        StringSource(plain, true, stf);
+        StringSource(cipher, true, stf);
 
         std::cout << "recovered text: " << recovered << std::endl;
+        return recovered;
     }
     catch(const Exception& e)
     {

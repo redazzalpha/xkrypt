@@ -11,7 +11,7 @@ class KSerial final: public QObject{
 
 private:
     QMainWindow* m_parent;
-    std::string m_fname = "";
+    std::string m_fname;
     QString m_dir;
     bool m_loop = true;
     bool m_override = false;

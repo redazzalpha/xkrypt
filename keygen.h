@@ -8,8 +8,8 @@
 class KeyGen {
 private:
     CryptoPP::AutoSeededRandomPool m_prng;
-    CryptoPP::SecByteBlock m_key;
-    CryptoPP::SecByteBlock m_iv;
+    CryptoPP::SecByteBlock m_key {0};
+    CryptoPP::SecByteBlock m_iv {0};
     KeyLength m_keyLength = KeyLength::LENGTH_DEFAULT;
 
 public:

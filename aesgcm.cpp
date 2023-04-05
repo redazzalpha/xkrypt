@@ -1,6 +1,7 @@
 #include "aesgcm.h"
 
 using namespace CryptoPP;
+using namespace std;
 
 const QString AesGCM::ModeName = "GCM";
 
@@ -16,11 +17,11 @@ QString AesGCM::getModeName() const
     return AesGCM::AlgName;
 }
 
-void AesGCM::encrypt(const KeyGen& keygen)
+string AesGCM::encrypt(const KeyGen& keygen, const string& plain)
 {
     std::cout << "cipher Aes gcm encrypt" << std::endl;
 }
-void AesGCM::decrypt(const KeyGen& keygen)
+string AesGCM::decrypt(const KeyGen& keygen, const string& cipher)
 {
     std::cout << "cipher Aes gcm decrypt" << std::endl;
 }

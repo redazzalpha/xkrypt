@@ -4,16 +4,8 @@
 using namespace CryptoPP;
 
 // constructors
-KeyGen::KeyGen()
-{
-    m_key.CleanNew(static_cast<size_t>(IvLength::LENGTH_DEFAULT));
-    m_iv.CleanNew(static_cast<size_t>(IvLength::LENGTH_DEFAULT));
-}
-KeyGen::KeyGen(KeyLength keyLength): m_keyLength(keyLength)
-{
-    m_key.CleanNew(static_cast<size_t>(keyLength));
-    m_iv.CleanNew(static_cast<size_t>(IvLength::LENGTH_DEFAULT));
-}
+KeyGen::KeyGen(){}
+KeyGen::KeyGen(KeyLength keyLength): m_keyLength(keyLength){}
 
 // methods
 void KeyGen::setKey(CryptoPP::SecByteBlock key)

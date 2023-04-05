@@ -17,8 +17,8 @@ public:
     // methods
     virtual QString getModeName() const override;
 
-    virtual void encrypt(const KeyGen& keygen) override;
-    virtual void decrypt(const KeyGen& keygen) override;
+    virtual std::string encrypt(const KeyGen& keygen, const std::string& plain ) override;
+    virtual std::string decrypt(const KeyGen& keygen, const std::string& cipher) override;
 };
 
 #endif // AESCBC_H

@@ -195,7 +195,10 @@ void MainWindow::on_m_decTabFileImport_clicked()
 
 void MainWindow::on_m_encTabTextEncrypt_clicked()
 {
-    std::cout << " encrypt tab text" << std::endl;
+    if(m_keygen->isReady()) {
+        std::cout << " encrypt tab text" << std::endl;
+    }
+    else dialogNoKeyMessage("encypt");
 }
 void MainWindow::on_m_decTabTextDecrypt_clicked()
 {
