@@ -16,11 +16,11 @@ QString RsaOEAP::getModeName() const
 {
     return RsaOEAP::ModeName;
 }
-void RsaOEAP::decrypt(SecByteBlock key, SecByteBlock iv)
+void RsaOEAP::decrypt(const KeyGen& keygen)
 {
     std::cout << "cipher Rsa oeap decrypt" << std::endl;
 }
-void RsaOEAP::encrypt(SecByteBlock key, SecByteBlock iv)
+void RsaOEAP::encrypt(const KeyGen& keygen)
 {
     std::cout << "cipher Rsa oeap encrypt" << std::endl;
 }

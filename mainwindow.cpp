@@ -1,6 +1,5 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
-#include "kexcept.h"
 #include "enums.h"
 #include "defines.h"
 #include <QToolButton>
@@ -63,7 +62,7 @@ void MainWindow::uiInit()
     ui->m_keyMEncodingI->addItems(*m_encodings);
     ui->m_keyMEncodingG->addItems(*m_encodings);
 }
-void MainWindow::connectItems()
+void MainWindow::connectItems() const
 {
     // connect comboboxes
     QObject::connect(ui->m_encTabFileAlgs, &QComboBox::textActivated, this, &MainWindow::setAlgorithm);
@@ -142,7 +141,7 @@ void MainWindow::dialogNoKeyMessage(const string& action)
     msg.exec();
 }
 
-void MainWindow::keyLoadedSelectable(const Qt::TextInteractionFlags flags)
+void MainWindow::keyLoadedSelectable(const Qt::TextInteractionFlags flags) const
 {
     ui->m_keyMLoaded->setTextInteractionFlags(flags);
     ui->m_encTabFileLoaded->setTextInteractionFlags(flags);
@@ -150,7 +149,7 @@ void MainWindow::keyLoadedSelectable(const Qt::TextInteractionFlags flags)
     ui->m_encTabTextLoaded->setTextInteractionFlags(flags);
     ui->m_decTabTextLoaded->setTextInteractionFlags(flags);
 }
-void MainWindow::setKeyLoadedStyle(const QString& style)
+void MainWindow::setKeyLoadedStyle(const QString& style) const
 {
     ui->m_keyMLoaded->setStyleSheet(style);
     ui->m_encTabFileLoaded->setStyleSheet(style);
@@ -158,7 +157,7 @@ void MainWindow::setKeyLoadedStyle(const QString& style)
     ui->m_encTabTextLoaded->setStyleSheet(style);
     ui->m_decTabTextLoaded->setStyleSheet(style);
 }
-void MainWindow::setKeyLoadedText(const QString& keyStr)
+void MainWindow::setKeyLoadedText(const QString& keyStr) const
 {
     ui->m_keyMLoaded->setPlainText(keyStr);
     ui->m_encTabFileLoaded->setPlainText(keyStr);
@@ -166,7 +165,7 @@ void MainWindow::setKeyLoadedText(const QString& keyStr)
     ui->m_encTabTextLoaded->setPlainText(keyStr);
     ui->m_decTabTextLoaded->setPlainText(keyStr);
 }
-void MainWindow::setKeyLoadedSelectable(const bool selectable)
+void MainWindow::setKeyLoadedSelectable(const bool selectable) const
 {
     if(selectable)keyLoadedSelectable(Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard);
     else keyLoadedSelectable(Qt::NoTextInteraction);

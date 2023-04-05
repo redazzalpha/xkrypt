@@ -1,10 +1,10 @@
 #ifndef CIPHERBASE_H
 #define CIPHERBASE_H
 
-#include "secblock.h"
-#include <iostream>
+#include "keygen.h"
 #include <QObject>
 #include <QString>
+#include <iostream>
 
 /**
  * CipherBase class is abstract and represent base
@@ -25,8 +25,8 @@ public:
     virtual QString getAlgName() const = 0;
     virtual QString getModeName() const = 0;
 
-    virtual void encrypt(CryptoPP::SecByteBlock key, CryptoPP::SecByteBlock iv) = 0;
-    virtual void decrypt(CryptoPP::SecByteBlock key, CryptoPP::SecByteBlock iv) = 0;
+    virtual void encrypt(const KeyGen& keygen) = 0;
+    virtual void decrypt(const KeyGen& keygen) = 0;
 };
 
 #endif // CIPHERBASE_H

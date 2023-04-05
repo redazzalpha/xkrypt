@@ -17,17 +17,17 @@ using namespace std;
 KSerial::KSerial(QMainWindow* parent): m_parent(parent){};
 
 // methods
-string KSerial::getDir() {
+string KSerial::getDir() const {
     return m_dir.toStdString();
 }
-string KSerial::encodingToString(const Encoding encoding)
+string KSerial::encodingToString(const Encoding encoding) const
 {
     string encodingStr;
     switch(static_cast<int>(encoding))  {
     case Encoding::BASE64: return "Base64";
     case Encoding::HEX: return "Hex";
     case Encoding::NONE: return "None";
-    default: return "Base64";
+    default: return "Unknown";
     }
 }
 bool KSerial::saveOnFile(KeyGen& keygen, const Encoding encoding)
@@ -126,7 +126,7 @@ string KSerial::keyToString(KeyGen& keygen, const Encoding encoding)
 }
 
 // private methods
-void KSerial::keyToFile(KeyGen& keygen, const Encoding encoding)
+void KSerial::keyToFile(KeyGen& keygen, const Encoding encoding) const
 {
     std::vector<CryptoPP::byte> xkrypt_refs {
         XKRYPT_REF_VERSION,
@@ -162,7 +162,7 @@ void KSerial::keyToFile(KeyGen& keygen, const Encoding encoding)
     ivSource.PumpAll();
     keySource.PumpAll();
 }
-bool KSerial::isFileExist(const string& filename)
+bool KSerial::isFileExist(const string& filename) const
 {
     return std::fstream(filename, ios::in | ios::binary).good();
 }
@@ -231,26 +231,6 @@ bool KSerial::dialogConfirm(const string& message)
     if(msg.clickedButton() == ok) isConfirmed = true;
 
     return isConfirmed;
-}
-bool KSerial::isBase64(vector<char>& bytes)
-{
-    int fsize = bytes.size();
-    stringstream ss;
-    ss << bytes[fsize-2];
-    return ss.str() == "=";
-}
-bool KSerial::isHex(vector<char>& bytes)
-{
-    bool hex = true;
-
-    for(char c : bytes) {
-        c = std::toupper(c);
-        if(!(c >= 48 && c <= 57) && !(c >= 65 && c <= 70)) {
-            hex = false;
-            break;
-        }
-    }
-    return hex;
 }
 
 

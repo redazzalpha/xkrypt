@@ -16,8 +16,8 @@ public:
     // methods
     virtual QString getModeName() const override;
 
-    virtual void encrypt(CryptoPP::SecByteBlock key, CryptoPP::SecByteBlock iv) override;
-    virtual void decrypt(CryptoPP::SecByteBlock key, CryptoPP::SecByteBlock iv) override;
+    virtual void encrypt(const KeyGen& keygen) override;
+    virtual void decrypt(const KeyGen& keygen) override;
 };
 
 #endif // AESGCM_H

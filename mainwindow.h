@@ -77,17 +77,17 @@ public:
 private:
     // methods
     void uiInit();
-    void connectItems();
+    void connectItems() const;
     void generateKey(const Encoding encoding);
 
     void dialogSuccessMessage(const std::string& message);
     void dialogErrorMessage(const std::string& message);
     void dialogNoKeyMessage(const std::string& action);
 
-    void keyLoadedSelectable(const Qt::TextInteractionFlags flags);
-    void setKeyLoadedStyle(const QString &style);
-    void setKeyLoadedText(const QString &keyStr);
-    void setKeyLoadedSelectable(const bool selectable);
+    void keyLoadedSelectable(const Qt::TextInteractionFlags flags) const;
+    void setKeyLoadedStyle(const QString &style) const;
+    void setKeyLoadedText(const QString &keyStr) const;
+    void setKeyLoadedSelectable(const bool selectable) const;
 
 private slots:
     void on_m_encTabFileEncrypt_clicked();

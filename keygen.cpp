@@ -30,11 +30,11 @@ void KeyGen::setKeyLength(KeyLength keyLength)
 {
     m_keyLength = keyLength;
 }
-const SecByteBlock& KeyGen::getKey()
+const SecByteBlock& KeyGen::getKey() const
 {
     return m_key;
 }
-const SecByteBlock& KeyGen::getIv()
+const SecByteBlock& KeyGen::getIv() const
 {
     return m_iv;
 }
