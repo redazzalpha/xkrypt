@@ -1,6 +1,7 @@
 #include "aescbc.h"
 #include "aes.h"
 #include "filters.h"
+#include "hex.h"
 #include "modes.h"
 
 using namespace CryptoPP;
@@ -20,54 +21,31 @@ QString AesCBC::getModeName() const
     return AesCBC::ModeName;
 }
 
-string AesCBC::encrypt(const KeyGen& keygen, const string& plain)
+string AesCBC::encrypt(const KeyGen& keygen, const string& plain) noexcept(false)
 {
-    try
-    {
-        std::string cipher = "";
-        const SecByteBlock& key = keygen.getKey();
-        const SecByteBlock& iv = keygen.getIv();
+    std::string cipher = "";
+    const SecByteBlock& key = keygen.getKey();
+    const SecByteBlock& iv = keygen.getIv();
+    StringSink* ss = new StringSink(cipher);
+    CBC_Mode<AES>::Encryption e;
+    StreamTransformationFilter* stf = new StreamTransformationFilter(e, new HexEncoder(ss));
 
-        CBC_Mode< AES >::Encryption e;
-        e.SetKeyWithIV(key.BytePtr(), key.size(), iv.BytePtr());
-
-        StringSink* ss = new StringSink(cipher);
-        StreamTransformationFilter* stf = new StreamTransformationFilter(e, ss);
-        StringSource s(plain, true, stf);
-
-        std::cout << "cipher text: " << cipher << std::endl;
-        return cipher;
-    }
-    catch(const Exception& e)
-    {
-        std::cerr << e.what() << std::endl;
-        exit(1);
-    }
+    e.SetKeyWithIV(key, key.size(), iv);
+    StringSource(plain, true, stf);
+    return cipher;
 }
-string AesCBC::decrypt(const KeyGen& keygen, const string& cipher)
+string AesCBC::decrypt(const KeyGen& keygen, const string& cipher) noexcept(false)
 {
-    try
-    {
-        const SecByteBlock& key = keygen.getKey();
-        const SecByteBlock& iv = keygen.getIv();
+    std::string recover;
+    const SecByteBlock& key = keygen.getKey();
+    const SecByteBlock& iv = keygen.getIv();
+    StringSink* sk = new StringSink(recover);
+    CBC_Mode<AES>::Decryption d;
+    StreamTransformationFilter* stf = new StreamTransformationFilter(d, sk);
 
-        std::string recovered;
-
-        CBC_Mode< AES >::Decryption d;
-        d.SetKeyWithIV(key.BytePtr(), key.size(), iv.BytePtr());
-
-        StringSink* sk = new StringSink(recovered);
-        StreamTransformationFilter* stf = new StreamTransformationFilter(d,sk);
-        StringSource(cipher, true, stf);
-
-        std::cout << "recovered text: " << recovered << std::endl;
-        return recovered;
-    }
-    catch(const Exception& e)
-    {
-        std::cerr << e.what() << std::endl;
-        exit(1);
-    }
+    d.SetKeyWithIV(key, key.size(), iv);
+    StringSource(cipher, true, new HexDecoder(stf));
+    return recover;
 }
 
 

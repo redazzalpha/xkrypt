@@ -74,8 +74,6 @@ void MainWindow::connectItems() const
     QObject::connect(ui->m_decTabTextAlgs, &QComboBox::textActivated, this, &MainWindow::setAlgorithm);
     QObject::connect(ui->m_decTabTextModes, &QComboBox::textActivated, this, &MainWindow::setMode);
 
-    QObject::connect(ui->m_keyMLength, &QComboBox::activated, this, &MainWindow::setKeyLength);
-
     // connect checkboxes
     QObject::connect(ui->m_keyMHide, &QCheckBox::clicked, this, &MainWindow::hideKey);
 
@@ -92,10 +90,40 @@ void MainWindow::connectItems() const
         QObject::connect(action, &KActionBase::setStackPage, ui->m_mainStack, &QStackedWidget::setCurrentIndex);
     }
 }
-void MainWindow::generateKey(const Encoding encoding) {
+void MainWindow::generateKey(Encoding encoding)
+{
+    const int keylengthIndex = ui->m_keyMLength->currentIndex();
+    const KeyLength keylength = keylengthFrom(keylengthIndex);
+
+    m_keygen->setKeyLength(keylength);
     m_keygen->generateKey();
+
     setKeyLoadedText(QString::fromStdString(m_ks.keyToString(*m_keygen, encoding)));
-    ui->m_keyMSaveOnF->setChecked(false);
+}
+void MainWindow::saveKeyOnFile(Encoding encoding) {
+    if(m_ks.saveOnFile(*m_keygen,  encoding)) {
+        string message = "key " + std::to_string(m_keygen->getKey().size()) + " bytes - encoded ";
+        message += m_ks.encodingToString(encoding);
+        message += "<br />has been successfully written on file<br />" + m_ks.getDir();
+        dialogSuccessMessage(message);
+        ui->m_keyMSaveOnF->setChecked(false);
+    }
+}
+KeyLength MainWindow::keylengthFrom(const int index)
+{
+    KeyLength keylength;
+    switch(index) {
+    case 0 : keylength = KeyLength::LENGTH_DEFAULT; break;
+    case 1 : keylength = KeyLength::LENGTH_32; break;
+    case 2 : keylength = KeyLength::LENGTH_64; break;
+    case 3 : keylength = KeyLength::LENGTH_128; break;
+    case 4 : keylength = KeyLength::LENGTH_256; break;
+    case 5 : keylength = KeyLength::LENGTH_512; break;
+    case 6 : keylength = KeyLength::LENGTH_1024; break;
+    case 7 : keylength = KeyLength::LENGTH_2048; break;
+    default: keylength = static_cast<KeyLength>(0);
+    }
+    return keylength;
 }
 
 void MainWindow::dialogSuccessMessage(const string& message)
@@ -195,14 +223,37 @@ void MainWindow::on_m_decTabFileImport_clicked()
 
 void MainWindow::on_m_encTabTextEncrypt_clicked()
 {
-    if(m_keygen->isReady()) {
-        std::cout << " encrypt tab text" << std::endl;
+    try {
+        if(m_keygen->isReady()) {
+            string plain = ui->m_encTabTextField->toPlainText().toStdString();
+            if(!plain.empty()) {
+                string cipher = m_cipher->encrypt(*m_keygen, plain);
+                ui->m_encTabTextField->setPlainText(QString::fromStdString(cipher));
+            }
+            else dialogErrorMessage("-- error: Cannot encrypt empty!");
+        }
+        else dialogNoKeyMessage("encypt");
     }
-    else dialogNoKeyMessage("encypt");
+    catch(exception& e) {
+        dialogErrorMessage(e.what());
+    }
 }
 void MainWindow::on_m_decTabTextDecrypt_clicked()
 {
-    std::cout << " deccrypt tab text" << std::endl;
+    try {
+        if(m_keygen->isReady()) {
+            string cipher = ui->m_encTabTextField->toPlainText().toStdString();
+            if(!cipher.empty()) {
+                string recover = m_cipher->decrypt(*m_keygen, cipher);
+                ui->m_decTabTextField->setPlainText(QString::fromStdString(recover));
+            }
+            else dialogErrorMessage("-- error: Cannot decrypt empty!");
+        }
+        else dialogNoKeyMessage("decrypt");
+    }
+    catch(exception& e) {
+        dialogErrorMessage(e.what());
+    }
 }
 void MainWindow::on_m_encTabTextReset_clicked()
 {
@@ -216,16 +267,9 @@ void MainWindow::on_m_decTabTextReset_clicked()
 void MainWindow::on_m_keyMGenerate_clicked()
 {
     Encoding encoding = static_cast<Encoding>(ui->m_keyMEncodingG->currentIndex());
-    if(ui->m_keyMSaveOnF->isChecked()) {
-        generateKey(encoding);
-        if(m_ks.saveOnFile(*m_keygen,  encoding)) {
-            string message = "key " + std::to_string(m_keygen->getKey().size()) + " bytes - encoded ";
-            message += m_ks.encodingToString(encoding);
-            message += "<br />has been successfully written on file<br />" + m_ks.getDir();
-            dialogSuccessMessage(message);
-        }
-    }
-    else generateKey(encoding);
+    generateKey(encoding);
+    if(ui->m_keyMSaveOnF->isChecked())
+        saveKeyOnFile(encoding);
 }
 void MainWindow::on_m_keyMImport_clicked()
 {
@@ -285,20 +329,6 @@ void MainWindow::setMode(const QString& mode)
     // rsa modes
     if(mode == RsaOEAP::ModeName) m_cipher = new RsaOEAP;
     if(mode == RsaSSA::ModeName) m_cipher = new RsaSSA;
-}
-void MainWindow::setKeyLength(const int index)
-{
-    switch(index) {
-    case 0 : m_keygen->setKeyLength(KeyLength::LENGTH_DEFAULT); break;
-    case 1 : m_keygen->setKeyLength(KeyLength::LENGTH_32); break;
-    case 2 : m_keygen->setKeyLength(KeyLength::LENGTH_64); break;
-    case 3 : m_keygen->setKeyLength(KeyLength::LENGTH_128); break;
-    case 4 : m_keygen->setKeyLength(KeyLength::LENGTH_256); break;
-    case 5 : m_keygen->setKeyLength(KeyLength::LENGTH_512); break;
-    case 6 : m_keygen->setKeyLength(KeyLength::LENGTH_1024); break;
-    case 7 : m_keygen->setKeyLength(KeyLength::LENGTH_2048); break;
-    default: m_keygen->setKeyLength(KeyLength::LENGTH_DEFAULT);
-    }
 }
 void MainWindow::hideKey(const bool isChecked)
 {

@@ -78,7 +78,9 @@ private:
     // methods
     void uiInit();
     void connectItems() const;
-    void generateKey(const Encoding encoding);
+    void generateKey(Encoding encodingIndex);
+    void saveKeyOnFile(Encoding encoding);
+    KeyLength keylengthFrom(const int index);
 
     void dialogSuccessMessage(const std::string& message);
     void dialogErrorMessage(const std::string& message);
@@ -105,7 +107,6 @@ private slots:
 
     void setAlgorithm(const QString& alg);
     void setMode(const QString& mode);
-    void setKeyLength(const int index);
     void hideKey(const bool isChecked);
     void colorKey();
     void flushKey();

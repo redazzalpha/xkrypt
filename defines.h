@@ -18,7 +18,7 @@
 #define MESSAGE_END "</td>"
 #define MESSAGE_SUCCESS_START "<td><img src=:/assets/success.png width=50 height=50/></td><td valign=middle>"
 #define MESSAGE_ERROR_START "<td><img src=:/assets/error.png width=50 height=50/></td><td valign=middle>"
-#define MESSAGE_NOKEY_START "<td><img src=:/assets/error.png width=50 height=50/></td><td valign=middle>Cannot "
+#define MESSAGE_NOKEY_START "<td><img src=:/assets/error.png width=50 height=50/></td><td valign=middle>-- error: Cannot "
 #define MESSAGE_SUCCESS_END MESSAGE_END
 #define MESSAGE_ERROR_END MESSAGE_END
 #define MESSAGE_NOKEY_END " - No key loaded!<br />Please generate or import key and retry</td>"

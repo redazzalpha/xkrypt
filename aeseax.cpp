@@ -16,11 +16,11 @@ QString AesEAX::getModeName() const {
     return AesEAX::ModeName;
 }
 
-string AesEAX::encrypt(const KeyGen& keygen, const string& plain)
+string AesEAX::encrypt(const KeyGen& keygen, const string& plain) noexcept(false)
 {
     std::cout << "cipher Aes eax encrypt" << std::endl;
 }
-string AesEAX::decrypt(const KeyGen& keygen, const string& cipher)
+string AesEAX::decrypt(const KeyGen& keygen, const string& cipher) noexcept(false)
 {
     std::cout << "cipher Aes eax decrypt" << std::endl;
 }

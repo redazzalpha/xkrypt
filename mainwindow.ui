@@ -608,7 +608,10 @@
             </size>
            </property>
            <property name="text">
-            <string>Select file(s)</string>
+            <string>&amp;Select file(s)</string>
+           </property>
+           <property name="shortcut">
+            <string>Ctrl+S</string>
            </property>
           </widget>
          </item>
@@ -699,7 +702,7 @@
               </size>
              </property>
              <property name="text">
-              <string>Algorithm:</string>
+              <string>Algorithm</string>
              </property>
             </widget>
            </item>
@@ -707,12 +710,19 @@
             <widget class="QLabel" name="label_9">
              <property name="minimumSize">
               <size>
-               <width>95</width>
+               <width>100</width>
                <height>0</height>
               </size>
              </property>
              <property name="text">
-              <string>Mode:</string>
+              <string>Mode</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="label_7">
+             <property name="text">
+              <string>Encoding</string>
              </property>
             </widget>
            </item>
@@ -766,6 +776,9 @@
             </widget>
            </item>
            <item>
+            <widget class="QComboBox" name="m_encTabFileEncoding"/>
+           </item>
+           <item>
             <widget class="QPushButton" name="m_encTabFileEncrypt">
              <property name="minimumSize">
               <size>
@@ -780,7 +793,10 @@
               </size>
              </property>
              <property name="text">
-              <string>Encrypt</string>
+              <string>&amp;Encrypt</string>
+             </property>
+             <property name="shortcut">
+              <string>Ctrl+E</string>
              </property>
             </widget>
            </item>
@@ -885,7 +901,7 @@
              </property>
              <property name="sizeHint" stdset="0">
               <size>
-               <width>85</width>
+               <width>60</width>
                <height>20</height>
               </size>
              </property>
@@ -906,7 +922,7 @@
               </size>
              </property>
              <property name="text">
-              <string>Algorithm:</string>
+              <string>Algorithm</string>
              </property>
             </widget>
            </item>
@@ -919,7 +935,20 @@
               </size>
              </property>
              <property name="text">
-              <string>Mode:</string>
+              <string>Mode</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="label_10">
+             <property name="minimumSize">
+              <size>
+               <width>85</width>
+               <height>0</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>Encoding</string>
              </property>
             </widget>
            </item>
@@ -986,9 +1015,15 @@
             </widget>
            </item>
            <item>
+            <widget class="QComboBox" name="m_encTabTextEncoding"/>
+           </item>
+           <item>
             <widget class="QCheckBox" name="m_encTabTextSaveOnF">
              <property name="text">
-              <string>Save on file</string>
+              <string>&amp;Save on file</string>
+             </property>
+             <property name="shortcut">
+              <string>Ctrl+S</string>
              </property>
             </widget>
            </item>
@@ -1001,7 +1036,10 @@
               </size>
              </property>
              <property name="text">
-              <string>Encrypt</string>
+              <string>&amp;Encrypt</string>
+             </property>
+             <property name="shortcut">
+              <string>Ctrl+E</string>
              </property>
             </widget>
            </item>
@@ -1014,7 +1052,10 @@
               </size>
              </property>
              <property name="text">
-              <string>Reset</string>
+              <string>&amp;Reset</string>
+             </property>
+             <property name="shortcut">
+              <string>Ctrl+R</string>
              </property>
             </widget>
            </item>
@@ -1151,7 +1192,10 @@
             </size>
            </property>
            <property name="text">
-            <string>Select file(s)</string>
+            <string>&amp;Select file(s)</string>
+           </property>
+           <property name="shortcut">
+            <string>Ctrl+S</string>
            </property>
           </widget>
          </item>
@@ -1236,7 +1280,7 @@
               </size>
              </property>
              <property name="text">
-              <string>Algorithm:</string>
+              <string>Algorithm</string>
              </property>
             </widget>
            </item>
@@ -1249,7 +1293,14 @@
               </size>
              </property>
              <property name="text">
-              <string>Mode:</string>
+              <string>Mode</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="label_20">
+             <property name="text">
+              <string>Encoding</string>
              </property>
             </widget>
            </item>
@@ -1291,6 +1342,9 @@
             </widget>
            </item>
            <item>
+            <widget class="QComboBox" name="m_decTabFileEncoding"/>
+           </item>
+           <item>
             <widget class="QPushButton" name="m_decTabFileDecrypt">
              <property name="minimumSize">
               <size>
@@ -1305,7 +1359,10 @@
               </size>
              </property>
              <property name="text">
-              <string>Decrypt</string>
+              <string>&amp;Decrypt</string>
+             </property>
+             <property name="shortcut">
+              <string>Ctrl+D</string>
              </property>
             </widget>
            </item>
@@ -1431,7 +1488,7 @@
               </size>
              </property>
              <property name="text">
-              <string>Algorithm:</string>
+              <string>Algorithm</string>
              </property>
             </widget>
            </item>
@@ -1444,7 +1501,20 @@
               </size>
              </property>
              <property name="text">
-              <string>Mode:</string>
+              <string>Mode</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="label_21">
+             <property name="minimumSize">
+              <size>
+               <width>85</width>
+               <height>0</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>Encoding</string>
              </property>
             </widget>
            </item>
@@ -1511,9 +1581,15 @@
             </widget>
            </item>
            <item>
+            <widget class="QComboBox" name="m_decTabTextEncoding"/>
+           </item>
+           <item>
             <widget class="QCheckBox" name="m_decTabTextSaveOnF">
              <property name="text">
-              <string>Save on file</string>
+              <string>&amp;Save on file</string>
+             </property>
+             <property name="shortcut">
+              <string>Ctrl+S</string>
              </property>
             </widget>
            </item>
@@ -1526,7 +1602,10 @@
               </size>
              </property>
              <property name="text">
-              <string>Decrypt</string>
+              <string>&amp;Decrypt</string>
+             </property>
+             <property name="shortcut">
+              <string>Ctrl+D</string>
              </property>
             </widget>
            </item>
@@ -1539,7 +1618,10 @@
               </size>
              </property>
              <property name="text">
-              <string>Reset</string>
+              <string>&amp;Reset</string>
+             </property>
+             <property name="shortcut">
+              <string>Ctrl+R</string>
              </property>
             </widget>
            </item>

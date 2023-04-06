@@ -33,10 +33,14 @@ const SecByteBlock& KeyGen::getIv() const
 
 void KeyGen::generateKey()
 {
-    m_key.CleanNew(static_cast<size_t>(m_keyLength));
-    m_iv.CleanNew(static_cast<size_t>(IvLength::LENGTH_DEFAULT));
-    m_prng.GenerateBlock(m_key, m_key.size());
-    m_prng.GenerateBlock(m_iv, m_iv.size());
+    m_key.CleanNew(0);
+    m_iv.CleanNew(0);
+    if(m_keyLength >= KeyLength::LENGTH_DEFAULT) {
+        m_key.CleanNew(static_cast<size_t>(m_keyLength));
+        m_iv.CleanNew(static_cast<size_t>(IvLength::LENGTH_DEFAULT));
+        m_prng.GenerateBlock(m_key, m_key.size());
+        m_prng.GenerateBlock(m_iv, m_iv.size());
+    }
 }
 bool KeyGen::isReady() const
 {

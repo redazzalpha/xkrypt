@@ -16,8 +16,9 @@ public:
 
     // methods
     virtual QString getModeName() const override;
-    virtual std::string encrypt(const KeyGen& keygen, const std::string& plain) override;
-    virtual std::string decrypt(const KeyGen& keygen, const std::string& cipher) override;
+
+    virtual std::string encrypt(const KeyGen& keygen, const std::string& plain ) noexcept(false) override;
+    virtual std::string decrypt(const KeyGen& keygen, const std::string& cipher) noexcept(false) override;
 };
 
 #endif // RSAOEAP_H

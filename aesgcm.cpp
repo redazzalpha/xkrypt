@@ -17,11 +17,11 @@ QString AesGCM::getModeName() const
     return AesGCM::AlgName;
 }
 
-string AesGCM::encrypt(const KeyGen& keygen, const string& plain)
+string AesGCM::encrypt(const KeyGen& keygen, const string& plain) noexcept(false)
 {
     std::cout << "cipher Aes gcm encrypt" << std::endl;
 }
-string AesGCM::decrypt(const KeyGen& keygen, const string& cipher)
+string AesGCM::decrypt(const KeyGen& keygen, const string& cipher) noexcept(false)
 {
     std::cout << "cipher Aes gcm decrypt" << std::endl;
 }
