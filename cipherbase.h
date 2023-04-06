@@ -25,8 +25,8 @@ public:
     virtual QString getAlgName() const = 0;
     virtual QString getModeName() const = 0;
 
-    virtual std::string encrypt(const KeyGen& keygen, const std::string& plain) noexcept(false) = 0;
-    virtual std::string decrypt(const KeyGen& keygen, const std::string& cipher) noexcept(false) = 0;
+    virtual std::string encrypt(const KeyGen& keygen, const std::string& plain, const Encoding encoding) noexcept(false) = 0;
+    virtual std::string decrypt(const KeyGen& keygen, const std::string& cipher, const Encoding encoding) noexcept(false) = 0;
 };
 
 #endif // CIPHERBASE_H

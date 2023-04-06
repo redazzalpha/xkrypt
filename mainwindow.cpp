@@ -50,17 +50,22 @@ void MainWindow::uiInit()
 
     ui->m_encTabFileAlgs->addItems(*m_algorithms);
     ui->m_encTabFileModes->addItems(*m_aesModes);
+    ui->m_encTabFileEncoding->addItems(*m_encodings);
     ui->m_decTabFileAlgs->addItems(*m_algorithms);
     ui->m_decTabFileModes->addItems(*m_aesModes);
+    ui->m_decTabFileEncoding->addItems(*m_encodings);
 
     ui->m_encTabTextAlgs->addItems(*m_algorithms);
     ui->m_encTabTextModes->addItems(*m_aesModes);
+    ui->m_encTabTextEncoding->addItems(*m_encodings);
     ui->m_decTabTextAlgs->addItems(*m_algorithms);
     ui->m_decTabTextModes->addItems(*m_aesModes);
+    ui->m_decTabTextEncoding->addItems(*m_encodings);
 
     ui->m_keyMLength->addItems(*m_aesKeys);
     ui->m_keyMEncodingI->addItems(*m_encodings);
     ui->m_keyMEncodingG->addItems(*m_encodings);
+
 }
 void MainWindow::connectItems() const
 {
@@ -227,7 +232,8 @@ void MainWindow::on_m_encTabTextEncrypt_clicked()
         if(m_keygen->isReady()) {
             string plain = ui->m_encTabTextField->toPlainText().toStdString();
             if(!plain.empty()) {
-                string cipher = m_cipher->encrypt(*m_keygen, plain);
+                Encoding encoding = static_cast<Encoding>(ui->m_encTabTextEncoding->currentIndex());
+                string cipher = m_cipher->encrypt(*m_keygen, plain, encoding);
                 ui->m_encTabTextField->setPlainText(QString::fromStdString(cipher));
             }
             else dialogErrorMessage("-- error: Cannot encrypt empty!");
@@ -242,9 +248,10 @@ void MainWindow::on_m_decTabTextDecrypt_clicked()
 {
     try {
         if(m_keygen->isReady()) {
-            string cipher = ui->m_encTabTextField->toPlainText().toStdString();
+            string cipher = ui->m_decTabTextField->toPlainText().toStdString();
             if(!cipher.empty()) {
-                string recover = m_cipher->decrypt(*m_keygen, cipher);
+                Encoding encoding = static_cast<Encoding>(ui->m_decTabTextEncoding->currentIndex());
+                string recover = m_cipher->decrypt(*m_keygen, cipher, encoding);
                 ui->m_decTabTextField->setPlainText(QString::fromStdString(recover));
             }
             else dialogErrorMessage("-- error: Cannot decrypt empty!");

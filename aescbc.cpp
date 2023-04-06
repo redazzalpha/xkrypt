@@ -2,6 +2,7 @@
 #include "aes.h"
 #include "filters.h"
 #include "hex.h"
+#include "base64.h"
 #include "modes.h"
 
 using namespace CryptoPP;
@@ -21,30 +22,41 @@ QString AesCBC::getModeName() const
     return AesCBC::ModeName;
 }
 
-string AesCBC::encrypt(const KeyGen& keygen, const string& plain) noexcept(false)
+string AesCBC::encrypt(const KeyGen& keygen, const string& plain, const Encoding encoding) noexcept(false)
 {
     std::string cipher = "";
     const SecByteBlock& key = keygen.getKey();
     const SecByteBlock& iv = keygen.getIv();
     StringSink* ss = new StringSink(cipher);
     CBC_Mode<AES>::Encryption e;
-    StreamTransformationFilter* stf = new StreamTransformationFilter(e, new HexEncoder(ss));
-
+    StreamTransformationFilter* stf = new StreamTransformationFilter(e);
     e.SetKeyWithIV(key, key.size(), iv);
+
+    switch(encoding) {
+    case Encoding::BASE64 : stf->Attach(new Base64Encoder(ss)); break;
+    case Encoding::HEX : stf->Attach(new HexEncoder(ss)); break;
+    default: stf->Attach(new Base64Encoder(ss));;
+    }
+
     StringSource(plain, true, stf);
     return cipher;
 }
-string AesCBC::decrypt(const KeyGen& keygen, const string& cipher) noexcept(false)
+string AesCBC::decrypt(const KeyGen& keygen, const string& cipher, const Encoding encoding) noexcept(false)
 {
     std::string recover;
     const SecByteBlock& key = keygen.getKey();
     const SecByteBlock& iv = keygen.getIv();
-    StringSink* sk = new StringSink(recover);
+    StringSink* ss = new StringSink(recover);
     CBC_Mode<AES>::Decryption d;
-    StreamTransformationFilter* stf = new StreamTransformationFilter(d, sk);
-
+    StreamTransformationFilter* stf = new StreamTransformationFilter(d, ss);
     d.SetKeyWithIV(key, key.size(), iv);
-    StringSource(cipher, true, new HexDecoder(stf));
+
+    switch(encoding) {
+    case Encoding::BASE64 : StringSource(cipher, true, new Base64Decoder(stf)); break;
+    case Encoding::HEX : StringSource(cipher, true, new HexDecoder(stf)); break;
+    default: StringSource(cipher, true, new Base64Decoder(stf));
+    }
+
     return recover;
 }
 

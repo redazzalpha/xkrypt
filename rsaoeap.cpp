@@ -17,11 +17,11 @@ QString RsaOEAP::getModeName() const
     return RsaOEAP::ModeName;
 }
 
-string RsaOEAP::encrypt(const KeyGen& keygen, const std::string& plain) noexcept(false)
+string RsaOEAP::encrypt(const KeyGen& keygen, const std::string& plain, const Encoding encoding) noexcept(false)
 {
     std::cout << "cipher Rsa oeap encrypt" << std::endl;
 }
-string RsaOEAP::decrypt(const KeyGen& keygen, const string& cipher) noexcept(false)
+string RsaOEAP::decrypt(const KeyGen& keygen, const string& cipher, const Encoding encoding) noexcept(false)
 {
     std::cout << "cipher Rsa oeap decrypt" << std::endl;
 }

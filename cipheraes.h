@@ -23,8 +23,8 @@ public:
     virtual QString getAlgName() const final;
     virtual QString getModeName() const override = 0 ;
 
-    virtual std::string encrypt(const KeyGen& keygen, const std::string& plain) noexcept(false) override = 0;
-    virtual std::string decrypt(const KeyGen& keygen, const std::string& cipher) noexcept(false) override = 0;
+    virtual std::string encrypt(const KeyGen& keygen, const std::string& plain, const Encoding encoding) noexcept(false) override = 0;
+    virtual std::string decrypt(const KeyGen& keygen, const std::string& cipher, const Encoding encoding) noexcept(false) override = 0;
 };
 
 #endif // CIPHERAES_H

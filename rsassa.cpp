@@ -18,11 +18,11 @@ QString RsaSSA::getModeName() const
     return RsaSSA::ModeName;
 }
 
-string RsaSSA::encrypt(const KeyGen& keygen, const string& plain)
+string RsaSSA::encrypt(const KeyGen& keygen, const string& plain, const Encoding encoding)
 {
     std::cout << "cipher Rsa ssa encrypt" << std::endl;
 }
-string RsaSSA::decrypt(const KeyGen& keygen, const string& cipher)
+string RsaSSA::decrypt(const KeyGen& keygen, const string& cipher, const Encoding encoding)
 {
     std::cout << "cipher Rsa ssa decrypt" << std::endl;
 }
