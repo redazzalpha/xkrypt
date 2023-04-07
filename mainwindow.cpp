@@ -2,6 +2,7 @@
 #include "./ui_mainwindow.h"
 #include "enums.h"
 #include "defines.h"
+#include "kexcept.h"
 #include <QToolButton>
 #include <QPushButton>
 #include <QLabel>
@@ -22,68 +23,66 @@ MainWindow::MainWindow(QWidget *parent)
 {
     uiInit();
     connectItems();
-    setFixedSize(800, 600);
-    setIconSize(QSize(35, 35));
+    setFixedSize(WINDOW_WIDTH, WINDOW_HEIGHT);
+    setIconSize(QSize(WINDOW_ICON_WIDTH, WINDOW_ICON_HEIGHT));
 }
 // destructor
-MainWindow::~MainWindow()
-{
-    delete ui;
-    delete m_keygen;
-    delete m_cipher;
-    delete m_aesModes;
-    delete m_rsaModes;
-    delete m_algorithms;
-    delete m_encodings;
-    foreach(KActionBase* action, m_actions) delete action;
-}
+    MainWindow::~MainWindow()
+    {
+        delete ui;
+        delete m_keygen;
+        delete m_cipher;
+        delete m_aesModes;
+        delete m_rsaModes;
+        delete m_algorithms;
+        delete m_keyEncodings;
+        foreach(KActionBase* action, m_actions) delete action;
+    }
 
 // private methods
 void MainWindow::uiInit()
 {
     ui->setupUi(this);
 
+    // tab widgets
     ui->m_encTab->setTabText(0, TAB_NAME_FILE);
     ui->m_encTab->setTabText(1, TAB_NAME_TEXT);
     ui->m_decTab->setTabText(0, TAB_NAME_FILE);
     ui->m_decTab->setTabText(1, TAB_NAME_TEXT);
 
+    // comboxes
+    ui->m_keyMLength->addItems(*m_aesKeys);
+    ui->m_keyMEncodingsI->addItems(*m_keyEncodings);
+    ui->m_keyMEncodingsG->addItems(*m_keyEncodings);
+
     ui->m_encTabFileAlgs->addItems(*m_algorithms);
     ui->m_encTabFileModes->addItems(*m_aesModes);
-    ui->m_encTabFileEncoding->addItems(*m_encodings);
+    ui->m_encTabFileEncodings->addItems(*m_keyEncodings);
     ui->m_decTabFileAlgs->addItems(*m_algorithms);
     ui->m_decTabFileModes->addItems(*m_aesModes);
-    ui->m_decTabFileEncoding->addItems(*m_encodings);
+    ui->m_decTabFileEncodings->addItems(*m_keyEncodings);
 
     ui->m_encTabTextAlgs->addItems(*m_algorithms);
     ui->m_encTabTextModes->addItems(*m_aesModes);
-    ui->m_encTabTextEncoding->addItems(*m_encodings);
+    ui->m_encTabTextEncodings->addItems(*m_enc_dec_encodings);
     ui->m_decTabTextAlgs->addItems(*m_algorithms);
     ui->m_decTabTextModes->addItems(*m_aesModes);
-    ui->m_decTabTextEncoding->addItems(*m_encodings);
-
-    ui->m_keyMLength->addItems(*m_aesKeys);
-    ui->m_keyMEncodingI->addItems(*m_encodings);
-    ui->m_keyMEncodingG->addItems(*m_encodings);
-
+    ui->m_decTabTextEncodings->addItems(*m_enc_dec_encodings);
 }
 void MainWindow::connectItems() const
 {
-    // connect comboboxes
+    // connect combos
     QObject::connect(ui->m_encTabFileAlgs, &QComboBox::textActivated, this, &MainWindow::setAlgorithm);
-    QObject::connect(ui->m_encTabFileModes, &QComboBox::textActivated, this, &MainWindow::setMode);
     QObject::connect(ui->m_decTabFileAlgs, &QComboBox::textActivated, this, &MainWindow::setAlgorithm);
-    QObject::connect(ui->m_decTabFileModes, &QComboBox::textActivated, this, &MainWindow::setMode);
     QObject::connect(ui->m_encTabTextAlgs, &QComboBox::textActivated, this, &MainWindow::setAlgorithm);
-    QObject::connect(ui->m_encTabTextModes, &QComboBox::textActivated, this, &MainWindow::setMode);
     QObject::connect(ui->m_decTabTextAlgs, &QComboBox::textActivated, this, &MainWindow::setAlgorithm);
-    QObject::connect(ui->m_decTabTextModes, &QComboBox::textActivated, this, &MainWindow::setMode);
 
     // connect checkboxes
     QObject::connect(ui->m_keyMHide, &QCheckBox::clicked, this, &MainWindow::hideKey);
 
     // connect buttons
     QObject::connect(ui->m_keyMFlush, &QPushButton::clicked, this, &MainWindow::flushKey);
+
     // connect plain texts
     QObject::connect(ui->m_keyMLoaded, &QPlainTextEdit::textChanged, this, &MainWindow::colorKey);
 
@@ -102,7 +101,6 @@ void MainWindow::generateKey(Encoding encoding)
 
     m_keygen->setKeyLength(keylength);
     m_keygen->generateKey();
-
     setKeyLoadedText(QString::fromStdString(m_ks.keyToString(*m_keygen, encoding)));
 }
 void MainWindow::saveKeyOnFile(Encoding encoding) {
@@ -112,6 +110,88 @@ void MainWindow::saveKeyOnFile(Encoding encoding) {
         message += "<br />has been successfully written on file<br />" + m_ks.getDir();
         dialogSuccessMessage(message);
         ui->m_keyMSaveOnF->setChecked(false);
+    }
+}
+void MainWindow::processEncrypt(QObject *sender)
+{
+    QObject* parent = sender->parent();
+    string senderName = sender->objectName().toStdString();
+    string algsName = senderName.substr(0, senderName.find("Encrypt")) + "Algs";
+    string modeName = senderName.substr(0, senderName.find("Encrypt")) + "Modes";
+    string encodingName = senderName.substr(0, senderName.find("Encrypt")) + "Encodings";
+    QComboBox* algs = parent->findChild<QComboBox*>(QString::fromStdString(algsName));
+    QComboBox* mode = parent->findChild<QComboBox*>(QString::fromStdString(modeName));
+    QComboBox* encoding = parent->findChild<QComboBox*>(QString::fromStdString(encodingName));
+
+    try {
+        if(!m_keygen->isReady()) throw UnreadyKeyException();
+        string plainText = ui->m_encTabTextField->toPlainText().toStdString();
+
+        if(plainText.empty()) throw EmptyTextException();
+        string algSelected = algs->currentText().toStdString();
+        string modeSelected = mode->currentText().toStdString();
+        Encoding encodingSelected = static_cast<Encoding>(encoding->currentIndex());
+        m_cipherFrom(algSelected, modeSelected);
+
+        if(!m_cipher) throw BadCipherException();
+        string cipherText = m_cipher->encrypt(*m_keygen, plainText, encodingSelected);
+        ui->m_encTabTextField->setPlainText(QString::fromStdString(cipherText));
+    }
+    catch(exception& e) {
+        dialogErrorMessage(e.what());
+    }
+}
+void MainWindow::processDecrypt(QObject *sender)
+{
+    QObject* parent = sender->parent();
+    string senderName = sender->objectName().toStdString();
+    string algsName = senderName.substr(0, senderName.find("Decrypt")) + "Algs";
+    string modeName = senderName.substr(0, senderName.find("Decrypt")) + "Modes";
+    string encodingName = senderName.substr(0, senderName.find("Decrypt")) + "Encodings";
+    QComboBox* algs = parent->findChild<QComboBox*>(QString::fromStdString(algsName));
+    QComboBox* mode = parent->findChild<QComboBox*>(QString::fromStdString(modeName));
+    QComboBox* encoding = parent->findChild<QComboBox*>(QString::fromStdString(encodingName));
+
+    try {
+        if(!m_keygen->isReady()) throw UnreadyKeyException();
+        string cipherText = ui->m_decTabTextField->toPlainText().toStdString();
+
+        if(cipherText.empty()) throw EmptyTextException();
+        string algSelected = algs->currentText().toStdString();
+        string modeSelected = mode->currentText().toStdString();
+        Encoding encodingSelected = static_cast<Encoding>(encoding->currentIndex());
+        m_cipherFrom(algSelected, modeSelected);
+
+        if(!m_cipher) throw BadCipherException();
+        string recoverText = m_cipher->decrypt(*m_keygen, cipherText, encodingSelected);
+        ui->m_decTabTextField->setPlainText(QString::fromStdString(recoverText));
+    }
+    catch(exception& e) {
+        dialogErrorMessage(e.what());
+    }
+}
+void MainWindow::m_cipherFrom(const string& alg, const string& mode)
+{
+    delete m_cipher;
+    m_cipher = nullptr;
+
+    // aes algs
+    if(QString::fromStdString(alg) == CipherAes::AlgName) {
+
+        if(QString::fromStdString(mode) == AesGCM::ModeName) m_cipher = new AesGCM;
+        if(QString::fromStdString(mode) == AesGCM::ModeName) m_cipher = new AesGCM;
+        if(QString::fromStdString(mode) == AesEAX::ModeName) m_cipher = new AesEAX;
+        if(QString::fromStdString(mode) == AesGCM::ModeName) m_cipher = new AesGCM;
+        if(QString::fromStdString(mode) == AesCBC::ModeName) m_cipher = new AesCBC;
+        if(QString::fromStdString(mode) == AesGCM::ModeName) m_cipher = new AesGCM;
+        if(QString::fromStdString(mode) == AesGCM::ModeName) m_cipher = new AesGCM;
+        if(QString::fromStdString(mode) == AesGCM::ModeName) m_cipher = new AesGCM;
+    }
+
+    // rsa algs
+    if(QString::fromStdString(alg) == CipherRsa::AlgName) {
+        if(QString::fromStdString(mode) == RsaOEAP::ModeName) m_cipher = new RsaOEAP;
+        if(QString::fromStdString(mode) == RsaSSA::ModeName) m_cipher = new RsaSSA;
     }
 }
 KeyLength MainWindow::keylengthFrom(const int index)
@@ -228,39 +308,11 @@ void MainWindow::on_m_decTabFileImport_clicked()
 
 void MainWindow::on_m_encTabTextEncrypt_clicked()
 {
-    try {
-        if(m_keygen->isReady()) {
-            string plain = ui->m_encTabTextField->toPlainText().toStdString();
-            if(!plain.empty()) {
-                Encoding encoding = static_cast<Encoding>(ui->m_encTabTextEncoding->currentIndex());
-                string cipher = m_cipher->encrypt(*m_keygen, plain, encoding);
-                ui->m_encTabTextField->setPlainText(QString::fromStdString(cipher));
-            }
-            else dialogErrorMessage("-- error: Cannot encrypt empty!");
-        }
-        else dialogNoKeyMessage("encypt");
-    }
-    catch(exception& e) {
-        dialogErrorMessage(e.what());
-    }
+    processEncrypt(QObject::sender());
 }
 void MainWindow::on_m_decTabTextDecrypt_clicked()
 {
-    try {
-        if(m_keygen->isReady()) {
-            string cipher = ui->m_decTabTextField->toPlainText().toStdString();
-            if(!cipher.empty()) {
-                Encoding encoding = static_cast<Encoding>(ui->m_decTabTextEncoding->currentIndex());
-                string recover = m_cipher->decrypt(*m_keygen, cipher, encoding);
-                ui->m_decTabTextField->setPlainText(QString::fromStdString(recover));
-            }
-            else dialogErrorMessage("-- error: Cannot decrypt empty!");
-        }
-        else dialogNoKeyMessage("decrypt");
-    }
-    catch(exception& e) {
-        dialogErrorMessage(e.what());
-    }
+    processDecrypt(QObject::sender());
 }
 void MainWindow::on_m_encTabTextReset_clicked()
 {
@@ -273,14 +325,14 @@ void MainWindow::on_m_decTabTextReset_clicked()
 
 void MainWindow::on_m_keyMGenerate_clicked()
 {
-    Encoding encoding = static_cast<Encoding>(ui->m_keyMEncodingG->currentIndex());
+    Encoding encoding = static_cast<Encoding>(ui->m_keyMEncodingsG->currentIndex());
     generateKey(encoding);
     if(ui->m_keyMSaveOnF->isChecked())
         saveKeyOnFile(encoding);
 }
 void MainWindow::on_m_keyMImport_clicked()
 {
-    Encoding encoding = static_cast<Encoding>(ui->m_keyMEncodingI->currentIndex());
+    Encoding encoding = static_cast<Encoding>(ui->m_keyMEncodingsI->currentIndex());
     try {
         bool imported = m_ks.importKeygen(m_keygen);
         if(m_keygen->isReady() && imported) {
@@ -302,41 +354,19 @@ void MainWindow::on_m_keyMImport_clicked()
 
 void MainWindow::setAlgorithm(const QString& alg)
 {
-    delete m_cipher;
-    ui->m_encTabFileModes->clear();
-    ui->m_keyMLength->clear();
+    QComboBox* sender = static_cast<QComboBox*>(QObject::sender());
+    QObject* parent = sender->parent();
+    string senderName = sender->objectName().toStdString();
+    string modeName = senderName.substr(0, senderName.find("Algs")) + "Modes";
+    QComboBox* mode = parent->findChild<QComboBox*>(QString::fromStdString(modeName));
 
-    if(alg == CipherAes::AlgName){
-//        ui->m_keyMLength->currentText().toInt();
-        m_cipher = new AesGCM;
-        ui->m_encTabFileModes->addItems(*m_aesModes);
-        ui->m_keyMLength->addItems(*m_aesKeys);
-        ui->m_keyMLength->setVisible(true);
-    }
-    if(alg == CipherRsa::AlgName) {
-        m_cipher = new RsaOEAP;
-        ui->m_encTabFileModes->addItems(*m_rsaModes);
-        ui->m_keyMLength->setVisible(false);
-    }
+    mode->clear();
+    if(alg == CipherAes::AlgName)
+        mode->addItems(*m_aesModes);
+    if(alg == CipherRsa::AlgName)
+        mode->addItems(*m_rsaModes);
 }
-void MainWindow::setMode(const QString& mode)
-{
-    delete m_cipher;
-//    ui->m_keyMLength->currentText().toInt();
-    // aes modes
-    if(mode == AesGCM::ModeName) m_cipher = new AesGCM;
-    if(mode == AesGCM::ModeName) m_cipher = new AesGCM;
-    if(mode == AesEAX::ModeName) m_cipher = new AesEAX;
-    if(mode == AesGCM::ModeName) m_cipher = new AesGCM;
-    if(mode == AesCBC::ModeName) m_cipher = new AesCBC;
-    if(mode == AesGCM::ModeName) m_cipher = new AesGCM;
-    if(mode == AesGCM::ModeName) m_cipher = new AesGCM;
-    if(mode == AesGCM::ModeName) m_cipher = new AesGCM;
 
-    // rsa modes
-    if(mode == RsaOEAP::ModeName) m_cipher = new RsaOEAP;
-    if(mode == RsaSSA::ModeName) m_cipher = new RsaSSA;
-}
 void MainWindow::hideKey(const bool isChecked)
 {
     bool isEmpty = ui->m_keyMLoaded->toPlainText() == QString::fromStdString(NO_KEY_LOADED);
@@ -366,6 +396,8 @@ void MainWindow::flushKey()
     ui->m_keyMHide->setChecked(false);
     setKeyLoadedText(NO_KEY_LOADED);
 }
+
+
 
 
 

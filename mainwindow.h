@@ -55,10 +55,14 @@ private:
         QString::number(static_cast<int>(KeyLength::LENGTH_1024)),
         QString::number(static_cast<int>(KeyLength::LENGTH_2048)),
     };
-    QList<QString>* m_encodings = new QList<QString>{
+    QList<QString>* m_keyEncodings = new QList<QString>{
         "Base64",
         "Hex",
         "None",
+    };
+    QList<QString>* m_enc_dec_encodings = new QList<QString>{
+        "Base64",
+        "Hex",
     };
     QList<KActionBase*> m_actions = QList<KActionBase*> {
         new KActionKeyMgr(),
@@ -80,6 +84,9 @@ private:
     void connectItems() const;
     void generateKey(Encoding encodingIndex);
     void saveKeyOnFile(Encoding encoding);
+    void processEncrypt(QObject* sender);
+    void processDecrypt(QObject *sender);
+    void m_cipherFrom(const std::string& alg, const std::string& mode);
     KeyLength keylengthFrom(const int index);
 
     void dialogSuccessMessage(const std::string& message);
@@ -106,7 +113,6 @@ private slots:
     void on_m_keyMImport_clicked();
 
     void setAlgorithm(const QString& alg);
-    void setMode(const QString& mode);
     void hideKey(const bool isChecked);
     void colorKey();
     void flushKey();

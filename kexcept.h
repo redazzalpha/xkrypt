@@ -3,57 +3,95 @@
 
 #include <exception>
 
-class UnsupportedEncoding : public std::exception {
+/*--------------------------------------------------------*/
+
+class EncodingException : public std::exception {
 private:
     const char* m_message;
 
 public:
     // constructors
-    UnsupportedEncoding(const char* message = "-- error: Unsupported encoding");
+    EncodingException(const char* message = "-- error: Bad encoding data");
 
     // methods
     virtual const char* what() const noexcept;
 };
-class UnsupportedKey : public std::exception {
+class BadKeyException : public std::exception {
 private:
     const char* m_message;
 
 public:
     // constructors
-    UnsupportedKey(const char* message = "-- error: Unsupported key<br /> key too heavy");
+    BadKeyException(const char* message = "-- error: Unsupported key");
 
     // methods
     virtual const char* what() const noexcept;
 };
-class UnsupportedData : public std::exception {
+class WrongDataException : public std::exception {
 private:
     const char* m_message;
 
 public:
     // constructors
-    UnsupportedData(const char* message = "-- error: Unsupported data<br />file is corrupt or unknown");
+    WrongDataException(const char* message = "-- error: Wrong data<br />file is corrupt or unknown");
 
     // methods
     virtual const char* what() const noexcept;
 };
-class UnsupportedVersion : public std::exception {
+class VersionException : public std::exception {
 private:
     const char* m_message;
 
 public:
     // constructors
-    UnsupportedVersion(const char* message = "-- error: Unsupported version<br />file is under version or unknown");
+    VersionException(const char* message = "-- error: Unsupported version<br />file is under version or unknown");
 
     // methods
     virtual const char* what() const noexcept;
 };
-class UnsupportedModel : public std::exception {
+class ModelException : public std::exception {
 private:
     const char* m_message;
 
 public:
     // constructors
-    UnsupportedModel(const char* message = "-- error: Unsupported model<br />file is corrupt or unknown");
+    ModelException(const char* message = "-- error: Unsupported model<br />file is corrupt or unknown");
+
+    // methods
+    virtual const char* what() const noexcept;
+};
+
+/*--------------------------------------------------------*/
+
+class UnreadyKeyException : public std::exception {
+private:
+    const char* m_message;
+
+public:
+    // constructors
+    UnreadyKeyException(const char* message = "-- error: key is not ready or not imported");
+
+    // methods
+    virtual const char* what() const noexcept;
+};
+class EmptyTextException : public std::exception {
+private:
+    const char* m_message;
+
+public:
+    // constructors
+    EmptyTextException(const char* message = "-- error: Text is empty<br />file is corrupt or unknown");
+
+    // methods
+    virtual const char* what() const noexcept;
+};
+class BadCipherException : public std::exception {
+private:
+    const char* m_message;
+
+public:
+    // constructors
+    BadCipherException(const char* message = "-- error: Bad cipher");
 
     // methods
     virtual const char* what() const noexcept;

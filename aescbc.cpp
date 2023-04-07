@@ -35,6 +35,7 @@ string AesCBC::encrypt(const KeyGen& keygen, const string& plain, const Encoding
     switch(encoding) {
     case Encoding::BASE64 : stf->Attach(new Base64Encoder(ss)); break;
     case Encoding::HEX : stf->Attach(new HexEncoder(ss)); break;
+    case Encoding::NONE : stf->Attach(ss); break;
     default: stf->Attach(new Base64Encoder(ss));;
     }
 
@@ -54,6 +55,7 @@ string AesCBC::decrypt(const KeyGen& keygen, const string& cipher, const Encodin
     switch(encoding) {
     case Encoding::BASE64 : StringSource(cipher, true, new Base64Decoder(stf)); break;
     case Encoding::HEX : StringSource(cipher, true, new HexDecoder(stf)); break;
+    case Encoding::NONE : StringSource(cipher, true, stf); break;
     default: StringSource(cipher, true, new Base64Decoder(stf));
     }
 

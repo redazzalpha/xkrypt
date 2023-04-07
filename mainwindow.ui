@@ -33,7 +33,7 @@
      <enum>QFrame::NoFrame</enum>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>2</number>
     </property>
     <widget class="QWidget" name="m_pageKeyM">
      <widget class="QWidget" name="verticalLayoutWidget">
@@ -95,7 +95,7 @@
        <item>
         <layout class="QHBoxLayout" name="hlayout_8">
          <item>
-          <widget class="QComboBox" name="m_keyMEncodingI">
+          <widget class="QComboBox" name="m_keyMEncodingsI">
            <property name="minimumSize">
             <size>
              <width>70</width>
@@ -253,7 +253,7 @@
               </widget>
              </item>
              <item>
-              <widget class="QComboBox" name="m_keyMEncodingG">
+              <widget class="QComboBox" name="m_keyMEncodingsG">
                <property name="minimumSize">
                 <size>
                  <width>90</width>
@@ -506,7 +506,7 @@
        <string notr="true"/>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="m_encTabFile">
        <attribute name="title">
@@ -776,7 +776,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QComboBox" name="m_encTabFileEncoding"/>
+            <widget class="QComboBox" name="m_encTabFileEncodings"/>
            </item>
            <item>
             <widget class="QPushButton" name="m_encTabFileEncrypt">
@@ -1015,7 +1015,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QComboBox" name="m_encTabTextEncoding"/>
+            <widget class="QComboBox" name="m_encTabTextEncodings"/>
            </item>
            <item>
             <widget class="QCheckBox" name="m_encTabTextSaveOnF">
@@ -1342,7 +1342,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QComboBox" name="m_decTabFileEncoding"/>
+            <widget class="QComboBox" name="m_decTabFileEncodings"/>
            </item>
            <item>
             <widget class="QPushButton" name="m_decTabFileDecrypt">
@@ -1581,7 +1581,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QComboBox" name="m_decTabTextEncoding"/>
+            <widget class="QComboBox" name="m_decTabTextEncodings"/>
            </item>
            <item>
             <widget class="QCheckBox" name="m_decTabTextSaveOnF">

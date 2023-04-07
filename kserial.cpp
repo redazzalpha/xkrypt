@@ -80,15 +80,15 @@ bool KSerial::importKeygen(KeyGen* keygen) noexcept(false)
 
             fs.Attach(new StringSink(refs));
             fs.Pump(XKRYPT_REF_SIZE);
-
-            if((refs[0] < XKRYPT_REF_VERSION)) throw UnsupportedVersion();
-            if( (refs[1] != XKRYPT_REF_MODEL)) throw UnsupportedModel();
+            
+            if((refs[0] < XKRYPT_REF_VERSION)) throw VersionException();
+            if( (refs[1] != XKRYPT_REF_MODEL)) throw ModelException();
 
             switch(refs[2]) {
             case Encoding::BASE64 : fs.Detach(new Base64Decoder); break;
             case Encoding::HEX : fs.Detach(new HexDecoder); break;
             case Encoding::NONE : fs.Detach(); break;
-            default : throw UnsupportedEncoding();
+            default : throw EncodingException();
             }
 
             fs.Attach(new StringSink(keyiv));

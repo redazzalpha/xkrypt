@@ -5,6 +5,11 @@
 #define XKRYPT_REF_VERSION 0x01
 #define XKRYPT_REF_MODEL 0x24
 
+#define WINDOW_WIDTH 800
+#define WINDOW_HEIGHT 600
+#define WINDOW_ICON_WIDTH 35
+#define WINDOW_ICON_HEIGHT 35
+
 #define NO_KEY_LOADED "no key loaded!"
 #define NO_FILE_LOADED "no file loaded!"
 

@@ -1,46 +1,75 @@
 #include "kexcept.h"
 
-UnsupportedEncoding::UnsupportedEncoding(const char* message)
+/*--------------------------------------------------------*/
+
+EncodingException::EncodingException(const char* message)
 {
     m_message = message;
 }
-const char*  UnsupportedEncoding::what() const noexcept
+const char*  EncodingException::what() const noexcept
 {
     return m_message;
 }
 
-UnsupportedKey::UnsupportedKey(const char* message)
+BadKeyException::BadKeyException(const char* message)
 {
     m_message = message;
 }
-const char*  UnsupportedKey::what() const noexcept
+const char*  BadKeyException::what() const noexcept
 {
     return m_message;
 }
 
-UnsupportedData::UnsupportedData(const char* message)
+WrongDataException::WrongDataException(const char* message)
 {
     m_message = message;
 }
-const char*  UnsupportedData::what() const noexcept
+const char*  WrongDataException::what() const noexcept
 {
     return m_message;
 }
 
-UnsupportedVersion::UnsupportedVersion(const char* message)
+VersionException::VersionException(const char* message)
 {
     m_message = message;
 }
-const char*  UnsupportedVersion::what() const noexcept
+const char*  VersionException::what() const noexcept
 {
     return m_message;
 }
 
-UnsupportedModel::UnsupportedModel(const char* message)
+ModelException::ModelException(const char* message)
 {
     m_message = message;
 }
-const char*  UnsupportedModel::what() const noexcept
+const char*  ModelException::what() const noexcept
+{
+    return m_message;
+}
+
+/*--------------------------------------------------------*/
+
+UnreadyKeyException::UnreadyKeyException(const char* message)
+{
+    m_message = message;
+}
+const char*  UnreadyKeyException::what() const noexcept
+{
+    return m_message;
+}
+EmptyTextException::EmptyTextException(const char* message)
+{
+    m_message = message;
+}
+const char*  EmptyTextException::what() const noexcept
+{
+    return m_message;
+}
+BadCipherException::BadCipherException(const char* message)
+{
+    m_message = message;
+}
+const char*  BadCipherException::what() const noexcept
 {
     return m_message;
 }
