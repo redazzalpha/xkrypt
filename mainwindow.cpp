@@ -115,89 +115,8 @@ void MainWindow::saveKeyOnFile(Encoding encoding) {
         ui->m_keyMSaveOnF->setChecked(false);
     }
 }
-void MainWindow::processEncrypt(QObject *sender)
+void MainWindow::importAsymmectric()
 {
-    QObject* parent = sender->parent();
-    string senderName = sender->objectName().toStdString();
-    string algsName = senderName.substr(0, senderName.find("Encrypt")) + "Algs";
-    string modeName = senderName.substr(0, senderName.find("Encrypt")) + "Modes";
-    string encodingName = senderName.substr(0, senderName.find("Encrypt")) + "Encodings";
-    QComboBox* algs = parent->findChild<QComboBox*>(QString::fromStdString(algsName));
-    QComboBox* mode = parent->findChild<QComboBox*>(QString::fromStdString(modeName));
-    QComboBox* encoding = parent->findChild<QComboBox*>(QString::fromStdString(encodingName));
-
-    try {
-        if(!m_keygen->isReady()) throw UnreadyKeyException();
-        string plainText = ui->m_encTabTextField->toPlainText().toStdString();
-
-        if(plainText.empty()) throw EmptyTextException();
-        string algSelected = algs->currentText().toStdString();
-        string modeSelected = mode->currentText().toStdString();
-        Encoding encodingSelected = static_cast<Encoding>(encoding->currentIndex());
-        m_cipherFrom(algSelected, modeSelected);
-
-        if(!m_cipher) throw BadCipherException();
-        string cipherText = m_cipher->encrypt(*m_keygen, plainText, encodingSelected);
-        ui->m_encTabTextField->setPlainText(QString::fromStdString(cipherText));
-    }
-    catch(exception& e) {
-        dialogErrorMessage(e.what());
-    }
-}
-void MainWindow::processDecrypt(QObject *sender)
-{
-    QObject* parent = sender->parent();
-    string senderName = sender->objectName().toStdString();
-    string algsName = senderName.substr(0, senderName.find("Decrypt")) + "Algs";
-    string modeName = senderName.substr(0, senderName.find("Decrypt")) + "Modes";
-    string encodingName = senderName.substr(0, senderName.find("Decrypt")) + "Encodings";
-    QComboBox* algs = parent->findChild<QComboBox*>(QString::fromStdString(algsName));
-    QComboBox* mode = parent->findChild<QComboBox*>(QString::fromStdString(modeName));
-    QComboBox* encoding = parent->findChild<QComboBox*>(QString::fromStdString(encodingName));
-
-    try {
-        if(!m_keygen->isReady()) throw UnreadyKeyException();
-        string cipherText = ui->m_decTabTextField->toPlainText().toStdString();
-
-        if(cipherText.empty()) throw EmptyTextException();
-        string algSelected = algs->currentText().toStdString();
-        string modeSelected = mode->currentText().toStdString();
-        Encoding encodingSelected = static_cast<Encoding>(encoding->currentIndex());
-        m_cipherFrom(algSelected, modeSelected);
-
-        if(!m_cipher) throw BadCipherException();
-        string recoverText = m_cipher->decrypt(*m_keygen, cipherText, encodingSelected);
-        ui->m_decTabTextField->setPlainText(QString::fromStdString(recoverText));
-    }
-    catch(exception& e) {
-        dialogErrorMessage(e.what());
-    }
-}
-void MainWindow::processGenerate(QObject*)
-{
-    Encoding encoding = static_cast<Encoding>(ui->m_keyMEncodingsG->currentIndex());
-    generateKey(encoding);
-    if(ui->m_keyMSaveOnF->isChecked())
-        saveKeyOnFile(encoding);
-}
-void MainWindow::processImport(QObject *sender)
-{
-    string senderName = sender->objectName().toStdString();
-    std::regex regex("keyM|encTab|decTab");
-    std::smatch match;
-    std::regex_search(senderName, match, regex);
-    string managerName = *match.begin();
-
-    if(managerName == "keyM") {
-        if(ui->m_keyMType->currentText() ==  CipherAes::AlgName)
-            subImportAsymmetric(sender->parent());
-        if(ui->m_keyMType->currentText() ==  CipherRsa::AlgName)
-            subImportSymmetric(sender->parent());
-    }
-    if(managerName == "encTab" || managerName == "decTab")
-        subImportFiles(sender->parent());
-}
-void MainWindow::subImportAsymmetric(QObject*) {
     Encoding encoding = static_cast<Encoding>(ui->m_keyMEncodingsI->currentIndex());
     try {
         bool imported = m_ks.importKeygen(m_keygen);
@@ -216,13 +135,9 @@ void MainWindow::subImportAsymmetric(QObject*) {
     catch(exception& e) {
         dialogErrorMessage(e.what());
     }
-
 }
-void MainWindow::subImportSymmetric(QObject *parent) {
-
-}
-void MainWindow::subImportFiles(QObject *parent) {
-    QString fileName = QFileDialog::getOpenFileName(this,"file(s) to encrypt", "", "All Files (*)");
+void MainWindow::importSymmectric()
+{
 
 }
 void MainWindow::m_cipherFrom(const string& alg, const string& mode)
@@ -342,32 +257,57 @@ void MainWindow::setKeyLoadedSelectable(const bool selectable) const
 // slots
 void MainWindow::on_m_encTabFileEncrypt_clicked()
 {
-//    m_keygen->isKeyLoaded()?
-//        m_cipher->encrypt():
-//        dialogNoKeyMessage("encrypt");
 }
 void MainWindow::on_m_decTabFileDecrypt_clicked()
 {
-//    m_keygen->isKeyLoaded()?
-//        m_cipher->decrypt():
-//        dialogNoKeyMessage("decrypt");
 }
 void MainWindow::on_m_encTabFileImport_clicked()
 {
-    processImport(QObject::sender());
 }
 void MainWindow::on_m_decTabFileImport_clicked()
 {
-    processImport(QObject::sender());
 }
 
 void MainWindow::on_m_encTabTextEncrypt_clicked()
-{
-    processEncrypt(QObject::sender());
+{    
+    try {
+        if(!m_keygen->isReady()) throw UnreadyKeyException();
+        string plainText = ui->m_encTabTextField->toPlainText().toStdString();
+
+        if(plainText.empty()) throw EmptyTextException();
+        string selectedAlg = ui->m_encTabTextAlgs->currentText().toStdString();
+        string selectedMode = ui->m_encTabTextModes->currentText().toStdString();
+        Encoding selectedEncoding = static_cast<Encoding>(ui->m_encTabTextEncodings->currentIndex());
+        m_cipherFrom(selectedAlg, selectedMode);
+
+        if(!m_cipher) throw BadCipherException();
+        string cipherText = m_cipher->encrypt(*m_keygen, plainText, selectedEncoding);
+        ui->m_encTabTextField->setPlainText(QString::fromStdString(cipherText));
+    }
+    catch(exception& e) {
+        dialogErrorMessage(e.what());
+    }
+
 }
 void MainWindow::on_m_decTabTextDecrypt_clicked()
 {
-    processDecrypt(QObject::sender());
+    try {
+        if(!m_keygen->isReady()) throw UnreadyKeyException();
+        string cipherText = ui->m_decTabTextField->toPlainText().toStdString();
+
+        if(cipherText.empty()) throw EmptyTextException();
+        string selectedAlg = ui->m_decTabTextAlgs->currentText().toStdString();
+        string selectedMode = ui->m_decTabTextModes->currentText().toStdString();
+        Encoding selectedEncoding = static_cast<Encoding>(ui->m_decTabTextEncodings->currentIndex());
+        m_cipherFrom(selectedAlg, selectedMode);
+
+        if(!m_cipher) throw BadCipherException();
+        string recoverText = m_cipher->decrypt(*m_keygen, cipherText, selectedEncoding);
+        ui->m_decTabTextField->setPlainText(QString::fromStdString(recoverText));
+    }
+    catch(exception& e) {
+        dialogErrorMessage(e.what());
+    }
 }
 void MainWindow::on_m_encTabTextReset_clicked()
 {
@@ -380,11 +320,16 @@ void MainWindow::on_m_decTabTextReset_clicked()
 
 void MainWindow::on_m_keyMGenerate_clicked()
 {
-    processGenerate(QObject::sender());
+    Encoding encoding = static_cast<Encoding>(ui->m_keyMEncodingsG->currentIndex());
+    generateKey(encoding);
+    if(ui->m_keyMSaveOnF->isChecked())
+        saveKeyOnFile(encoding);
 }
 void MainWindow::on_m_keyMImport_clicked()
 {
-    processImport(QObject::sender());
+    QString type = ui->m_keyMType->currentText();
+    if(type == CipherRsa::AlgName) importAsymmectric();
+    if(type == CipherRsa::AlgName)importSymmectric();
 }
 
 void MainWindow::setAlgorithm(const QString& alg)
@@ -401,7 +346,6 @@ void MainWindow::setAlgorithm(const QString& alg)
     if(alg == CipherRsa::AlgName)
         mode->addItems(*m_rsaModes);
 }
-
 void MainWindow::hideKey(const bool isChecked)
 {
     bool isEmpty = ui->m_keyMLoaded->toPlainText() == QString::fromStdString(NO_KEY_LOADED);
