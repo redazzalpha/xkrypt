@@ -11,6 +11,8 @@
 #include <QInputDialog>
 #include <iostream>
 #include <fstream>
+#include <regex>
+
 
 using namespace std;
 using namespace CryptoPP;
@@ -54,6 +56,7 @@ void MainWindow::uiInit()
     ui->m_keyMLength->addItems(*m_aesKeys);
     ui->m_keyMEncodingsI->addItems(*m_keyEncodings);
     ui->m_keyMEncodingsG->addItems(*m_keyEncodings);
+    ui->m_keyMType->addItems(*m_algorithms);
 
     ui->m_encTabFileAlgs->addItems(*m_algorithms);
     ui->m_encTabFileModes->addItems(*m_aesModes);
@@ -169,6 +172,58 @@ void MainWindow::processDecrypt(QObject *sender)
     catch(exception& e) {
         dialogErrorMessage(e.what());
     }
+}
+void MainWindow::processGenerate(QObject*)
+{
+    Encoding encoding = static_cast<Encoding>(ui->m_keyMEncodingsG->currentIndex());
+    generateKey(encoding);
+    if(ui->m_keyMSaveOnF->isChecked())
+        saveKeyOnFile(encoding);
+}
+void MainWindow::processImport(QObject *sender)
+{
+    string senderName = sender->objectName().toStdString();
+    std::regex regex("keyM|encTab|decTab");
+    std::smatch match;
+    std::regex_search(senderName, match, regex);
+    string managerName = *match.begin();
+
+    if(managerName == "keyM") {
+        if(ui->m_keyMType->currentText() ==  CipherAes::AlgName)
+            subImportAsymmetric(sender->parent());
+        if(ui->m_keyMType->currentText() ==  CipherRsa::AlgName)
+            subImportSymmetric(sender->parent());
+    }
+    if(managerName == "encTab" || managerName == "decTab")
+        subImportFiles(sender->parent());
+}
+void MainWindow::subImportAsymmetric(QObject*) {
+    Encoding encoding = static_cast<Encoding>(ui->m_keyMEncodingsI->currentIndex());
+    try {
+        bool imported = m_ks.importKeygen(m_keygen);
+        if(m_keygen->isReady() && imported) {
+
+            string keyStr = m_ks.keyToString(*m_keygen, encoding);
+            setKeyLoadedText(QString::fromStdString(keyStr));
+            colorKey();
+
+            string message = "key " + std::to_string(m_keygen->getKey().size()) + " bytes - encoded ";
+            message += m_ks.encodingToString(encoding);
+            message += "<br />has been successfully imported";
+            dialogSuccessMessage(message);
+        }
+    }
+    catch(exception& e) {
+        dialogErrorMessage(e.what());
+    }
+
+}
+void MainWindow::subImportSymmetric(QObject *parent) {
+
+}
+void MainWindow::subImportFiles(QObject *parent) {
+    QString fileName = QFileDialog::getOpenFileName(this,"file(s) to encrypt", "", "All Files (*)");
+
 }
 void MainWindow::m_cipherFrom(const string& alg, const string& mode)
 {
@@ -299,11 +354,11 @@ void MainWindow::on_m_decTabFileDecrypt_clicked()
 }
 void MainWindow::on_m_encTabFileImport_clicked()
 {
-    QString fileName = QFileDialog::getOpenFileName(this,"file(s) to encrypt", "", "All Files (*)");
+    processImport(QObject::sender());
 }
 void MainWindow::on_m_decTabFileImport_clicked()
 {
-    QString fileName = QFileDialog::getOpenFileName(this,"file(s) to decrypt", "", "All Files (*)");
+    processImport(QObject::sender());
 }
 
 void MainWindow::on_m_encTabTextEncrypt_clicked()
@@ -325,31 +380,11 @@ void MainWindow::on_m_decTabTextReset_clicked()
 
 void MainWindow::on_m_keyMGenerate_clicked()
 {
-    Encoding encoding = static_cast<Encoding>(ui->m_keyMEncodingsG->currentIndex());
-    generateKey(encoding);
-    if(ui->m_keyMSaveOnF->isChecked())
-        saveKeyOnFile(encoding);
+    processGenerate(QObject::sender());
 }
 void MainWindow::on_m_keyMImport_clicked()
 {
-    Encoding encoding = static_cast<Encoding>(ui->m_keyMEncodingsI->currentIndex());
-    try {
-        bool imported = m_ks.importKeygen(m_keygen);
-        if(m_keygen->isReady() && imported) {
-            string keyStr = m_ks.keyToString(*m_keygen, encoding);
-            setKeyLoadedText(QString::fromStdString(keyStr));
-            colorKey();
-
-            string message = "key " + std::to_string(m_keygen->getKey().size()) + " bytes - encoded ";
-            message += m_ks.encodingToString(encoding);
-            message += "<br />has been successfully imported";
-
-            dialogSuccessMessage(message);
-        }
-    }
-    catch(exception& e) {
-        dialogErrorMessage(e.what());
-    }
+    processImport(QObject::sender());
 }
 
 void MainWindow::setAlgorithm(const QString& alg)

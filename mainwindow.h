@@ -86,6 +86,11 @@ private:
     void saveKeyOnFile(Encoding encoding);
     void processEncrypt(QObject* sender);
     void processDecrypt(QObject *sender);
+    void processGenerate(QObject *sender);
+    void processImport(QObject *sender);
+    void subImportAsymmetric(QObject *parent);
+    void subImportSymmetric(QObject *parent);
+    void subImportFiles(QObject *parent);
     void m_cipherFrom(const std::string& alg, const std::string& mode);
     KeyLength keylengthFrom(const int index);
 

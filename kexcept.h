@@ -80,7 +80,7 @@ private:
 
 public:
     // constructors
-    EmptyTextException(const char* message = "-- error: Text is empty<br />file is corrupt or unknown");
+    EmptyTextException(const char* message = "-- error: Text is empty");
 
     // methods
     virtual const char* what() const noexcept;
