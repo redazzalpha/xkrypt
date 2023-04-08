@@ -61,11 +61,11 @@ string AesCBC::decryptText(const KeyGen& keygen, const string& cipher, const Enc
 
     return recover;
 }
-void AesCBC::encryptFile(const KeyGen& keygen, const std::string& plain, const Encoding encoding) noexcept(false)
+void AesCBC::encryptFile(const KeyGen& keygen, fstream* file, const Encoding encoding) noexcept(false)
 {
 
 }
-void AesCBC::decryptFile(const KeyGen& keygen, const std::string& cipher, const Encoding encoding) noexcept(false)
+void AesCBC::decryptFile(const KeyGen& keygen, fstream* file, const Encoding encoding) noexcept(false)
 {
 
 }

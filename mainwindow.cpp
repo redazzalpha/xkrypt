@@ -2,6 +2,7 @@
 #include "./ui_mainwindow.h"
 #include "enums.h"
 #include "defines.h"
+#include "fileimporter.h"
 #include "kexcept.h"
 #include <QToolButton>
 #include <QPushButton>
@@ -256,7 +257,11 @@ void MainWindow::setKeyLoadedSelectable(const bool selectable) const
 // slots
 void MainWindow::on_m_encTabFileImport_clicked()
 {
+    fstream* f = FileImporter().importFile();
 
+    if(f) {
+        m_cipher->encryptFile(*m_keygen, f, static_cast<Encoding>(ui->m_encTabFileEncodings->currentIndex()));
+    }
 }
 void MainWindow::on_m_decTabFileImport_clicked()
 {

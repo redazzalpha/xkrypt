@@ -27,8 +27,8 @@ public:
 
     virtual std::string encryptText(const KeyGen& keygen, const std::string& plain, const Encoding encoding) noexcept(false) = 0;
     virtual std::string decryptText(const KeyGen& keygen, const std::string& cipher, const Encoding encoding) noexcept(false) = 0;
-    virtual void encryptFile(const KeyGen& keygen, const std::string& plain, const Encoding encoding) noexcept(false) = 0;
-    virtual void decryptFile(const KeyGen& keygen, const std::string& cipher, const Encoding encoding) noexcept(false) = 0;
+    virtual void encryptFile(const KeyGen& keygen, std::fstream* file, const Encoding encoding) noexcept(false) = 0;
+    virtual void decryptFile(const KeyGen& keygen, std::fstream* file, const Encoding encoding) noexcept(false) = 0;
 };
 
 #endif // CIPHERBASE_H

@@ -59,11 +59,11 @@ string AesGCM::decryptText(const KeyGen& keygen, const string& cipher, const Enc
 
     return recover;
 }
-void AesGCM::encryptFile(const KeyGen& keygen, const std::string& plain, const Encoding encoding) noexcept(false)
+void AesGCM::encryptFile(const KeyGen& keygen, fstream* file, const Encoding encoding) noexcept(false)
 {
 
 }
-void AesGCM::decryptFile(const KeyGen& keygen, const std::string& cipher, const Encoding encoding) noexcept(false)
+void AesGCM::decryptFile(const KeyGen& keygen, fstream* file, const Encoding encoding) noexcept(false)
 {
 
 }
