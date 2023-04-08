@@ -10,6 +10,7 @@ CONFIG += c++17
 
 SOURCES += \
     aescbc.cpp \
+    aesccm.cpp \
     aeseax.cpp \
     aesgcm.cpp \
     cipheraes.cpp \
@@ -32,6 +33,7 @@ SOURCES += \
 
 HEADERS += \
     aescbc.h \
+    aesccm.h \
     aeseax.h \
     aesgcm.h \
     cipheraes.h \

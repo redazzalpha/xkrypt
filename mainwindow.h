@@ -13,6 +13,7 @@
 #include "kactionencrypt.h"
 #include "kactiondecrypt.h"
 #include "kactionquit.h"
+#include "aesccm.h"
 #include <QMainWindow>
 #include <QList>
 #include <QString>
@@ -37,9 +38,10 @@ private:
         CipherRsa::AlgName
     };
     QList<QString>* m_aesModes = new QList<QString>{
-        AesGCM::ModeName,
         AesCBC::ModeName,
-        AesEAX::ModeName
+        AesEAX::ModeName,
+        AesGCM::ModeName,
+        AesCCM::ModeName,
     };
     QList<QString>* m_rsaModes = new QList<QString>{
         RsaOEAP::ModeName,
@@ -101,10 +103,10 @@ private:
     void setKeyLoadedSelectable(const bool selectable) const;
 
 private slots:
-    void on_m_encTabFileEncrypt_clicked();
-    void on_m_decTabFileDecrypt_clicked();
     void on_m_encTabFileImport_clicked();
     void on_m_decTabFileImport_clicked();
+    void on_m_encTabFileEncrypt_clicked();
+    void on_m_decTabFileDecrypt_clicked();
 
     void on_m_encTabTextEncrypt_clicked();
     void on_m_decTabTextDecrypt_clicked();

@@ -147,11 +147,11 @@ void MainWindow::m_cipherFrom(const string& alg, const string& mode)
     // aes algs
     if(QString::fromStdString(alg) == CipherAes::AlgName) {
 
-        if(QString::fromStdString(mode) == AesGCM::ModeName) m_cipher = new AesGCM;
-        if(QString::fromStdString(mode) == AesGCM::ModeName) m_cipher = new AesGCM;
+        if(QString::fromStdString(mode) == AesCBC::ModeName) m_cipher = new AesCBC;
         if(QString::fromStdString(mode) == AesEAX::ModeName) m_cipher = new AesEAX;
         if(QString::fromStdString(mode) == AesGCM::ModeName) m_cipher = new AesGCM;
-        if(QString::fromStdString(mode) == AesCBC::ModeName) m_cipher = new AesCBC;
+        if(QString::fromStdString(mode) == AesCCM::ModeName) m_cipher = new AesCCM;
+        if(QString::fromStdString(mode) == AesGCM::ModeName) m_cipher = new AesGCM;
         if(QString::fromStdString(mode) == AesGCM::ModeName) m_cipher = new AesGCM;
         if(QString::fromStdString(mode) == AesGCM::ModeName) m_cipher = new AesGCM;
         if(QString::fromStdString(mode) == AesGCM::ModeName) m_cipher = new AesGCM;
@@ -254,16 +254,16 @@ void MainWindow::setKeyLoadedSelectable(const bool selectable) const
 }
 
 // slots
-void MainWindow::on_m_encTabFileEncrypt_clicked()
-{
-}
-void MainWindow::on_m_decTabFileDecrypt_clicked()
-{
-}
 void MainWindow::on_m_encTabFileImport_clicked()
 {
 }
 void MainWindow::on_m_decTabFileImport_clicked()
+{
+}
+void MainWindow::on_m_encTabFileEncrypt_clicked()
+{
+}
+void MainWindow::on_m_decTabFileDecrypt_clicked()
 {
 }
 
@@ -280,7 +280,7 @@ void MainWindow::on_m_encTabTextEncrypt_clicked()
         m_cipherFrom(selectedAlg, selectedMode);
 
         if(!m_cipher) throw BadCipherException();
-        string cipherText = m_cipher->encrypt(*m_keygen, plainText, selectedEncoding);
+        string cipherText = m_cipher->encryptText(*m_keygen, plainText, selectedEncoding);
         ui->m_encTabTextField->setPlainText(QString::fromStdString(cipherText));
     }
     catch(exception& e) {
@@ -301,7 +301,7 @@ void MainWindow::on_m_decTabTextDecrypt_clicked()
         m_cipherFrom(selectedAlg, selectedMode);
 
         if(!m_cipher) throw BadCipherException();
-        string recoverText = m_cipher->decrypt(*m_keygen, cipherText, selectedEncoding);
+        string recoverText = m_cipher->decryptText(*m_keygen, cipherText, selectedEncoding);
         ui->m_decTabTextField->setPlainText(QString::fromStdString(recoverText));
     }
     catch(exception& e) {

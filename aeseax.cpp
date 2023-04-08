@@ -20,7 +20,7 @@ QString AesEAX::getModeName() const {
     return AesEAX::ModeName;
 }
 
-string AesEAX::encrypt(const KeyGen& keygen, const string& plain, const Encoding encoding) noexcept(false)
+string AesEAX::encryptText(const KeyGen& keygen, const string& plain, const Encoding encoding) noexcept(false)
 {
     std::string cipher = "";
     const SecByteBlock& key = keygen.getKey();
@@ -40,9 +40,8 @@ string AesEAX::encrypt(const KeyGen& keygen, const string& plain, const Encoding
     StringSource(plain, true, aef);
     return cipher;
 }
-string AesEAX::decrypt(const KeyGen& keygen, const string& cipher, const Encoding encoding) noexcept(false)
+string AesEAX::decryptText(const KeyGen& keygen, const string& cipher, const Encoding encoding) noexcept(false)
 {
-
     std::string recover;
     const SecByteBlock& key = keygen.getKey();
     const SecByteBlock& iv = keygen.getIv();
@@ -59,5 +58,13 @@ string AesEAX::decrypt(const KeyGen& keygen, const string& cipher, const Encodin
     }
 
     return recover;
+}
+void AesEAX::encryptFile(const KeyGen& keygen, const std::string& plain, const Encoding encoding) noexcept(false)
+{
+
+}
+void AesEAX::decryptFile(const KeyGen& keygen, const std::string& cipher, const Encoding encoding) noexcept(false)
+{
+
 }
 

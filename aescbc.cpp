@@ -22,7 +22,7 @@ QString AesCBC::getModeName() const
     return AesCBC::ModeName;
 }
 
-string AesCBC::encrypt(const KeyGen& keygen, const string& plain, const Encoding encoding) noexcept(false)
+string AesCBC::encryptText(const KeyGen& keygen, const string& plain, const Encoding encoding) noexcept(false)
 {
     std::string cipher = "";
     const SecByteBlock& key = keygen.getKey();
@@ -42,7 +42,7 @@ string AesCBC::encrypt(const KeyGen& keygen, const string& plain, const Encoding
     StringSource(plain, true, stf);
     return cipher;
 }
-string AesCBC::decrypt(const KeyGen& keygen, const string& cipher, const Encoding encoding) noexcept(false)
+string AesCBC::decryptText(const KeyGen& keygen, const string& cipher, const Encoding encoding) noexcept(false)
 {
     std::string recover;
     const SecByteBlock& key = keygen.getKey();
@@ -61,6 +61,13 @@ string AesCBC::decrypt(const KeyGen& keygen, const string& cipher, const Encodin
 
     return recover;
 }
+void AesCBC::encryptFile(const KeyGen& keygen, const std::string& plain, const Encoding encoding) noexcept(false)
+{
 
+}
+void AesCBC::decryptFile(const KeyGen& keygen, const std::string& cipher, const Encoding encoding) noexcept(false)
+{
+
+}
 
 

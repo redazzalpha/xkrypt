@@ -1,4 +1,4 @@
-#include "aesgcm.h"
+#include "aesccm.h"
 #include "base64.h"
 #include "hex.h"
 #include "gcm.h"
@@ -6,21 +6,21 @@
 using namespace CryptoPP;
 using namespace std;
 
-const QString AesGCM::ModeName = "GCM";
+const QString AesCCM::ModeName = "GCM";
 
 // constructors
-AesGCM::AesGCM(){}
+AesCCM::AesCCM(){}
 
 // destructor
-AesGCM::~AesGCM(){};
+AesCCM::~AesCCM(){};
 
 // virtual methods
-QString AesGCM::getModeName() const
+QString AesCCM::getModeName() const
 {
-    return AesGCM::AlgName;
+    return AesCCM::AlgName;
 }
 
-string AesGCM::encryptText(const KeyGen& keygen, const string& plain, const Encoding encoding) noexcept(false)
+string AesCCM::encryptText(const KeyGen& keygen, const string& plain, const Encoding encoding) noexcept(false)
 {
     std::string cipher = "";
     const SecByteBlock& key = keygen.getKey();
@@ -40,7 +40,7 @@ string AesGCM::encryptText(const KeyGen& keygen, const string& plain, const Enco
     StringSource(plain, true, aef);
     return cipher;
 }
-string AesGCM::decryptText(const KeyGen& keygen, const string& cipher, const Encoding encoding) noexcept(false)
+string AesCCM::decryptText(const KeyGen& keygen, const string& cipher, const Encoding encoding) noexcept(false)
 {
     std::string recover;
     const SecByteBlock& key = keygen.getKey();
@@ -59,11 +59,11 @@ string AesGCM::decryptText(const KeyGen& keygen, const string& cipher, const Enc
 
     return recover;
 }
-void AesGCM::encryptFile(const KeyGen& keygen, const std::string& plain, const Encoding encoding) noexcept(false)
+void AesCCM::encryptFile(const KeyGen& keygen, const std::string& plain, const Encoding encoding) noexcept(false)
 {
 
 }
-void AesGCM::decryptFile(const KeyGen& keygen, const std::string& cipher, const Encoding encoding) noexcept(false)
+void AesCCM::decryptFile(const KeyGen& keygen, const std::string& cipher, const Encoding encoding) noexcept(false)
 {
 
 }
