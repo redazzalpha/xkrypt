@@ -80,7 +80,7 @@ bool KSerial::importKeygen(KeyGen* keygen) noexcept(false)
 
             fs.Attach(new StringSink(refs));
             fs.Pump(XKRYPT_REF_SIZE);
-            
+
             if((refs[0] < XKRYPT_REF_VERSION)) throw VersionException();
             if( (refs[1] != XKRYPT_REF_MODEL)) throw ModelException();
 
@@ -103,7 +103,7 @@ bool KSerial::importKeygen(KeyGen* keygen) noexcept(false)
     return imported;
 }
 string KSerial::keyToString(KeyGen& keygen, const Encoding encoding)
-{    
+{
     StringSource keySource(keygen.getKey().BytePtr(), keygen.getKey().size(), false);
     string key;
 
@@ -128,39 +128,40 @@ string KSerial::keyToString(KeyGen& keygen, const Encoding encoding)
 // private methods
 void KSerial::keyToFile(KeyGen& keygen, const Encoding encoding) const
 {
+    size_t ivSize = keygen.getIv().size();
+    size_t keySize = keygen.getKey().size();
+    size_t keyIvSize = ivSize + keySize;
     std::vector<CryptoPP::byte> xkrypt_refs {
         XKRYPT_REF_VERSION,
         XKRYPT_REF_MODEL,
         (CryptoPP::byte)encoding,
     };
+    CryptoPP::byte* keyIv = new CryptoPP::byte[keyIvSize];
     StringSource refsSource(&xkrypt_refs[0], xkrypt_refs.size(),false);
-    StringSource ivSource(keygen.getIv().BytePtr(), keygen.getIv().size(), false);
-    StringSource keySource(keygen.getKey().BytePtr(), keygen.getKey().size(), false);
+    StringSource keyIvSource(keyIv, keyIvSize, false);
     FileSink fs(m_dir.toStdString().c_str(), true);
 
-        switch(encoding) {
-        case Encoding::BASE64 :
-            ivSource.Attach(new Base64Encoder);
-            keySource.Attach(new Base64Encoder);
-            break;
-        case Encoding::HEX :
-            ivSource.Attach(new HexEncoder);
-            keySource.Attach(new HexEncoder);
-        case Encoding::NONE :
-            break;
-        default :
-            ivSource.Attach(new Base64Encoder);
-            keySource.Attach(new Base64Encoder);
-            break;
-        }
+    memcpy(keyIv, keygen.getIv().BytePtr(), ivSize);
+    memcpy(keyIv + ivSize, keygen.getKey().BytePtr(), keySize);
+
+    switch(encoding) {
+    case Encoding::BASE64 :
+        keyIvSource.Attach(new Base64Encoder);
+        break;
+    case Encoding::HEX :
+        keyIvSource.Attach(new HexEncoder);
+    case Encoding::NONE :
+        break;
+    default :
+        keyIvSource.Attach(new Base64Encoder);
+        break;
+    }
 
     refsSource.Attach(new Redirector(fs));
-    ivSource.Attach(new Redirector(fs));
-    keySource.Attach(new Redirector(fs));
+    keyIvSource.Attach(new Redirector(fs));
 
     refsSource.PumpAll();
-    ivSource.PumpAll();
-    keySource.PumpAll();
+    keyIvSource.PumpAll();
 }
 bool KSerial::isFileExist(const string& filename) const
 {

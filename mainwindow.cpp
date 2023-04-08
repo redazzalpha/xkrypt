@@ -115,7 +115,7 @@ void MainWindow::saveKeyOnFile(Encoding encoding) {
         ui->m_keyMSaveOnF->setChecked(false);
     }
 }
-void MainWindow::importAsymmectric()
+void MainWindow::importSymmectric()
 {
     Encoding encoding = static_cast<Encoding>(ui->m_keyMEncodingsI->currentIndex());
     try {
@@ -136,9 +136,8 @@ void MainWindow::importAsymmectric()
         dialogErrorMessage(e.what());
     }
 }
-void MainWindow::importSymmectric()
+void MainWindow::importAsymmectric()
 {
-
 }
 void MainWindow::m_cipherFrom(const string& alg, const string& mode)
 {
@@ -328,8 +327,8 @@ void MainWindow::on_m_keyMGenerate_clicked()
 void MainWindow::on_m_keyMImport_clicked()
 {
     QString type = ui->m_keyMType->currentText();
-    if(type == CipherRsa::AlgName) importAsymmectric();
-    if(type == CipherRsa::AlgName)importSymmectric();
+    if(type == CipherAes::AlgName) importSymmectric();
+    if(type == CipherRsa::AlgName)importAsymmectric();
 }
 
 void MainWindow::setAlgorithm(const QString& alg)

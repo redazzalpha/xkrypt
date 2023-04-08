@@ -48,12 +48,12 @@ private:
     QList<QString>* m_aesKeys = new QList<QString>{
         QString::number(static_cast<int>(KeyLength::LENGTH_DEFAULT)),
         QString::number(static_cast<int>(KeyLength::LENGTH_32)),
-        QString::number(static_cast<int>(KeyLength::LENGTH_64)),
-        QString::number(static_cast<int>(KeyLength::LENGTH_128)),
-        QString::number(static_cast<int>(KeyLength::LENGTH_256)),
-        QString::number(static_cast<int>(KeyLength::LENGTH_512)),
-        QString::number(static_cast<int>(KeyLength::LENGTH_1024)),
-        QString::number(static_cast<int>(KeyLength::LENGTH_2048)),
+//        QString::number(static_cast<int>(KeyLength::LENGTH_64)),
+//        QString::number(static_cast<int>(KeyLength::LENGTH_128)),
+//        QString::number(static_cast<int>(KeyLength::LENGTH_256)),
+//        QString::number(static_cast<int>(KeyLength::LENGTH_512)),
+//        QString::number(static_cast<int>(KeyLength::LENGTH_1024)),
+//        QString::number(static_cast<int>(KeyLength::LENGTH_2048)),
     };
     QList<QString>* m_keyEncodings = new QList<QString>{
         "Base64",
