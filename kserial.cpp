@@ -1,6 +1,7 @@
 #include "kserial.h"
 #include "base64.h"
 #include "defines.h"
+#include "fileimporter.h"
 #include "files.h"
 #include "hex.h"
 #include "qinputdialog.h"
@@ -68,38 +69,37 @@ bool KSerial::saveOnFile(KeyGen& keygen, const Encoding encoding)
 }
 bool KSerial::importKeygen(KeyGen* keygen) noexcept(false)
 {
+
     bool imported = false;
-    m_dir = QFileDialog::getOpenFileName(m_parent,"Import key", "", "All Files (*)");
+    ifstream* f = (ifstream*)FileImporter().importFile();
 
-    if(!m_dir.isEmpty()) {
-        ifstream f(m_dir.toStdString(), ios::binary | ios::in);
-        if(f.good()) {
-            size_t ivsize = static_cast<size_t>(IvLength::LENGTH_DEFAULT);
-            string refs, keyiv;
-            FileSource fs(f, false);
+    if(f) {
+        size_t ivsize = static_cast<size_t>(IvLength::LENGTH_DEFAULT);
+        string refs, keyiv;
+        FileSource fs(*f, false);
 
-            fs.Attach(new StringSink(refs));
-            fs.Pump(XKRYPT_REF_SIZE);
+        fs.Attach(new StringSink(refs));
+        fs.Pump(XKRYPT_REF_SIZE);
 
-            if((refs[0] < XKRYPT_REF_VERSION)) throw VersionException();
-            if( (refs[1] != XKRYPT_REF_MODEL)) throw ModelException();
+        if((refs[0] < XKRYPT_REF_VERSION)) throw VersionException();
+        if( (refs[1] != XKRYPT_REF_MODEL)) throw ModelException();
 
-            switch(refs[2]) {
-            case Encoding::BASE64 : fs.Detach(new Base64Decoder); break;
-            case Encoding::HEX : fs.Detach(new HexDecoder); break;
-            case Encoding::NONE : fs.Detach(); break;
-            default : throw EncodingException();
-            }
-
-            fs.Attach(new StringSink(keyiv));
-            fs.PumpAll();
-
-            keygen->setIv(SecByteBlock((uchar*) &keyiv[0], ivsize));
-            keygen->setKey(SecByteBlock((uchar*) &keyiv[ivsize], keyiv.size() - ivsize));
-
-            imported = true;
+        switch(refs[2]) {
+        case Encoding::BASE64 : fs.Detach(new Base64Decoder); break;
+        case Encoding::HEX : fs.Detach(new HexDecoder); break;
+        case Encoding::NONE : fs.Detach(); break;
+        default : throw EncodingException();
         }
+
+        fs.Attach(new StringSink(keyiv));
+        fs.PumpAll();
+
+        keygen->setIv(SecByteBlock((uchar*) &keyiv[0], ivsize));
+        keygen->setKey(SecByteBlock((uchar*) &keyiv[ivsize], keyiv.size() - ivsize));
+
+        imported = true;
     }
+
     return imported;
 }
 string KSerial::keyToString(KeyGen& keygen, const Encoding encoding)
