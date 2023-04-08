@@ -28,9 +28,9 @@ string AesCBC::encrypt(const KeyGen& keygen, const string& plain, const Encoding
     const SecByteBlock& key = keygen.getKey();
     const SecByteBlock& iv = keygen.getIv();
     StringSink* ss = new StringSink(cipher);
-    CBC_Mode<AES>::Encryption e;
-    StreamTransformationFilter* stf = new StreamTransformationFilter(e);
-    e.SetKeyWithIV(key, key.size(), iv);
+    CBC_Mode<AES>::Encryption encryptor;
+    StreamTransformationFilter* stf = new StreamTransformationFilter(encryptor);
+    encryptor.SetKeyWithIV(key, key.size(), iv);
 
     switch(encoding) {
     case Encoding::BASE64 : stf->Attach(new Base64Encoder(ss)); break;
@@ -48,9 +48,9 @@ string AesCBC::decrypt(const KeyGen& keygen, const string& cipher, const Encodin
     const SecByteBlock& key = keygen.getKey();
     const SecByteBlock& iv = keygen.getIv();
     StringSink* ss = new StringSink(recover);
-    CBC_Mode<AES>::Decryption d;
-    StreamTransformationFilter* stf = new StreamTransformationFilter(d, ss);
-    d.SetKeyWithIV(key, key.size(), iv);
+    CBC_Mode<AES>::Decryption decryptor;
+    StreamTransformationFilter* stf = new StreamTransformationFilter(decryptor, ss);
+    decryptor.SetKeyWithIV(key, key.size(), iv);
 
     switch(encoding) {
     case Encoding::BASE64 : StringSource(cipher, true, new Base64Decoder(stf)); break;
