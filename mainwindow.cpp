@@ -118,8 +118,8 @@ void MainWindow::saveKeyOnFile(Encoding encoding) {
 }
 void MainWindow::importSymmectric()
 {
-    Encoding encoding = static_cast<Encoding>(ui->m_keyMEncodingsI->currentIndex());
     try {
+        Encoding encoding = static_cast<Encoding>(ui->m_keyMEncodingsI->currentIndex());
         bool imported = m_ks.importKeygen(m_keygen);
         if(m_keygen->isReady() && imported) {
 
@@ -257,11 +257,11 @@ void MainWindow::setKeyLoadedSelectable(const bool selectable) const
 // slots
 void MainWindow::on_m_encTabFileImport_clicked()
 {
-    fstream* f = FileImporter().importFile();
-
-    if(f) {
-        m_cipher->encryptFile(*m_keygen, f, static_cast<Encoding>(ui->m_encTabFileEncodings->currentIndex()));
-    }
+    string alg = ui->m_encTabFileAlgs->currentText().toStdString();
+    string mode = ui->m_encTabFileModes->currentText().toStdString();
+    Encoding encoding = static_cast<Encoding>(ui->m_encTabFileEncodings->currentIndex());
+    m_cipherFrom(alg, mode);
+    m_cipher->encryptFile(*m_keygen, encoding);
 }
 void MainWindow::on_m_decTabFileImport_clicked()
 {

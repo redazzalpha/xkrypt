@@ -70,7 +70,7 @@ bool KSerial::saveOnFile(KeyGen& keygen, const Encoding encoding)
 bool KSerial::importKeygen(KeyGen* keygen) noexcept(false)
 {
     bool imported = false;
-    ifstream* f = (ifstream*)FileImporter().importFile();
+    ifstream* f = (ifstream*)m_fi.importFile();
 
     if(f) {
         size_t ivsize = static_cast<size_t>(IvLength::LENGTH_DEFAULT);

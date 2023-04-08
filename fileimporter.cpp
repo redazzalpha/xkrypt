@@ -26,6 +26,22 @@ void FileImporter::setFname(const string& fname)
 {
     m_fname = fname;
 }
+void FileImporter::setPath(const string& path)
+{
+    m_path = path;
+    setDirFname(path);
+}
+void FileImporter::setPath(const string& dir, const string& fname)
+{
+    m_dir = dir;
+    m_fname = fname;
+    m_path = m_dir + m_delim + m_fname;
+}
+void FileImporter::setPath()
+{
+    m_path = m_dir + m_delim + m_fname;
+}
+
 string FileImporter::getDir()
 {
     return m_dir;
@@ -34,10 +50,18 @@ string FileImporter::getFname()
 {
     return m_fname;
 }
+string FileImporter::getPath()
+{
+    return m_path;
+}
+fstream* FileImporter::getFile()
+{
+    return m_file;
+}
 size_t FileImporter::getFSize()
 {
     size_t fsize = 0;
-    ifstream f(m_dir);
+    ifstream f(m_path);
     if(f.good()) {
         std::vector<char> bytes((std::istream_iterator<char>(f)), std::istream_iterator<char>());
         fsize = bytes.size();
@@ -45,21 +69,19 @@ size_t FileImporter::getFSize()
     f.close();
     return fsize;
 }
-fstream* FileImporter::getFile()
-{
-    return m_file;
-}
 
 fstream* FileImporter::importFile()
 {
-    m_dir = QFileDialog::getOpenFileName(nullptr,"Import file", "", "All Files (*)").toStdString();
-    int pos = m_dir.find_last_of(m_delim) + 1;
-    m_fname = m_dir.substr(pos, m_dir.max_size() - pos);
-
-    fstream* f = new fstream(m_dir, std::ios::in | std::ios::out | std::ios::binary);
+    setPath(QFileDialog::getOpenFileName(nullptr,"Import file", "", "All Files (*)").toStdString());
+    return newFile(m_path, std::ios::in | std::ios::out | std::ios::binary);
+}
+fstream* FileImporter::importFile(const string& dir, const string& fname)
+{
+    setPath(dir, fname);
+    fstream* f = new fstream(m_path, std::ios::in | std::ios::out | std::ios::binary);
     if(f->good()) {
-//        if(m_file) delete m_file;
-//        m_file = f;
+        if(m_file) delete m_file;
+        m_file = f;
     }
     else {
         delete f;
@@ -67,22 +89,53 @@ fstream* FileImporter::importFile()
     }
     return f;
 }
-fstream* FileImporter::openRead()
+fstream* FileImporter::importFile(const string& path)
 {
-    if(!m_dir.empty() && !m_fname.empty()) {
-        if(m_file) delete m_file;
-        return m_file = new fstream(m_dir, std::ios::in | std::ios::binary);
+    setPath(path);
+    return newFile(std::ios::in | std::ios::out | std::ios::binary);
+}
+fstream* FileImporter::openRead(const string& path)
+{
+    setPath(path);
+    return newFile(std::ios::in | std::ios::binary);
+}
+fstream* FileImporter::openWriteTrunc(const string& path)
+{
+    setPath(path);
+    return newFile(std::ios::out | std::ios::trunc | std::ios::binary);
+}
+fstream* FileImporter::openWriteApp(const string& path)
+{
+    setPath(path);
+    return newFile(std::ios::out | std::ios::app | std::ios::binary);
+}
+
+// private methods
+void FileImporter::setDirFname(const std::string& path)
+{
+    if(!path.empty()) {
+        int pos = path.find_last_of(m_delim);
+        m_dir = path.substr(0, pos);
+        m_fname = path.substr(pos+1, m_dir.max_size() - pos);
     }
-    return nullptr;
 }
-fstream* FileImporter::openWriteTrunc()
+fstream* FileImporter::newFile(const ios::openmode mode)
 {
-    if(m_file) delete m_file;
-    return m_file = new fstream(m_dir, std::ios::out | std::ios::trunc | std::ios::binary);
+    if(!m_path.empty()) {
+        if(m_file) delete m_file;
+        return m_file = new fstream(m_path, mode);
+    }
+    else return nullptr;
 }
-fstream* FileImporter::openWriteApp()
+fstream* FileImporter::newFile(const string& path, const ios::openmode mode)
 {
-    if(m_file) delete m_file;
-    return m_file = new fstream(m_dir, std::ios::out | std::ios::app | std::ios::binary);
+    setPath(path);
+    if(!path.empty()) {
+        if(m_file) delete m_file;
+        return m_file = new fstream(m_path, mode);
+    }
+    else return nullptr;
 }
+
+
 

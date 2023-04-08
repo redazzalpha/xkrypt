@@ -1,5 +1,6 @@
 #include "aescbc.h"
 #include "aes.h"
+#include "fileimporter.h"
 #include "filters.h"
 #include "hex.h"
 #include "base64.h"
@@ -61,11 +62,16 @@ string AesCBC::decryptText(const KeyGen& keygen, const string& cipher, const Enc
 
     return recover;
 }
-void AesCBC::encryptFile(const KeyGen& keygen, fstream* file, const Encoding encoding) noexcept(false)
+bool AesCBC::encryptFile(const KeyGen& keygen, const Encoding encoding) noexcept(false)
 {
+    bool encrypted = false;
+    fstream* f = FileImporter().importFile();
+    if(f) {
 
+    }
+    return encrypted;
 }
-void AesCBC::decryptFile(const KeyGen& keygen, fstream* file, const Encoding encoding) noexcept(false)
+bool AesCBC::decryptFile(const KeyGen& keygen, const Encoding encoding) noexcept(false)
 {
 
 }

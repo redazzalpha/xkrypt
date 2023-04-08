@@ -9,6 +9,7 @@ private:
     std::fstream* m_file = nullptr;
     std::string m_dir;
     std::string m_fname;
+    std::string m_path;
     const std::string m_delim = "/";
 
 public:
@@ -22,15 +23,27 @@ public:
     // methods
     void setDir(const std::string& dir);
     void setFname(const std::string& fname);
+    void setPath(const std::string& dir, const std::string& fname);
+    void setPath(const std::string& path);
+    void setPath();
+
     std::string getDir();
     std::string getFname();
-    size_t getFSize();
+    std::string getPath();
     std::fstream* getFile();
+    size_t getFSize();
 
     std::fstream* importFile();
-    std::fstream* openRead();
-    std::fstream* openWriteTrunc();
-    std::fstream* openWriteApp();
+    std::fstream* importFile(const std::string& dir, const std::string& fname);
+    std::fstream* importFile(const std::string& path);
+    std::fstream* openRead(const std::string& path);
+    std::fstream* openWriteTrunc(const std::string& path);
+    std::fstream* openWriteApp(const std::string& path);
+
+private:
+    void setDirFname(const std::string& path);
+    std::fstream* newFile(const std::ios::openmode mode);
+    std::fstream* newFile(const std::string& path, const std::ios::openmode mode);
 
 };
 

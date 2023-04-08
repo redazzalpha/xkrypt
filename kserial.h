@@ -1,6 +1,7 @@
 #ifndef KSERIAL_H
 #define KSERIAL_H
 
+#include "fileimporter.h"
 #include "keygen.h"
 #include "enums.h"
 #include <QMessageBox>
@@ -17,6 +18,7 @@ private:
     bool m_override = false;
     bool m_create = false;
     bool m_changeDirectory = false;
+    FileImporter m_fi;
 
 public:
     // constructor

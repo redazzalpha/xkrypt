@@ -25,11 +25,11 @@ string RsaOEAP::decryptText(const KeyGen& keygen, const string& cipher, const En
 {
     std::cout << "cipher Rsa oeap decrypt" << std::endl;
 }
-void RsaOEAP::encryptFile(const KeyGen& keygen, fstream* file, const Encoding encoding) noexcept(false)
+bool RsaOEAP::encryptFile(const KeyGen& keygen, const Encoding encoding) noexcept(false)
 {
 
 }
-void RsaOEAP::decryptFile(const KeyGen& keygen, fstream* file, const Encoding encoding) noexcept(false)
+bool RsaOEAP::decryptFile(const KeyGen& keygen, const Encoding encoding) noexcept(false)
 {
 
 }
