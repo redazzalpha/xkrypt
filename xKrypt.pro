@@ -16,6 +16,7 @@ SOURCES += \
     cipheraes.cpp \
     cipherbase.cpp \
     cipherrsa.cpp \
+    fileimporter.cpp \
     kaction.cpp \
     kactionbase.cpp \
     kactiondecrypt.cpp \
@@ -41,6 +42,7 @@ HEADERS += \
     cipherrsa.h \
     defines.h \
     enums.h \
+    fileimporter.h \
     kaction.h \
     kactionbase.h \
     kactiondecrypt.h \
