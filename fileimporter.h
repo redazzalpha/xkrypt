@@ -16,7 +16,6 @@ private:
     const std::string m_delim = "/";
 
 public:
-
     // constructors
     FileImporter(const std::string& dir = "", const std::string& fname = "");
 
@@ -30,13 +29,13 @@ public:
     void setPath(const std::string& path);
     void setPath();
 
-    std::string getDir();
-    std::string getFname();
-    std::string getPath();
-    std::fstream* getFile();
+    std::string getDir() const;
+    std::string getFname() const;
+    std::string getPath() const;
+    std::fstream* getFile() const;
     const std::vector<std::fstream>& getFiles();
     const std::vector<std::string>& getFilePaths();
-    size_t getFSize();
+    size_t getFSize() const;
 
     std::fstream* importFile();
     std::fstream* importFile(const std::string& dir, const std::string& fname);
@@ -51,7 +50,6 @@ private:
     void setDirFname(const std::string& path);
     std::fstream* newFile(const std::ios::openmode mode);
     std::fstream* newFile(const std::string& path, const std::ios::openmode mode);
-
 };
 
 #endif // FILEIMPORTER_H

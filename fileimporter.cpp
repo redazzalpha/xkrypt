@@ -42,19 +42,19 @@ void FileImporter::setPath()
     m_path = m_dir + m_delim + m_fname;
 }
 
-string FileImporter::getDir()
+string FileImporter::getDir() const
 {
     return m_dir;
 }
-string FileImporter::getFname()
+string FileImporter::getFname() const
 {
     return m_fname;
 }
-string FileImporter::getPath()
+string FileImporter::getPath() const
 {
     return m_path;
 }
-fstream* FileImporter::getFile()
+fstream* FileImporter::getFile() const
 {
     return m_file;
 }
@@ -68,7 +68,7 @@ const std::vector<string> &FileImporter::getFilePaths()
 {
     return m_filePaths;
 }
-size_t FileImporter::getFSize()
+size_t FileImporter::getFSize() const
 {
     size_t fsize = 0;
     ifstream f(m_path);

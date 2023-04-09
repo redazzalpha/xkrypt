@@ -14,6 +14,7 @@
 #include "actiondecrypt.h"
 #include "actionquit.h"
 #include "aesccm.h"
+#include "fileimporter.h"
 #include <QMainWindow>
 #include <QList>
 #include <QString>
@@ -29,12 +30,21 @@ class MainWindow : public QMainWindow {
 
 private:
     Ui::MainWindow *ui;
-    Serial m_ks;
-
+    Serial m_serial;
+    FileImporter m_fi;
+    std::string m_fname;
+    std::string m_dir;
     KeyGen* m_keygen = new KeyGen;
     AbstractCipherBase* m_cipher = new AesGCM;
+
+    QList<AbstractActionBase*> m_actions = QList<AbstractActionBase*> {
+        new ActionKeyMgr(),
+        new ActionEncrypt(),
+        new ActionDecrypt(),
+        new ActionQuit(),
+    };
     QList<QString>* m_algorithms = new QList<QString> {
-                                                      AbstractCipherAes::AlgName,
+        AbstractCipherAes::AlgName,
         AbstractCipherRsa::AlgName
     };
     QList<QString>* m_aesModes = new QList<QString>{
@@ -50,6 +60,7 @@ private:
     QList<QString>* m_aesKeys = new QList<QString>{
         QString::number(static_cast<int>(KeyLength::LENGTH_DEFAULT)),
         QString::number(static_cast<int>(KeyLength::LENGTH_32)),
+//        AES SIZES NOT DEFINED YET CANNOT USE THEM!
 //        QString::number(static_cast<int>(KeyLength::LENGTH_64)),
 //        QString::number(static_cast<int>(KeyLength::LENGTH_128)),
 //        QString::number(static_cast<int>(KeyLength::LENGTH_256)),
@@ -66,12 +77,6 @@ private:
         "Base64",
         "Hex",
     };
-    QList<AbstractActionBase*> m_actions = QList<AbstractActionBase*> {
-        new ActionKeyMgr(),
-        new ActionEncrypt(),
-        new ActionDecrypt(),
-        new ActionQuit(),
-    };
 
 public:
     // constructors
@@ -81,11 +86,12 @@ public:
     ~MainWindow();
 
 private:
+
     // methods
     void uiInit();
     void connectItems() const;
     void generateKey(Encoding encodingIndex);
-    void saveKeyOnFile(Encoding encoding);
+    void saveSuccess(Encoding encoding);
     void processEncrypt(QObject* sender);
     void processDecrypt(QObject *sender);
     void importAsymmectric();
@@ -93,6 +99,11 @@ private:
     void m_cipherFrom(const std::string& alg, const std::string& mode);
     KeyLength keylengthFrom(const int index);
 
+    void saveOnFile(const Encoding encoding);
+    bool isFileExist(const std::string& filename) const;
+    QMessageBox::ButtonRole dialogFileExists(const std::string& message);
+    bool dialogInsertFilename(const std::string& message);
+    bool dialogConfirm(const std::string& message);
     void dialogSuccessMessage(const std::string& message);
     void dialogErrorMessage(const std::string& message);
     void dialogNoKeyMessage(const std::string& action);

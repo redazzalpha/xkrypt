@@ -1,7 +1,6 @@
 #ifndef SERIAL_H
 #define SERIAL_H
 
-#include "fileimporter.h"
 #include "keygen.h"
 #include "enums.h"
 #include <QMessageBox>
@@ -9,34 +8,15 @@
 #include <QMainWindow>
 
 class Serial final: public QObject{
-
-private:
-    QMainWindow* m_parent;
-    std::string m_fname;
-    QString m_dir;
-    bool m_loop = true;
-    bool m_override = false;
-    bool m_create = false;
-    bool m_changeDirectory = false;
-    FileImporter m_fi;
-
 public:
     // constructor
-    Serial(QMainWindow* parent);
+    Serial();
 
     // methods
-    std::string getDir() const;
+    bool importKeygen(KeyGen *keygen, std::ifstream* file) const noexcept(false);
+    void keyToFile(const std::string& path, KeyGen& keygen, const Encoding encoding) const;
+    std::string keyToString(KeyGen& keygen, const Encoding encoding) const;
     std::string encodingToString(const Encoding encoding) const;
-    bool saveOnFile(KeyGen& keygen, const Encoding encoding);
-    bool importKeygen(KeyGen *keygen) noexcept(false);
-    std::string keyToString(KeyGen& keygen, const Encoding encoding);
-
-private:
-    void keyToFile(KeyGen& keygen, const Encoding encoding) const;
-    bool isFileExist(const std::string& filename) const;
-    QMessageBox::ButtonRole dialogFileExists(const std::string& message);
-    bool dialogInsertFilename(const std::string& message);
-    bool dialogConfirm(const std::string& message);
 };
 
 #endif // SERIAL_H

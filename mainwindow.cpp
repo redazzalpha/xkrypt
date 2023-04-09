@@ -6,6 +6,7 @@
 #include <QToolButton>
 #include <QPushButton>
 #include <QLabel>
+#include <QString>
 #include <QGridLayout>
 #include <QFileDialog>
 #include <QInputDialog>
@@ -21,7 +22,6 @@ using namespace CryptoPP;
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
-    ,   m_ks(this)
 {
     uiInit();
     connectItems();
@@ -29,17 +29,17 @@ MainWindow::MainWindow(QWidget *parent)
     setIconSize(QSize(WINDOW_ICON_WIDTH, WINDOW_ICON_HEIGHT));
 }
 // destructor
-    MainWindow::~MainWindow()
-    {
-        delete ui;
-        delete m_keygen;
-        delete m_cipher;
-        delete m_aesModes;
-        delete m_rsaModes;
-        delete m_algorithms;
-        delete m_keyEncodings;
-        foreach(AbstractActionBase* action, m_actions) delete action;
-    }
+MainWindow::~MainWindow()
+{
+    delete ui;
+    delete m_keygen;
+    delete m_cipher;
+    delete m_aesModes;
+    delete m_rsaModes;
+    delete m_algorithms;
+    delete m_keyEncodings;
+    foreach(AbstractActionBase* action, m_actions) delete action;
+}
 
 // private methods
 void MainWindow::uiInit()
@@ -104,30 +104,60 @@ void MainWindow::generateKey(Encoding encoding)
 
     m_keygen->setKeyLength(keylength);
     m_keygen->generateKey();
-    setKeyLoadedText(QString::fromStdString(m_ks.keyToString(*m_keygen, encoding)));
+    setKeyLoadedText(QString::fromStdString(m_serial.keyToString(*m_keygen, encoding)));
 }
-void MainWindow::saveKeyOnFile(Encoding encoding) {
-    if(m_ks.saveOnFile(*m_keygen,  encoding)) {
-        string message = "key " + std::to_string(m_keygen->getKey().size()) + " bytes - encoded ";
-        message += m_ks.encodingToString(encoding);
-        message += "<br />has been successfully written on file<br />" + m_ks.getDir();
-        dialogSuccessMessage(message);
-        ui->m_keyMSaveOnF->setChecked(false);
+void MainWindow::saveOnFile(const Encoding encoding)
+{
+    bool m_override = false;
+    bool m_create = false;
+    bool m_changeDirectory = false;
+
+    while(true) {
+        if(!m_override && !m_create) m_dir = QFileDialog::getExistingDirectory(nullptr, "Select saving directory", "").toStdString();
+        if(!m_dir.empty()) {
+            bool canWrite = true;
+            if(!m_override && !m_create && !m_changeDirectory) canWrite = dialogInsertFilename("Please insert filename");
+            if(canWrite) {
+                string dir = m_dir +  "/" + m_fname;
+                if(!isFileExist(dir) || m_override) {
+                    m_dir =  QString::fromStdString(dir).toStdString();
+                    m_serial.keyToFile(m_dir, *m_keygen, encoding);
+                    saveSuccess(encoding);
+                    break;
+                }
+                else {
+                    QMessageBox::ButtonRole role = dialogFileExists("File already exists! What you want to do?");
+                    if(role == QMessageBox::AcceptRole)  { m_changeDirectory = true; continue; }
+                    if(role == QMessageBox::ApplyRole) { m_override = true; continue; }
+                    if(role == QMessageBox::ActionRole) { m_create = true; continue; }
+                    if(role == QMessageBox::RejectRole) break;
+                }
+            }
+            else break;
+        }
+        else break;
     }
+}
+void MainWindow::saveSuccess(Encoding encoding) {
+    string message = "key " + std::to_string(m_keygen->getKey().size()) + " bytes - encoded ";
+    message += m_serial.encodingToString(encoding);
+    message += "<br />has been successfully written on file<br />" + m_dir;
+    dialogSuccessMessage(message);
+    ui->m_keyMSaveOnF->setChecked(false);
 }
 void MainWindow::importSymmectric()
 {
     try {
         Encoding encoding = static_cast<Encoding>(ui->m_keyMEncodingsI->currentIndex());
-        bool imported = m_ks.importKeygen(m_keygen);
+        bool imported = m_serial.importKeygen(m_keygen, (ifstream*)m_fi.importFile());
         if(m_keygen->isReady() && imported) {
 
-            string keyStr = m_ks.keyToString(*m_keygen, encoding);
+            string keyStr = m_serial.keyToString(*m_keygen, encoding);
             setKeyLoadedText(QString::fromStdString(keyStr));
             colorKey();
 
             string message = "key " + std::to_string(m_keygen->getKey().size()) + " bytes - encoded ";
-            message += m_ks.encodingToString(encoding);
+            message += m_serial.encodingToString(encoding);
             message += "<br />has been successfully imported";
             dialogSuccessMessage(message);
         }
@@ -187,6 +217,76 @@ KeyLength MainWindow::keylengthFrom(const int index)
     return keylength;
 }
 
+bool MainWindow::isFileExist(const string& filename) const
+{
+    return std::fstream(filename, ios::in | ios::binary).good();
+}
+QMessageBox::ButtonRole MainWindow::dialogFileExists(const string& message)
+{
+    string text = MESSAGE_FILE_EXISTS_START + message + MESSAGE_FILE_EXISTS_END;
+    QMessageBox msg(this);
+    QPushButton* changeDirectory =  msg.addButton("Change directory", QMessageBox::AcceptRole);
+    QPushButton* override =  msg.addButton("Override file", QMessageBox::ApplyRole);
+    QPushButton* create =  msg.addButton("Create file", QMessageBox::ActionRole);
+    QPushButton* cancel =  msg.addButton("Cancel", QMessageBox::RejectRole);
+
+    cancel->setVisible(false);
+    msg.setWindowTitle("xKrypt - Warning");
+    msg.setWindowIcon(QIcon(QPixmap(ICON_WARNING)));
+    msg.setText(QString::fromStdString(text));
+    msg.setDefaultButton(changeDirectory);
+    msg.setEscapeButton(cancel);
+    msg.setModal(true);
+    msg.exec();
+
+    if(msg.clickedButton() == changeDirectory)
+        return QMessageBox::AcceptRole;
+    else if(msg.clickedButton() == override)
+        return dialogConfirm("Are you sure you want to override file?<br />This operation cannot be undone!")? QMessageBox::ApplyRole : QMessageBox::RejectRole;
+    else if(msg.clickedButton() == create)
+        return dialogInsertFilename("Please insert filename")? QMessageBox::ActionRole: QMessageBox::RejectRole;
+    else if(msg.clickedButton() == cancel)
+        return QMessageBox::RejectRole;
+    return QMessageBox::RejectRole;
+}
+bool MainWindow::dialogInsertFilename(const string& message) {
+    string text = MESSAGE_INSERT_FNAME_START + message + MESSAGE_INSERT_FNAME_END;
+    QInputDialog input(this);
+    bool isFnameInserted = false;
+    m_fname = "";
+
+    input.setWindowTitle("xKrypt - insert");
+    input.setWindowIcon(QIcon(QPixmap(ICON_FILE)));
+    input.setLabelText(QString::fromStdString(text));
+    input.setFixedSize(500, 200);
+    input.setModal(true);
+    if(input.exec()) {
+        m_fname = input.textValue().toStdString();
+        isFnameInserted = true;
+    }
+
+    return isFnameInserted;
+}
+bool MainWindow::dialogConfirm(const string& message)
+{
+    string text = MESSAGE_CONFIRM_START + message + MESSAGE_CONFIRM_END;
+    QMessageBox msg(this);
+    QPushButton* ok =  msg.addButton("Ok", QMessageBox::AcceptRole);
+    QPushButton* cancel =  msg.addButton("Cancel", QMessageBox::RejectRole);
+    bool isConfirmed = false;
+
+    msg.setWindowTitle("xKrypt - Warning");
+    msg.setWindowIcon(QIcon(QPixmap(ICON_WARNING)));
+    msg.setText(QString::fromStdString(text));
+    msg.setDefaultButton(cancel);
+    msg.setEscapeButton(cancel);
+    msg.setModal(true);
+    msg.exec();
+
+    if(msg.clickedButton() == ok) isConfirmed = true;
+
+    return isConfirmed;
+}
 void MainWindow::dialogSuccessMessage(const string& message)
 {
     string text = MESSAGE_SUCCESS_START+ message + MESSAGE_SUCCESS_END;
@@ -339,8 +439,7 @@ void MainWindow::on_m_keyMGenerate_clicked()
 {
     Encoding encoding = static_cast<Encoding>(ui->m_keyMEncodingsG->currentIndex());
     generateKey(encoding);
-    if(ui->m_keyMSaveOnF->isChecked())
-        saveKeyOnFile(encoding);
+    if(ui->m_keyMSaveOnF->isChecked()) saveOnFile(encoding);
 }
 void MainWindow::on_m_keyMImport_clicked()
 {
