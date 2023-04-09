@@ -3,7 +3,7 @@
 
 #include "cipherrsa.h"
 
-class RsaSSA : public CipherRsa {
+class RsaSSA : public AbstractCipherRsa {
 public:
     static const QString ModeName;
 

@@ -3,7 +3,7 @@
 
 #include "cipheraes.h"
 
-class AesGCM : public  CipherAes {
+class AesGCM : public  AbstractCipherAes {
 public:
     static const QString ModeName;
 

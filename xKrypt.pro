@@ -9,6 +9,13 @@ CONFIG += c++17
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    action.cpp \
+    actionbase.cpp \
+    actiondecrypt.cpp \
+    actionencrypt.cpp \
+    actionkeyMgr.cpp \
+    actionpage.cpp \
+    actionquit.cpp \
     aescbc.cpp \
     aesccm.cpp \
     aeseax.cpp \
@@ -17,22 +24,22 @@ SOURCES += \
     cipherbase.cpp \
     cipherrsa.cpp \
     fileimporter.cpp \
-    kaction.cpp \
-    kactionbase.cpp \
-    kactiondecrypt.cpp \
-    kactionencrypt.cpp \
-    kactionkeyMgr.cpp \
-    kactionpage.cpp \
-    kactionquit.cpp \
     kexcept.cpp \
     keygen.cpp \
-    kserial.cpp \
     main.cpp \
     mainwindow.cpp \
     rsaoeap.cpp \
-    rsassa.cpp
+    rsassa.cpp \
+    serial.cpp
 
 HEADERS += \
+    action.h \
+    actionbase.h \
+    actiondecrypt.h \
+    actionencrypt.h \
+    actionkeyMgr.h \
+    actionpage.h \
+    actionquit.h \
     aescbc.h \
     aesccm.h \
     aeseax.h \
@@ -43,19 +50,12 @@ HEADERS += \
     defines.h \
     enums.h \
     fileimporter.h \
-    kaction.h \
-    kactionbase.h \
-    kactiondecrypt.h \
-    kactionencrypt.h \
-    kactionkeyMgr.h \
-    kactionpage.h \
-    kactionquit.h \
     kexcept.h \
     keygen.h \
-    kserial.h \
     mainwindow.h \
     rsaoeap.h \
-    rsassa.h
+    rsassa.h \
+    serial.h
 
 FORMS += \
     mainwindow.ui

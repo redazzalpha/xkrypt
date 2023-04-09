@@ -4,16 +4,16 @@
 
 using namespace std;
 
-const QString CipherAes::AlgName = "Symmectric - Aes";
+const QString AbstractCipherAes::AlgName = "Symmectric - Aes";
 
 // constructors
-CipherAes::CipherAes() {}
+AbstractCipherAes::AbstractCipherAes() {}
 
 // destructor
-CipherAes::~CipherAes() {};
+AbstractCipherAes::~AbstractCipherAes() {};
 
 // virtual methods
-QString CipherAes::getAlgName() const
+QString AbstractCipherAes::getAlgName() const
 {
-    return CipherAes::AlgName;
+    return AbstractCipherAes::AlgName;
 }

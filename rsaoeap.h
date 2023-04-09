@@ -4,7 +4,7 @@
 #include "cipherrsa.h"
 
 
-class RsaOEAP : public CipherRsa {
+class RsaOEAP : public AbstractCipherRsa {
 public:
     static const QString ModeName;
 

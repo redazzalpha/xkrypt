@@ -3,7 +3,10 @@
 
 
 // constructors
-CipherBase::CipherBase() {}
+AbstractCipherBase::AbstractCipherBase(): m_fi(new FileImporter) {}
 
 // destructor
-CipherBase::~CipherBase() {}
+AbstractCipherBase::~AbstractCipherBase()
+{
+    delete m_fi;
+}

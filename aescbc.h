@@ -4,7 +4,7 @@
 #include "cipheraes.h"
 #include "keygen.h"
 
-class AesCBC : public CipherAes {
+class AesCBC : public AbstractCipherAes {
 public:
     static const QString ModeName;
 

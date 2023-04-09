@@ -1,7 +1,7 @@
-#ifndef KACTIONQUIT_H
-#define KACTIONQUIT_H
+#ifndef ACTIONQUIT_H
+#define ACTIONQUIT_H
 
-#include "kaction.h"
+#include "action.h"
 
 /**
  * KActionQuit class represents QAction object
@@ -9,16 +9,16 @@
  * quit application
  */
 
-class KActionQuit : public KAction {
+class ActionQuit : public AbstractAction {
 public:
     // constructors
-    KActionQuit();
+    ActionQuit();
 
     // destructor
-    virtual ~KActionQuit();
+    virtual ~ActionQuit();
 
 public slots:
     virtual void onActionClick() override;
 };
 
-#endif // KACTIONQUIT_H
+#endif // ACTIONQUIT_H

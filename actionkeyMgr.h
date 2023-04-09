@@ -1,7 +1,7 @@
-#ifndef KACTIONKEYMGR_H
-#define KACTIONKEYMGR_H
+#ifndef ACTIONKEYMGR_H
+#define ACTIONKEYMGR_H
 
-#include "kactionpage.h"
+#include "actionpage.h"
 
 /**
  * KActionKeyMgr class represents QAction object
@@ -9,16 +9,16 @@
  * manager visibility
  */
 
-class KActionKeyMgr : public KActionPage {
+class ActionKeyMgr : public AbstractActionPage {
 public:
     // constructors
-    KActionKeyMgr();
+    ActionKeyMgr();
 
     // destructor
-    virtual ~KActionKeyMgr();
+    virtual ~ActionKeyMgr();
 
 public slots:
     virtual void onActionClick() override;
 };
 
-#endif // KACTIONKEYMGR_H
+#endif // ACTIONKEYMGR_H

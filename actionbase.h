@@ -1,5 +1,5 @@
-#ifndef KACTIONBASE_H
-#define KACTIONBASE_H
+#ifndef ACTIONBASE_H
+#define ACTIONBASE_H
 
 #include <QAction>
 #include <QMainWindow>
@@ -9,7 +9,7 @@
  * This class is used to remplace QAction object
  */
 
-class KActionBase: public QAction {
+class AbstractActionBase: public QAction {
     Q_OBJECT
 
 protected:
@@ -18,10 +18,10 @@ protected:
 
 public:
     // constructor
-    KActionBase(const std::string& toolTipText, const std::string& iconPath);
+    AbstractActionBase(const std::string& toolTipText, const std::string& iconPath);
 
     // destructor
-    virtual ~KActionBase();
+    virtual ~AbstractActionBase();
 
 public slots:
     virtual void onActionClick() = 0;
@@ -31,4 +31,4 @@ signals:
     void quit();
 };
 
-#endif // KACTIONBASE_H
+#endif // ACTIONBASE_H

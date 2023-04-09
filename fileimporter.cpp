@@ -94,6 +94,21 @@ fstream* FileImporter::importFile(const string& path)
     setPath(path);
     return newFile(std::ios::in | std::ios::out | std::ios::binary);
 }
+vector<fstream> FileImporter::importFiles()
+{
+    vector<fstream> files;
+    QFileDialog dialog;
+    dialog.setFileMode(QFileDialog::ExistingFiles);
+    if (dialog.exec()) {
+        QStringList paths;
+        paths = dialog.selectedFiles();
+        files.clear();
+        foreach(QString path, paths)
+            files.push_back(fstream (path.toStdString(), ios::in | ios::out | ios::binary));
+    }
+    return files;
+}
+
 fstream* FileImporter::openRead(const string& path)
 {
     setPath(path);

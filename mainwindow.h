@@ -4,15 +4,15 @@
 #include "aesgcm.h"
 #include "aescbc.h"
 #include "aeseax.h"
-#include "kserial.h"
+#include "serial.h"
 #include "keygen.h"
 #include "rsassa.h"
 #include "rsaoeap.h"
 #include "enums.h"
-#include "kactionkeyMgr.h"
-#include "kactionencrypt.h"
-#include "kactiondecrypt.h"
-#include "kactionquit.h"
+#include "actionkeyMgr.h"
+#include "actionencrypt.h"
+#include "actiondecrypt.h"
+#include "actionquit.h"
 #include "aesccm.h"
 #include <QMainWindow>
 #include <QList>
@@ -29,13 +29,13 @@ class MainWindow : public QMainWindow {
 
 private:
     Ui::MainWindow *ui;
-    KSerial m_ks;
+    Serial m_ks;
 
     KeyGen* m_keygen = new KeyGen;
-    CipherBase* m_cipher = new AesGCM;
+    AbstractCipherBase* m_cipher = new AesGCM;
     QList<QString>* m_algorithms = new QList<QString> {
-        CipherAes::AlgName,
-        CipherRsa::AlgName
+                                                      AbstractCipherAes::AlgName,
+        AbstractCipherRsa::AlgName
     };
     QList<QString>* m_aesModes = new QList<QString>{
         AesCBC::ModeName,
@@ -66,11 +66,11 @@ private:
         "Base64",
         "Hex",
     };
-    QList<KActionBase*> m_actions = QList<KActionBase*> {
-        new KActionKeyMgr(),
-        new KActionEncrypt(),
-        new KActionDecrypt(),
-        new KActionQuit(),
+    QList<AbstractActionBase*> m_actions = QList<AbstractActionBase*> {
+        new ActionKeyMgr(),
+        new ActionEncrypt(),
+        new ActionDecrypt(),
+        new ActionQuit(),
     };
 
 public:
@@ -116,7 +116,7 @@ private slots:
     void on_m_keyMGenerate_clicked();
     void on_m_keyMImport_clicked();
 
-    void setAlgorithm(const QString& alg);
+    void setComboModes(const QString& alg);
     void hideKey(const bool isChecked);
     void colorKey();
     void flushKey();

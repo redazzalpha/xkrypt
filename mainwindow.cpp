@@ -39,7 +39,7 @@ MainWindow::MainWindow(QWidget *parent)
         delete m_rsaModes;
         delete m_algorithms;
         delete m_keyEncodings;
-        foreach(KActionBase* action, m_actions) delete action;
+        foreach(AbstractActionBase* action, m_actions) delete action;
     }
 
 // private methods
@@ -76,10 +76,10 @@ void MainWindow::uiInit()
 void MainWindow::connectItems() const
 {
     // connect combos
-    QObject::connect(ui->m_encTabFileAlgs, &QComboBox::textActivated, this, &MainWindow::setAlgorithm);
-    QObject::connect(ui->m_decTabFileAlgs, &QComboBox::textActivated, this, &MainWindow::setAlgorithm);
-    QObject::connect(ui->m_encTabTextAlgs, &QComboBox::textActivated, this, &MainWindow::setAlgorithm);
-    QObject::connect(ui->m_decTabTextAlgs, &QComboBox::textActivated, this, &MainWindow::setAlgorithm);
+    QObject::connect(ui->m_encTabFileAlgs, &QComboBox::textActivated, this, &MainWindow::setComboModes);
+    QObject::connect(ui->m_decTabFileAlgs, &QComboBox::textActivated, this, &MainWindow::setComboModes);
+    QObject::connect(ui->m_encTabTextAlgs, &QComboBox::textActivated, this, &MainWindow::setComboModes);
+    QObject::connect(ui->m_decTabTextAlgs, &QComboBox::textActivated, this, &MainWindow::setComboModes);
 
     // connect checkboxes
     QObject::connect(ui->m_keyMHide, &QCheckBox::clicked, this, &MainWindow::hideKey);
@@ -91,11 +91,11 @@ void MainWindow::connectItems() const
     QObject::connect(ui->m_keyMLoaded, &QPlainTextEdit::textChanged, this, &MainWindow::colorKey);
 
     // create and connect actions
-    foreach (KActionBase* action, m_actions) {
+    foreach (AbstractActionBase* action, m_actions) {
         ui->m_toolBar->addAction(action);
-        QObject::connect(action, &QAction::triggered, action, &KActionBase::onActionClick);
-        QObject::connect(action, &KActionBase::quit, this, &QMainWindow::close);
-        QObject::connect(action, &KActionBase::setStackPage, ui->m_mainStack, &QStackedWidget::setCurrentIndex);
+        QObject::connect(action, &QAction::triggered, action, &AbstractActionBase::onActionClick);
+        QObject::connect(action, &AbstractActionBase::quit, this, &QMainWindow::close);
+        QObject::connect(action, &AbstractActionBase::setStackPage, ui->m_mainStack, &QStackedWidget::setCurrentIndex);
     }
 }
 void MainWindow::generateKey(Encoding encoding)
@@ -146,23 +146,30 @@ void MainWindow::m_cipherFrom(const string& alg, const string& mode)
     m_cipher = nullptr;
 
     // aes algs
-    if(QString::fromStdString(alg) == CipherAes::AlgName) {
+    if(QString::fromStdString(alg) == AbstractCipherAes::AlgName) {
 
         if(QString::fromStdString(mode) == AesCBC::ModeName) m_cipher = new AesCBC;
-        if(QString::fromStdString(mode) == AesEAX::ModeName) m_cipher = new AesEAX;
-        if(QString::fromStdString(mode) == AesGCM::ModeName) m_cipher = new AesGCM;
-        if(QString::fromStdString(mode) == AesCCM::ModeName) m_cipher = new AesCCM;
-        if(QString::fromStdString(mode) == AesGCM::ModeName) m_cipher = new AesGCM;
-        if(QString::fromStdString(mode) == AesGCM::ModeName) m_cipher = new AesGCM;
-        if(QString::fromStdString(mode) == AesGCM::ModeName) m_cipher = new AesGCM;
-        if(QString::fromStdString(mode) == AesGCM::ModeName) m_cipher = new AesGCM;
+        else if(QString::fromStdString(mode) == AesEAX::ModeName) m_cipher = new AesEAX;
+        else if(QString::fromStdString(mode) == AesGCM::ModeName) m_cipher = new AesGCM;
+        else if(QString::fromStdString(mode) == AesCCM::ModeName) m_cipher = new AesCCM;
+        else if(QString::fromStdString(mode) == AesGCM::ModeName) m_cipher = new AesGCM;
+        else if(QString::fromStdString(mode) == AesGCM::ModeName) m_cipher = new AesGCM;
+        else if(QString::fromStdString(mode) == AesGCM::ModeName) m_cipher = new AesGCM;
+        else if(QString::fromStdString(mode) == AesGCM::ModeName) m_cipher = new AesGCM;
+        // default. shouldn't go here but used to remove clang warnings
+        else m_cipher = new AesCBC;
     }
 
     // rsa algs
-    if(QString::fromStdString(alg) == CipherRsa::AlgName) {
+    else if(QString::fromStdString(alg) == AbstractCipherRsa::AlgName) {
         if(QString::fromStdString(mode) == RsaOEAP::ModeName) m_cipher = new RsaOEAP;
-        if(QString::fromStdString(mode) == RsaSSA::ModeName) m_cipher = new RsaSSA;
+        else if(QString::fromStdString(mode) == RsaSSA::ModeName) m_cipher = new RsaSSA;
+        // default. shouldn't go here but used to remove clang warnings
+        else m_cipher = new RsaOEAP;
     }
+
+    // default. shouldn't go here but used to remove clang warnings
+    else m_cipher = new AesCBC;
 }
 KeyLength MainWindow::keylengthFrom(const int index)
 {
@@ -333,11 +340,11 @@ void MainWindow::on_m_keyMGenerate_clicked()
 void MainWindow::on_m_keyMImport_clicked()
 {
     QString type = ui->m_keyMType->currentText();
-    if(type == CipherAes::AlgName) importSymmectric();
-    if(type == CipherRsa::AlgName)importAsymmectric();
+    if(type == AbstractCipherAes::AlgName) importSymmectric();
+    if(type == AbstractCipherRsa::AlgName)importAsymmectric();
 }
 
-void MainWindow::setAlgorithm(const QString& alg)
+void MainWindow::setComboModes(const QString& alg)
 {
     QComboBox* sender = static_cast<QComboBox*>(QObject::sender());
     QObject* parent = sender->parent();
@@ -346,9 +353,9 @@ void MainWindow::setAlgorithm(const QString& alg)
     QComboBox* mode = parent->findChild<QComboBox*>(QString::fromStdString(modeName));
 
     mode->clear();
-    if(alg == CipherAes::AlgName)
+    if(alg == AbstractCipherAes::AlgName)
         mode->addItems(*m_aesModes);
-    if(alg == CipherRsa::AlgName)
+    if(alg == AbstractCipherRsa::AlgName)
         mode->addItems(*m_rsaModes);
 }
 void MainWindow::hideKey(const bool isChecked)

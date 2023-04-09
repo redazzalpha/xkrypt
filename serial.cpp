@@ -1,4 +1,4 @@
-#include "kserial.h"
+#include "serial.h"
 #include "base64.h"
 #include "defines.h"
 #include "fileimporter.h"
@@ -15,13 +15,13 @@ using namespace CryptoPP;
 using namespace std;
 
 // constructors
-KSerial::KSerial(QMainWindow* parent): m_parent(parent){};
+Serial::Serial(QMainWindow* parent): m_parent(parent){};
 
 // methods
-string KSerial::getDir() const {
+string Serial::getDir() const {
     return m_dir.toStdString();
 }
-string KSerial::encodingToString(const Encoding encoding) const
+string Serial::encodingToString(const Encoding encoding) const
 {
     string encodingStr;
     switch(static_cast<int>(encoding))  {
@@ -31,7 +31,7 @@ string KSerial::encodingToString(const Encoding encoding) const
     default: return "Unknown";
     }
 }
-bool KSerial::saveOnFile(KeyGen& keygen, const Encoding encoding)
+bool Serial::saveOnFile(KeyGen& keygen, const Encoding encoding)
 {
     bool written = false;
     m_override = false;
@@ -67,7 +67,7 @@ bool KSerial::saveOnFile(KeyGen& keygen, const Encoding encoding)
     }
     return written;
 }
-bool KSerial::importKeygen(KeyGen* keygen) noexcept(false)
+bool Serial::importKeygen(KeyGen* keygen) noexcept(false)
 {
     bool imported = false;
     ifstream* f = (ifstream*)m_fi.importFile();
@@ -101,7 +101,7 @@ bool KSerial::importKeygen(KeyGen* keygen) noexcept(false)
 
     return imported;
 }
-string KSerial::keyToString(KeyGen& keygen, const Encoding encoding)
+string Serial::keyToString(KeyGen& keygen, const Encoding encoding)
 {
     StringSource keySource(keygen.getKey().BytePtr(), keygen.getKey().size(), false);
     string key;
@@ -125,7 +125,7 @@ string KSerial::keyToString(KeyGen& keygen, const Encoding encoding)
 }
 
 // private methods
-void KSerial::keyToFile(KeyGen& keygen, const Encoding encoding) const
+void Serial::keyToFile(KeyGen& keygen, const Encoding encoding) const
 {
     size_t ivSize = keygen.getIv().size();
     size_t keySize = keygen.getKey().size();
@@ -162,11 +162,11 @@ void KSerial::keyToFile(KeyGen& keygen, const Encoding encoding) const
     refsSource.PumpAll();
     keyIvSource.PumpAll();
 }
-bool KSerial::isFileExist(const string& filename) const
+bool Serial::isFileExist(const string& filename) const
 {
     return std::fstream(filename, ios::in | ios::binary).good();
 }
-QMessageBox::ButtonRole KSerial::dialogFileExists(const string& message)
+QMessageBox::ButtonRole Serial::dialogFileExists(const string& message)
 {
     string text = MESSAGE_FILE_EXISTS_START + message + MESSAGE_FILE_EXISTS_END;
     QMessageBox msg(m_parent);
@@ -194,7 +194,7 @@ QMessageBox::ButtonRole KSerial::dialogFileExists(const string& message)
         return QMessageBox::RejectRole;
     return QMessageBox::RejectRole;
 }
-bool KSerial::dialogInsertFilename(const string& message) {
+bool Serial::dialogInsertFilename(const string& message) {
     string text = MESSAGE_INSERT_FNAME_START + message + MESSAGE_INSERT_FNAME_END;
     QInputDialog input(m_parent);
     bool isFnameInserted = false;
@@ -212,7 +212,7 @@ bool KSerial::dialogInsertFilename(const string& message) {
 
     return isFnameInserted;
 }
-bool KSerial::dialogConfirm(const string& message)
+bool Serial::dialogConfirm(const string& message)
 {
     string text = MESSAGE_CONFIRM_START + message + MESSAGE_CONFIRM_END;
     QMessageBox msg(m_parent);

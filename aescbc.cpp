@@ -65,10 +65,8 @@ string AesCBC::decryptText(const KeyGen& keygen, const string& cipher, const Enc
 bool AesCBC::encryptFile(const KeyGen& keygen, const Encoding encoding) noexcept(false)
 {
     bool encrypted = false;
-    fstream* f = FileImporter().importFile();
-    if(f) {
+    vector<fstream> files = m_fi->importFiles();
 
-    }
     return encrypted;
 }
 bool AesCBC::decryptFile(const KeyGen& keygen, const Encoding encoding) noexcept(false)

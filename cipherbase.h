@@ -1,6 +1,7 @@
 #ifndef CIPHERBASE_H
 #define CIPHERBASE_H
 
+#include "fileimporter.h"
 #include "keygen.h"
 #include <QObject>
 #include <QString>
@@ -11,15 +12,18 @@
  * class for cipher algorithms
  */
 
-class CipherBase : public QObject {
+class AbstractCipherBase : public QObject {
     Q_OBJECT
+
+protected:
+    FileImporter* m_fi;
 
 public:
     // constructors
-    CipherBase();
+    AbstractCipherBase();
 
     // destructor
-    virtual ~CipherBase();
+    virtual ~AbstractCipherBase();
 
     // methods
     virtual QString getAlgName() const = 0;

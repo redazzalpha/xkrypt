@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <QStringList>
 
 class FileImporter {
 private:
@@ -36,6 +37,8 @@ public:
     std::fstream* importFile();
     std::fstream* importFile(const std::string& dir, const std::string& fname);
     std::fstream* importFile(const std::string& path);
+    std::vector<std::fstream> importFiles();
+
     std::fstream* openRead(const std::string& path);
     std::fstream* openWriteTrunc(const std::string& path);
     std::fstream* openWriteApp(const std::string& path);

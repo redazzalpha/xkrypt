@@ -1,7 +1,7 @@
-#ifndef KACTIONENCRYPT_H
-#define KACTIONENCRYPT_H
+#ifndef ACTIONENCRYPT_H
+#define ACTIONENCRYPT_H
 
-#include "kactionpage.h"
+#include "actionpage.h"
 
 /**
  * KActionEncrypt class represents QAction object
@@ -9,16 +9,16 @@
  * manager visibility
  */
 
-class KActionEncrypt : public KActionPage {
+class ActionEncrypt : public AbstractActionPage {
 public:
     // constructors
-    KActionEncrypt();
+    ActionEncrypt();
 
     // destructor
-    virtual ~KActionEncrypt();
+    virtual ~ActionEncrypt();
 
 public slots:
     virtual void onActionClick() override;
 };
 
-#endif // KACTIONENCRYPT_H
+#endif // ACTIONENCRYPT_H

@@ -1,5 +1,5 @@
-#ifndef KSERIAL_H
-#define KSERIAL_H
+#ifndef SERIAL_H
+#define SERIAL_H
 
 #include "fileimporter.h"
 #include "keygen.h"
@@ -8,7 +8,7 @@
 #include <QString>
 #include <QMainWindow>
 
-class KSerial final: public QObject{
+class Serial final: public QObject{
 
 private:
     QMainWindow* m_parent;
@@ -22,7 +22,7 @@ private:
 
 public:
     // constructor
-    KSerial(QMainWindow* parent);
+    Serial(QMainWindow* parent);
 
     // methods
     std::string getDir() const;
@@ -39,4 +39,4 @@ private:
     bool dialogConfirm(const std::string& message);
 };
 
-#endif // KSERIAL_H
+#endif // SERIAL_H
