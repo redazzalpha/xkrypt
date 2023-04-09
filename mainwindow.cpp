@@ -2,7 +2,6 @@
 #include "./ui_mainwindow.h"
 #include "enums.h"
 #include "defines.h"
-#include "fileimporter.h"
 #include "kexcept.h"
 #include <QToolButton>
 #include <QPushButton>

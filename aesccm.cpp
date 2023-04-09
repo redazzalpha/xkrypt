@@ -20,7 +20,7 @@ QString AesCCM::getModeName() const
     return AesCCM::AlgName;
 }
 
-string AesCCM::encryptText(const KeyGen& keygen, const string& plain, const Encoding encoding) noexcept(false)
+string AesCCM::encryptText(const KeyGen& keygen, const string& plain, const Encoding encoding) const noexcept(false)
 {
     std::string cipher = "";
     const SecByteBlock& key = keygen.getKey();
@@ -40,7 +40,7 @@ string AesCCM::encryptText(const KeyGen& keygen, const string& plain, const Enco
     StringSource(plain, true, aef);
     return cipher;
 }
-string AesCCM::decryptText(const KeyGen& keygen, const string& cipher, const Encoding encoding) noexcept(false)
+string AesCCM::decryptText(const KeyGen& keygen, const string& cipher, const Encoding encoding) const noexcept(false)
 {
     std::string recover;
     const SecByteBlock& key = keygen.getKey();
@@ -59,11 +59,11 @@ string AesCCM::decryptText(const KeyGen& keygen, const string& cipher, const Enc
 
     return recover;
 }
-bool AesCCM::encryptFile(const KeyGen& keygen, const Encoding encoding) noexcept(false)
+bool AesCCM::encryptFile(const KeyGen& keygen, const Encoding encoding) const noexcept(false)
 {
 
 }
-bool AesCCM::decryptFile(const KeyGen& keygen, const Encoding encoding) noexcept(false)
+bool AesCCM::decryptFile(const KeyGen& keygen, const Encoding encoding) const noexcept(false)
 {
 
 }

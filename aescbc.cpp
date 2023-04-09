@@ -23,7 +23,7 @@ QString AesCBC::getModeName() const
     return AesCBC::ModeName;
 }
 
-string AesCBC::encryptText(const KeyGen& keygen, const string& plain, const Encoding encoding) noexcept(false)
+string AesCBC::encryptText(const KeyGen& keygen, const string& plain, const Encoding encoding) const noexcept(false)
 {
     std::string cipher = "";
     const SecByteBlock& key = keygen.getKey();
@@ -43,7 +43,7 @@ string AesCBC::encryptText(const KeyGen& keygen, const string& plain, const Enco
     StringSource(plain, true, stf);
     return cipher;
 }
-string AesCBC::decryptText(const KeyGen& keygen, const string& cipher, const Encoding encoding) noexcept(false)
+string AesCBC::decryptText(const KeyGen& keygen, const string& cipher, const Encoding encoding) const noexcept(false)
 {
     std::string recover;
     const SecByteBlock& key = keygen.getKey();
@@ -62,14 +62,14 @@ string AesCBC::decryptText(const KeyGen& keygen, const string& cipher, const Enc
 
     return recover;
 }
-bool AesCBC::encryptFile(const KeyGen& keygen, const Encoding encoding) noexcept(false)
+bool AesCBC::encryptFile(const KeyGen& keygen, const Encoding encoding) const noexcept(false)
 {
     bool encrypted = false;
     vector<fstream> files = m_fi->importFiles();
 
     return encrypted;
 }
-bool AesCBC::decryptFile(const KeyGen& keygen, const Encoding encoding) noexcept(false)
+bool AesCBC::decryptFile(const KeyGen& keygen, const Encoding encoding) const noexcept(false)
 {
 
 }
