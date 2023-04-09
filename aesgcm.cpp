@@ -20,7 +20,7 @@ QString AesGCM::getModeName() const
     return AesGCM::AlgName;
 }
 
-string AesGCM::encryptText(const KeyGen& keygen, const string& plain, const Encoding encoding) const noexcept(false)
+string AesGCM::encryptText(const string& plain, const KeyGen& keygen, const Encoding encoding) const noexcept(false)
 {
     std::string cipher = "";
     const SecByteBlock& key = keygen.getKey();
@@ -40,7 +40,7 @@ string AesGCM::encryptText(const KeyGen& keygen, const string& plain, const Enco
     StringSource(plain, true, aef);
     return cipher;
 }
-string AesGCM::decryptText(const KeyGen& keygen, const string& cipher, const Encoding encoding) const noexcept(false)
+string AesGCM::decryptText(const string& cipher, const KeyGen& keygen, const Encoding encoding) const noexcept(false)
 {
     std::string recover;
     const SecByteBlock& key = keygen.getKey();
@@ -59,11 +59,11 @@ string AesGCM::decryptText(const KeyGen& keygen, const string& cipher, const Enc
 
     return recover;
 }
-bool AesGCM::encryptFile(const KeyGen& keygen, const Encoding encoding) const noexcept(false)
+bool AesGCM::encryptFile(const string& fname, const KeyGen& keygen, const Encoding encoding) const noexcept(false)
 {
 
 }
-bool AesGCM::decryptFile(const KeyGen& keygen, const Encoding encoding) const noexcept(false)
+bool AesGCM::decryptFile(const string& fname, const KeyGen& keygen, const Encoding encoding) const noexcept(false)
 {
 
 }

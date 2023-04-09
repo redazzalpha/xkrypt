@@ -363,19 +363,23 @@ void MainWindow::setKeyLoadedSelectable(const bool selectable) const
 // slots
 void MainWindow::on_m_encTabFileImport_clicked()
 {
+    m_fi.importFiles();
     string alg = ui->m_encTabFileAlgs->currentText().toStdString();
     string mode = ui->m_encTabFileModes->currentText().toStdString();
     Encoding encoding = static_cast<Encoding>(ui->m_encTabFileEncodings->currentIndex());
     m_cipherFrom(alg, mode);
-    m_cipher->encryptFile(*m_keygen, encoding);
+    for(const string &fname : m_fi.getFilePaths())
+    m_cipher->encryptFile(fname, *m_keygen, encoding);
 }
 void MainWindow::on_m_decTabFileImport_clicked()
 {
+    m_fi.importFiles();
     string alg = ui->m_decTabFileAlgs->currentText().toStdString();
     string mode = ui->m_decTabFileModes->currentText().toStdString();
     Encoding encoding = static_cast<Encoding>(ui->m_decTabFileEncodings->currentIndex());
     m_cipherFrom(alg, mode);
-    m_cipher->decryptFile(*m_keygen, encoding);
+    for(const string& fname : m_fi.getFilePaths())
+    m_cipher->decryptFile(fname, *m_keygen, encoding);
 
 }
 void MainWindow::on_m_encTabFileEncrypt_clicked()
@@ -398,7 +402,7 @@ void MainWindow::on_m_encTabTextEncrypt_clicked()
         m_cipherFrom(selectedAlg, selectedMode);
 
         if(!m_cipher) throw BadCipherException();
-        string cipherText = m_cipher->encryptText(*m_keygen, plainText, selectedEncoding);
+        string cipherText = m_cipher->encryptText(plainText, *m_keygen, selectedEncoding);
         ui->m_encTabTextField->setPlainText(QString::fromStdString(cipherText));
     }
     catch(exception& e) {
@@ -419,7 +423,7 @@ void MainWindow::on_m_decTabTextDecrypt_clicked()
         m_cipherFrom(selectedAlg, selectedMode);
 
         if(!m_cipher) throw BadCipherException();
-        string recoverText = m_cipher->decryptText(*m_keygen, cipherText, selectedEncoding);
+        string recoverText = m_cipher->decryptText(cipherText, *m_keygen, selectedEncoding);
         ui->m_decTabTextField->setPlainText(QString::fromStdString(recoverText));
     }
     catch(exception& e) {
