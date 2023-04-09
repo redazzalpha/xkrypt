@@ -26,11 +26,11 @@ string RsaSSA::decryptText(const string& cipher, const KeyGen& keygen, const Enc
 {
     std::cout << "cipher Rsa ssa decrypt" << std::endl;
 }
-bool RsaSSA::encryptFile(const string& fname, const KeyGen& keygen, const Encoding encoding) const noexcept(false)
+bool RsaSSA::encryptFile(const string& path, const KeyGen& keygen, const Encoding encoding) const noexcept(false)
 {
 
 }
-bool RsaSSA::decryptFile(const string& fname, const KeyGen& keygen, const Encoding encoding) const noexcept(false)
+bool RsaSSA::decryptFile(const string& path, const KeyGen& keygen, const Encoding encoding) const noexcept(false)
 {
 
 }

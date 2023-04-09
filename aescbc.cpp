@@ -6,6 +6,8 @@
 #include "base64.h"
 #include "modes.h"
 
+#include <regex>
+
 using namespace CryptoPP;
 using namespace std;
 
@@ -63,15 +65,16 @@ string AesCBC::decryptText(const string& cipher, const KeyGen& keygen, const Enc
 
     return recover;
 }
-bool AesCBC::encryptFile(const string& fname, const KeyGen& keygen, const Encoding encoding) const noexcept(false)
+bool AesCBC::encryptFile(const string& path, const KeyGen& keygen, const Encoding encoding) const noexcept(false)
 {
     bool done = false;
+    DirFname dirfname = extractFname(path, "/");
     const SecByteBlock& key = keygen.getKey();
     const SecByteBlock& iv = keygen.getIv();
     CBC_Mode<AES>::Encryption encryptor;
     encryptor.SetKeyWithIV(key, key.size(), iv);
     StreamTransformationFilter* stf = new StreamTransformationFilter(encryptor);
-    FileSink* fs = new FileSink((fname + "_enc").c_str());
+    FileSink* fs = new FileSink((dirfname.m_dir + dirfname.m_delim + encryptText(dirfname.m_fname, keygen, Encoding::HEX)).c_str());
 
     switch(encoding) {
     case Encoding::BASE64 : stf->Attach(new Base64Encoder(fs)); break;
@@ -79,26 +82,25 @@ bool AesCBC::encryptFile(const string& fname, const KeyGen& keygen, const Encodi
     case Encoding::NONE : stf->Attach(fs); break;
     default: stf->Attach(new Base64Encoder(fs));;
     }
-    FileSource(fname.c_str(), true, stf);
+    FileSource(path.c_str(), true, stf);
     return done;
 }
-bool AesCBC::decryptFile(const string& fname, const KeyGen& keygen, const Encoding encoding) const noexcept(false)
+bool AesCBC::decryptFile(const string& path, const KeyGen& keygen, const Encoding encoding) const noexcept(false)
 {
     bool done = false;
+    DirFname dirfname = extractFname(path, "/");
     const SecByteBlock& key = keygen.getKey();
     const SecByteBlock& iv = keygen.getIv();
     CBC_Mode<AES>::Decryption decryptor;
     decryptor.SetKeyWithIV(key, key.size(), iv);
-    FileSink* fs = new FileSink((fname + "_dec").c_str());
+    FileSink* fs = new FileSink((dirfname.m_dir + dirfname.m_delim + decryptText(dirfname.m_fname, keygen, Encoding::HEX)).c_str());
     StreamTransformationFilter* stf  = new StreamTransformationFilter(decryptor, fs);
 
-
-//    FileSource source;
     switch(encoding) {
-    case Encoding::BASE64 : FileSource(fname.c_str(), true, new Base64Decoder(stf)); break;
-    case Encoding::HEX : FileSource(fname.c_str(), true, new HexDecoder(stf)); break;
-    case Encoding::NONE : FileSource(fname.c_str(), true, stf); break;
-    default: FileSource(fname.c_str(), true, new Base64Decoder(stf));
+    case Encoding::BASE64 : FileSource(path.c_str(), true, new Base64Decoder(stf)); break;
+    case Encoding::HEX : FileSource(path.c_str(), true, new HexDecoder(stf)); break;
+    case Encoding::NONE : FileSource(path.c_str(), true, stf); break;
+    default: FileSource(path.c_str(), true, new Base64Decoder(stf));
     }
     return done;
 }
