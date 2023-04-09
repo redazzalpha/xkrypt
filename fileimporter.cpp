@@ -58,6 +58,16 @@ fstream* FileImporter::getFile()
 {
     return m_file;
 }
+
+const std::vector<fstream>& FileImporter::getFiles()
+{
+    return m_files;
+}
+
+const std::vector<string> &FileImporter::getFilePaths()
+{
+    return m_filePaths;
+}
 size_t FileImporter::getFSize()
 {
     size_t fsize = 0;
@@ -94,19 +104,21 @@ fstream* FileImporter::importFile(const string& path)
     setPath(path);
     return newFile(std::ios::in | std::ios::out | std::ios::binary);
 }
-vector<fstream> FileImporter::importFiles()
+const vector<fstream>& FileImporter::importFiles()
 {
-    vector<fstream> files;
     QFileDialog dialog;
     dialog.setFileMode(QFileDialog::ExistingFiles);
     if (dialog.exec()) {
         QStringList paths;
         paths = dialog.selectedFiles();
-        files.clear();
-        foreach(QString path, paths)
-            files.push_back(fstream (path.toStdString(), ios::in | ios::out | ios::binary));
+        m_files.clear();
+        m_filePaths.clear();
+        foreach(QString path, paths) {
+            m_files.push_back(fstream (path.toStdString(), ios::in | ios::out | ios::binary));
+            m_filePaths.push_back(path.toStdString());
+        }
     }
-    return files;
+    return m_files;
 }
 
 fstream* FileImporter::openRead(const string& path)

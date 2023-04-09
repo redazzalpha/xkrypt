@@ -6,7 +6,7 @@
 #include "hex.h"
 #include "qinputdialog.h"
 #include "qpushbutton.h"
-#include "kexcept.h"
+#include "except.h"
 #include <QFileDialog>
 #include <fstream>
 #include<vector>

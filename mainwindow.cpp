@@ -2,7 +2,7 @@
 #include "./ui_mainwindow.h"
 #include "enums.h"
 #include "defines.h"
-#include "kexcept.h"
+#include "except.h"
 #include <QToolButton>
 #include <QPushButton>
 #include <QLabel>
@@ -271,6 +271,12 @@ void MainWindow::on_m_encTabFileImport_clicked()
 }
 void MainWindow::on_m_decTabFileImport_clicked()
 {
+    string alg = ui->m_decTabFileAlgs->currentText().toStdString();
+    string mode = ui->m_decTabFileModes->currentText().toStdString();
+    Encoding encoding = static_cast<Encoding>(ui->m_decTabFileEncodings->currentIndex());
+    m_cipherFrom(alg, mode);
+    m_cipher->decryptFile(*m_keygen, encoding);
+
 }
 void MainWindow::on_m_encTabFileEncrypt_clicked()
 {

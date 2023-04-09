@@ -8,6 +8,8 @@
 class FileImporter {
 private:
     std::fstream* m_file = nullptr;
+    std::vector<std::fstream> m_files;
+    std::vector<std::string> m_filePaths;
     std::string m_dir;
     std::string m_fname;
     std::string m_path;
@@ -32,12 +34,14 @@ public:
     std::string getFname();
     std::string getPath();
     std::fstream* getFile();
+    const std::vector<std::fstream>& getFiles();
+    const std::vector<std::string>& getFilePaths();
     size_t getFSize();
 
     std::fstream* importFile();
     std::fstream* importFile(const std::string& dir, const std::string& fname);
     std::fstream* importFile(const std::string& path);
-    std::vector<std::fstream> importFiles();
+    const std::vector<std::fstream>& importFiles();
 
     std::fstream* openRead(const std::string& path);
     std::fstream* openWriteTrunc(const std::string& path);

@@ -23,8 +23,8 @@ SOURCES += \
     cipheraes.cpp \
     cipherbase.cpp \
     cipherrsa.cpp \
+    except.cpp \
     fileimporter.cpp \
-    kexcept.cpp \
     keygen.cpp \
     main.cpp \
     mainwindow.cpp \
@@ -49,8 +49,8 @@ HEADERS += \
     cipherrsa.h \
     defines.h \
     enums.h \
+    except.h \
     fileimporter.h \
-    kexcept.h \
     keygen.h \
     mainwindow.h \
     rsaoeap.h \

@@ -1,6 +1,7 @@
 #include "aescbc.h"
 #include "aes.h"
 #include "fileimporter.h"
+#include "files.h"
 #include "filters.h"
 #include "hex.h"
 #include "base64.h"
@@ -41,6 +42,7 @@ string AesCBC::encryptText(const KeyGen& keygen, const string& plain, const Enco
     }
 
     StringSource(plain, true, stf);
+
     return cipher;
 }
 string AesCBC::decryptText(const KeyGen& keygen, const string& cipher, const Encoding encoding) const noexcept(false)
@@ -64,14 +66,52 @@ string AesCBC::decryptText(const KeyGen& keygen, const string& cipher, const Enc
 }
 bool AesCBC::encryptFile(const KeyGen& keygen, const Encoding encoding) const noexcept(false)
 {
-    bool encrypted = false;
-    vector<fstream> files = m_fi->importFiles();
+    bool done = false;
+    const vector<fstream>& files = m_fi->importFiles();
+    CBC_Mode<AES>::Encryption encryptor;
+    StreamTransformationFilter* stf;
 
-    return encrypted;
+    const SecByteBlock& key = keygen.getKey();
+    const SecByteBlock& iv = keygen.getIv();
+    encryptor.SetKeyWithIV(key, key.size(), iv);
+
+    for(size_t i = 0; i <  files.size(); i++) {
+        FileSink* fs = new FileSink((m_fi->getFilePaths()[i] + "_enc").c_str());
+        stf  = new StreamTransformationFilter(encryptor);
+
+        switch(encoding) {
+        case Encoding::BASE64 : stf->Attach(new Base64Encoder(fs)); break;
+        case Encoding::HEX : stf->Attach(new HexEncoder(fs)); break;
+        case Encoding::NONE : stf->Attach(fs); break;
+        default: stf->Attach(new Base64Encoder(fs));;
+        }
+        FileSource(const_cast<fstream&>(files[i]), true, stf);
+    }
+    return done;
 }
 bool AesCBC::decryptFile(const KeyGen& keygen, const Encoding encoding) const noexcept(false)
 {
+    bool done = false;
+    const vector<fstream>& files = m_fi->importFiles();
+    CBC_Mode<AES>::Decryption decryptor;
+    StreamTransformationFilter* stf;
 
+    const SecByteBlock& key = keygen.getKey();
+    const SecByteBlock& iv = keygen.getIv();
+    decryptor.SetKeyWithIV(key, key.size(), iv);
+
+    for(size_t i = 0; i <  files.size(); i++) {
+        FileSink* fs = new FileSink((m_fi->getFilePaths()[i] + "_dec").c_str());
+        stf  = new StreamTransformationFilter(decryptor, fs);
+        FileSource source;
+        switch(encoding) {
+        case Encoding::BASE64 : FileSource(const_cast<fstream&>(files[i]), true, new Base64Decoder(stf)); break;
+        case Encoding::HEX : FileSource(const_cast<fstream&>(files[i]), true, new HexDecoder(stf)); break;
+        case Encoding::NONE : FileSource(const_cast<fstream&>(files[i]), true, stf); break;
+        default: FileSource(const_cast<fstream&>(files[i]), true, new Base64Decoder(stf));
+        }
+    }
+    return done;
 }
 
 

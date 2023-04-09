@@ -1,5 +1,5 @@
-#ifndef KEXCEPT_H
-#define KEXCEPT_H
+#ifndef EXCEPT_H
+#define EXCEPT_H
 
 #include <exception>
 
@@ -97,4 +97,4 @@ public:
     virtual const char* what() const noexcept;
 };
 
-#endif // KEXCEPT_H
+#endif // EXCEPT_H
