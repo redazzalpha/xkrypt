@@ -87,7 +87,9 @@ void MainWindow::connectItems() const
     QObject::connect(ui->m_keyMFlush, &QPushButton::clicked, this, &MainWindow::flushKey);
 
     // connect plain texts
-    QObject::connect(ui->m_keyMLoaded, &QPlainTextEdit::textChanged, this, &MainWindow::colorKey);
+    QObject::connect(ui->m_keyMLoaded, &QPlainTextEdit::textChanged, this, &MainWindow::colorKeyLoaded);
+    QObject::connect(ui->m_encTabFileSelected, &QPlainTextEdit::textChanged, this, &MainWindow::colorFilesLoaded);
+    QObject::connect(ui->m_decTabFileSelected, &QPlainTextEdit::textChanged, this, &MainWindow::colorFilesLoaded);
 
     // create and connect actions
     foreach (AbstractActionBase* action, m_actions) {
@@ -148,13 +150,12 @@ void MainWindow::saveSuccess(Encoding encoding) {
 void MainWindow::importSymmectric()
 {
     try {
+        m_fimporterKey.clear();
         Encoding encoding = static_cast<Encoding>(ui->m_keyMEncodingsI->currentIndex());
-        bool imported = m_serial.importKeygen(m_keygen, (ifstream*)m_fi.importFile());
+        bool imported = m_serial.importKeygen(m_keygen, (ifstream*)m_fimporterKey.importFile());
         if(m_keygen->isReady() && imported) {
-
             string keyStr = m_serial.keyToString(*m_keygen, encoding);
             setKeyLoadedText(QString::fromStdString(keyStr));
-            colorKey();
 
             string message = "key " + std::to_string(m_keygen->getKey().size()) + " bytes - encoded ";
             message += m_serial.encodingToString(encoding);
@@ -175,24 +176,24 @@ void MainWindow::m_cipherFrom(const string& alg, const string& mode)
     m_cipher = nullptr;
 
     // aes algs
-    if(QString::fromStdString(alg) == AbstractCipherAes::AlgName) {
+    if(alg == AbstractCipherAes::AlgName) {
 
-        if(QString::fromStdString(mode) == AesCBC::ModeName) m_cipher = new AesCBC;
-        else if(QString::fromStdString(mode) == AesEAX::ModeName) m_cipher = new AesEAX;
-        else if(QString::fromStdString(mode) == AesGCM::ModeName) m_cipher = new AesGCM;
-        else if(QString::fromStdString(mode) == AesCCM::ModeName) m_cipher = new AesCCM;
-        else if(QString::fromStdString(mode) == AesGCM::ModeName) m_cipher = new AesGCM;
-        else if(QString::fromStdString(mode) == AesGCM::ModeName) m_cipher = new AesGCM;
-        else if(QString::fromStdString(mode) == AesGCM::ModeName) m_cipher = new AesGCM;
-        else if(QString::fromStdString(mode) == AesGCM::ModeName) m_cipher = new AesGCM;
+        if(mode == AesCBC::ModeName) m_cipher = new AesCBC;
+        else if(mode == AesEAX::ModeName) m_cipher = new AesEAX;
+        else if(mode == AesGCM::ModeName) m_cipher = new AesGCM;
+        else if(mode == AesCCM::ModeName) m_cipher = new AesCCM;
+        else if(mode == AesGCM::ModeName) m_cipher = new AesGCM;
+        else if(mode == AesGCM::ModeName) m_cipher = new AesGCM;
+        else if(mode == AesGCM::ModeName) m_cipher = new AesGCM;
+        else if(mode == AesGCM::ModeName) m_cipher = new AesGCM;
         // default. shouldn't go here but used to remove clang warnings
         else m_cipher = new AesCBC;
     }
 
     // rsa algs
-    else if(QString::fromStdString(alg) == AbstractCipherRsa::AlgName) {
-        if(QString::fromStdString(mode) == RsaOEAP::ModeName) m_cipher = new RsaOEAP;
-        else if(QString::fromStdString(mode) == RsaSSA::ModeName) m_cipher = new RsaSSA;
+    else if(alg == AbstractCipherRsa::AlgName) {
+        if(mode == RsaOEAP::ModeName) m_cipher = new RsaOEAP;
+        else if(mode == RsaSSA::ModeName) m_cipher = new RsaSSA;
         // default. shouldn't go here but used to remove clang warnings
         else m_cipher = new RsaOEAP;
     }
@@ -338,6 +339,11 @@ void MainWindow::keyLoadedSelectable(const Qt::TextInteractionFlags flags) const
     ui->m_encTabTextLoaded->setTextInteractionFlags(flags);
     ui->m_decTabTextLoaded->setTextInteractionFlags(flags);
 }
+void MainWindow::setFilesLoadedStyle(const QString& style) const
+{
+    QPlainTextEdit* sender = static_cast<QPlainTextEdit*>(QObject::sender());
+    sender->setStyleSheet(style);
+}
 void MainWindow::setKeyLoadedStyle(const QString& style) const
 {
     ui->m_keyMLoaded->setStyleSheet(style);
@@ -363,30 +369,69 @@ void MainWindow::setKeyLoadedSelectable(const bool selectable) const
 // slots
 void MainWindow::on_m_encTabFileImport_clicked()
 {
-    m_fi.importFiles();
-    string alg = ui->m_encTabFileAlgs->currentText().toStdString();
-    string mode = ui->m_encTabFileModes->currentText().toStdString();
-    Encoding encoding = static_cast<Encoding>(ui->m_encTabFileEncodings->currentIndex());
-    m_cipherFrom(alg, mode);
-    for(const string &fname : m_fi.getFilePaths())
-    m_cipher->encryptFile(fname, *m_keygen, encoding);
+    m_fimporterEnc.clear();
+    m_fimporterEnc.importFiles();
+    stringstream ss;
+
+    for(const string& path : m_fimporterEnc.getFilePaths()) ss << path << "\n";
+    ui->m_encTabFileSelected->setPlainText(QString::fromStdString(ss.str()));
 }
 void MainWindow::on_m_decTabFileImport_clicked()
 {
-    m_fi.importFiles();
-    string alg = ui->m_decTabFileAlgs->currentText().toStdString();
-    string mode = ui->m_decTabFileModes->currentText().toStdString();
-    Encoding encoding = static_cast<Encoding>(ui->m_decTabFileEncodings->currentIndex());
-    m_cipherFrom(alg, mode);
-    for(const string& fname : m_fi.getFilePaths())
-    m_cipher->decryptFile(fname, *m_keygen, encoding);
+    m_fimporterDec.clear();
+    m_fimporterDec.importFiles();
+    stringstream ss;
 
+    for(const string& path : m_fimporterDec.getFilePaths()) ss << path << "\n";
+    ui->m_decTabFileSelected->setPlainText(QString::fromStdString(ss.str()));
 }
 void MainWindow::on_m_encTabFileEncrypt_clicked()
 {
+    try {
+        if(m_fimporterEnc.getFilePaths().size() < 1)
+            throw FileSelectedException();
+        string alg = ui->m_encTabFileAlgs->currentText().toStdString();
+        string mode = ui->m_encTabFileModes->currentText().toStdString();
+        Encoding encoding = static_cast<Encoding>(ui->m_encTabFileEncodings->currentIndex());
+        m_cipherFrom(alg, mode);
+        for(const string &fname : m_fimporterEnc.getFilePaths())
+            m_cipher->encryptFile(fname, *m_keygen, encoding);
+        string message = "file(s) successfully encrypted!<br />";
+        message += "Using: " + m_cipher->getAlgName() += (" - " + m_cipher->getModeName()) + " mode";
+        dialogSuccessMessage(message);
+    }
+    catch(exception& e) {
+        dialogErrorMessage(e.what());
+    }
 }
 void MainWindow::on_m_decTabFileDecrypt_clicked()
 {
+    try {
+        if(m_fimporterDec.getFilePaths().size() < 1)
+            throw FileSelectedException();
+        string alg = ui->m_decTabFileAlgs->currentText().toStdString();
+        string mode = ui->m_decTabFileModes->currentText().toStdString();
+        Encoding encoding = static_cast<Encoding>(ui->m_decTabFileEncodings->currentIndex());
+        m_cipherFrom(alg, mode);
+        for(const string &fname : m_fimporterDec.getFilePaths())
+            m_cipher->decryptFile(fname, *m_keygen, encoding);
+        string message = "file(s) successfully decrypted!<br />";
+        message += "Using: " + m_cipher->getAlgName() += (" - " + m_cipher->getModeName()) + " mode";
+        dialogSuccessMessage(message);
+    }
+    catch(exception& e) {
+        dialogErrorMessage(e.what());
+    }
+}
+void MainWindow::on_m_encTabFileClear_clicked()
+{
+    m_fimporterEnc.clear();
+    ui->m_encTabFileSelected->setPlainText(NO_FILE_LOADED);
+}
+void MainWindow::on_m_decTabFileClear_clicked()
+{
+    m_fimporterDec.clear();
+    ui->m_decTabFileSelected->setPlainText(NO_FILE_LOADED);
 }
 
 void MainWindow::on_m_encTabTextEncrypt_clicked()
@@ -408,7 +453,6 @@ void MainWindow::on_m_encTabTextEncrypt_clicked()
     catch(exception& e) {
         dialogErrorMessage(e.what());
     }
-
 }
 void MainWindow::on_m_decTabTextDecrypt_clicked()
 {
@@ -447,7 +491,7 @@ void MainWindow::on_m_keyMGenerate_clicked()
 }
 void MainWindow::on_m_keyMImport_clicked()
 {
-    QString type = ui->m_keyMType->currentText();
+    string type = ui->m_keyMType->currentText().toStdString();
     if(type == AbstractCipherAes::AlgName) importSymmectric();
     if(type == AbstractCipherRsa::AlgName)importAsymmectric();
 }
@@ -461,9 +505,9 @@ void MainWindow::setComboModes(const QString& alg)
     QComboBox* mode = parent->findChild<QComboBox*>(QString::fromStdString(modeName));
 
     mode->clear();
-    if(alg == AbstractCipherAes::AlgName)
+    if(alg.toStdString() == AbstractCipherAes::AlgName)
         mode->addItems(*m_aesModes);
-    if(alg == AbstractCipherRsa::AlgName)
+    if(alg.toStdString() == AbstractCipherRsa::AlgName)
         mode->addItems(*m_rsaModes);
 }
 void MainWindow::hideKey(const bool isChecked)
@@ -479,9 +523,10 @@ void MainWindow::hideKey(const bool isChecked)
         setKeyLoadedSelectable(true);
     }
 }
-void MainWindow::colorKey()
+void MainWindow::colorKeyLoaded()
 {
-    bool isEmpty = ui->m_keyMLoaded->toPlainText() == QString::fromStdString(NO_KEY_LOADED);
+    QPlainTextEdit* sender = static_cast<QPlainTextEdit*>(QObject::sender());
+    bool isEmpty = sender->toPlainText() == QString::fromStdString(NO_KEY_LOADED);
     if(ui->m_keyMHide->isChecked())
         setKeyLoadedStyle(STYLE_BLANK);
     else {
@@ -489,12 +534,25 @@ void MainWindow::colorKey()
         else setKeyLoadedStyle(STYLE_NORMAL);
     }
 }
+void MainWindow::colorFilesLoaded()
+{
+    QPlainTextEdit* sender = static_cast<QPlainTextEdit*>(QObject::sender());
+    bool isEmpty = sender->toPlainText() == QString::fromStdString(NO_FILE_LOADED);
+
+    if(isEmpty) setFilesLoadedStyle(STYLE_RED);
+    else setFilesLoadedStyle(STYLE_NORMAL);
+
+}
 void MainWindow::flushKey()
 {
     m_keygen->flush();
     ui->m_keyMHide->setChecked(false);
     setKeyLoadedText(NO_KEY_LOADED);
 }
+
+
+
+
 
 
 

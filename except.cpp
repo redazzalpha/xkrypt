@@ -73,3 +73,11 @@ const char*  BadCipherException::what() const noexcept
 {
     return m_message;
 }
+FileSelectedException::FileSelectedException(const char* message)
+{
+    m_message = message;
+}
+const char*  FileSelectedException::what() const noexcept
+{
+    return m_message;
+}

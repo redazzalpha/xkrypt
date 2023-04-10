@@ -4,7 +4,7 @@
 
 using namespace std;
 
-const QString AbstractCipherAes::AlgName = "Symmectric - Aes";
+const std::string AbstractCipherAes::AlgName = "Symmectric - Aes";
 
 // constructors
 AbstractCipherAes::AbstractCipherAes() {}
@@ -13,7 +13,7 @@ AbstractCipherAes::AbstractCipherAes() {}
 AbstractCipherAes::~AbstractCipherAes() {};
 
 // virtual methods
-QString AbstractCipherAes::getAlgName() const
+std::string AbstractCipherAes::getAlgName() const
 {
     return AbstractCipherAes::AlgName;
 }

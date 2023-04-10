@@ -11,7 +11,7 @@
 
 class AbstractCipherRsa : public AbstractCipherBase {
 public:
-    static const QString AlgName;
+    static const std::string AlgName;
 
     // constructors
     AbstractCipherRsa();
@@ -20,13 +20,13 @@ public:
     virtual ~AbstractCipherRsa();
 
     // methods
-    virtual QString getAlgName() const final;
-    virtual QString getModeName() const override = 0;
+    virtual std::string getAlgName() const final;
+    virtual std::string getModeName() const override = 0;
 
     virtual std::string encryptText(const std::string& plain, const KeyGen& keygen, const Encoding encoding) const noexcept(false) override = 0;
     virtual std::string decryptText(const std::string& cipher, const KeyGen& keygen, const Encoding encoding) const noexcept(false) override = 0;
-    virtual bool encryptFile(const std::string& path, const KeyGen& keygen, const Encoding encoding) const noexcept(false) override = 0;
-    virtual bool decryptFile(const std::string& path, const KeyGen& keygen, const Encoding encoding) const noexcept(false) override = 0;
+    virtual void encryptFile(const std::string& path, const KeyGen& keygen, const Encoding encoding) const noexcept(false) override = 0;
+    virtual void decryptFile(const std::string& path, const KeyGen& keygen, const Encoding encoding) const noexcept(false) override = 0;
 };
 
 #endif // CIPHERRSA_H

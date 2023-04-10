@@ -96,5 +96,16 @@ public:
     // methods
     virtual const char* what() const noexcept;
 };
+class FileSelectedException : public std::exception {
+private:
+    const char* m_message;
+
+public:
+    // constructors
+    FileSelectedException(const char* message = "-- error: wrong file(s) selected");
+
+    // methods
+    virtual const char* what() const noexcept;
+};
 
 #endif // EXCEPT_H

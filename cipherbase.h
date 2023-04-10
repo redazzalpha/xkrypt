@@ -4,7 +4,6 @@
 #include "keygen.h"
 #include "structures.h"
 #include <QObject>
-#include <QString>
 #include <iostream>
 
 /**
@@ -23,15 +22,16 @@ public:
     virtual ~AbstractCipherBase();
 
     // methods
-    virtual QString getAlgName() const = 0;
-    virtual QString getModeName() const = 0;
+    virtual std::string getAlgName() const = 0;
+    virtual std::string getModeName() const = 0;
 
     virtual std::string encryptText(const std::string& plain, const KeyGen& keygen, const Encoding encoding) const noexcept(false) = 0;
     virtual std::string decryptText(const std::string& cipher, const KeyGen& keygen, const Encoding encoding) const noexcept(false) = 0;
-    virtual bool encryptFile(const std::string& path, const KeyGen& keygen, const Encoding encoding) const noexcept(false) = 0;
-    virtual bool decryptFile(const std::string& path, const KeyGen& keygen, const Encoding encoding) const noexcept(false) = 0;
+    virtual void encryptFile(const std::string& path, const KeyGen& keygen, const Encoding encoding) const noexcept(false) = 0;
+    virtual void decryptFile(const std::string& path, const KeyGen& keygen, const Encoding encoding) const noexcept(false) = 0;
 
 protected :
+    void removeFile(const std::string& filePath) const;
     DirFname extractFname(const std::string& path, const std::string& delim) const;
 };
 

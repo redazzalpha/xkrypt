@@ -6,7 +6,7 @@
 using namespace CryptoPP;
 using namespace std;
 
-const QString AesGCM::ModeName = "GCM";
+const std::string AesGCM::ModeName = "GCM";
 
 // constructors
 AesGCM::AesGCM(){}
@@ -15,7 +15,7 @@ AesGCM::AesGCM(){}
 AesGCM::~AesGCM(){};
 
 // virtual methods
-QString AesGCM::getModeName() const
+std::string AesGCM::getModeName() const
 {
     return AesGCM::AlgName;
 }
@@ -59,11 +59,11 @@ string AesGCM::decryptText(const string& cipher, const KeyGen& keygen, const Enc
 
     return recover;
 }
-bool AesGCM::encryptFile(const string& path, const KeyGen& keygen, const Encoding encoding) const noexcept(false)
+void AesGCM::encryptFile(const string& path, const KeyGen& keygen, const Encoding encoding) const noexcept(false)
 {
 
 }
-bool AesGCM::decryptFile(const string& path, const KeyGen& keygen, const Encoding encoding) const noexcept(false)
+void AesGCM::decryptFile(const string& path, const KeyGen& keygen, const Encoding encoding) const noexcept(false)
 {
 
 }

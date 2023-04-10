@@ -1,6 +1,6 @@
 #include "cipherrsa.h"
 
-const QString AbstractCipherRsa::AlgName = "Asymmectric - Rsa";
+const std::string AbstractCipherRsa::AlgName = "Asymmectric - Rsa";
 
 // constructors
 AbstractCipherRsa::AbstractCipherRsa(){}
@@ -9,7 +9,7 @@ AbstractCipherRsa::AbstractCipherRsa(){}
 AbstractCipherRsa::~AbstractCipherRsa() {};
 
 // virtual methods
-QString AbstractCipherRsa::getAlgName() const
+std::string AbstractCipherRsa::getAlgName() const
 {
     return AbstractCipherRsa::AlgName;
 }

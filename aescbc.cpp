@@ -11,7 +11,7 @@
 using namespace CryptoPP;
 using namespace std;
 
-const QString AesCBC::ModeName = "CBC";
+const std::string AesCBC::ModeName = "CBC";
 
 // constructors
 AesCBC::AesCBC() {}
@@ -20,7 +20,7 @@ AesCBC::AesCBC() {}
 AesCBC::~AesCBC() {};
 
 // virtual methods
-QString AesCBC::getModeName() const
+std::string AesCBC::getModeName() const
 {
     return AesCBC::ModeName;
 }
@@ -65,9 +65,8 @@ string AesCBC::decryptText(const string& cipher, const KeyGen& keygen, const Enc
 
     return recover;
 }
-bool AesCBC::encryptFile(const string& path, const KeyGen& keygen, const Encoding encoding) const noexcept(false)
+void AesCBC::encryptFile(const string& path, const KeyGen& keygen, const Encoding encoding) const noexcept(false)
 {
-    bool done = false;
     DirFname dirfname = extractFname(path, "/");
     const SecByteBlock& key = keygen.getKey();
     const SecByteBlock& iv = keygen.getIv();
@@ -83,11 +82,10 @@ bool AesCBC::encryptFile(const string& path, const KeyGen& keygen, const Encodin
     default: stf->Attach(new Base64Encoder(fs));;
     }
     FileSource(path.c_str(), true, stf);
-    return done;
+    removeFile(path);
 }
-bool AesCBC::decryptFile(const string& path, const KeyGen& keygen, const Encoding encoding) const noexcept(false)
+void AesCBC::decryptFile(const string& path, const KeyGen& keygen, const Encoding encoding) const noexcept(false)
 {
-    bool done = false;
     DirFname dirfname = extractFname(path, "/");
     const SecByteBlock& key = keygen.getKey();
     const SecByteBlock& iv = keygen.getIv();
@@ -102,7 +100,7 @@ bool AesCBC::decryptFile(const string& path, const KeyGen& keygen, const Encodin
     case Encoding::NONE : FileSource(path.c_str(), true, stf); break;
     default: FileSource(path.c_str(), true, new Base64Decoder(stf));
     }
-    return done;
+    removeFile(path);
 }
 
 

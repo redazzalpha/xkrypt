@@ -33,7 +33,7 @@
      <enum>QFrame::NoFrame</enum>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="m_pageKeyM">
      <widget class="QWidget" name="verticalLayoutWidget">
@@ -639,20 +639,53 @@
           </spacer>
          </item>
          <item>
-          <widget class="QPushButton" name="m_encTabFileImport">
-           <property name="maximumSize">
-            <size>
-             <width>100</width>
-             <height>16777215</height>
-            </size>
-           </property>
-           <property name="text">
-            <string>&amp;Select file(s)</string>
-           </property>
-           <property name="shortcut">
-            <string>Ctrl+S</string>
-           </property>
-          </widget>
+          <layout class="QHBoxLayout" name="hlayout_12">
+           <item>
+            <widget class="QPushButton" name="m_encTabFileImport">
+             <property name="maximumSize">
+              <size>
+               <width>100</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>&amp;Select file(s)</string>
+             </property>
+             <property name="shortcut">
+              <string>Ctrl+S</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="m_encTabFileClear">
+             <property name="maximumSize">
+              <size>
+               <width>100</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>&amp;Clear</string>
+             </property>
+             <property name="shortcut">
+              <string>Ctrl+C</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_2">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
          </item>
          <item>
           <widget class="QPlainTextEdit" name="m_encTabFileSelected">
@@ -1223,20 +1256,53 @@
           </spacer>
          </item>
          <item>
-          <widget class="QPushButton" name="m_decTabFileImport">
-           <property name="maximumSize">
-            <size>
-             <width>100</width>
-             <height>16777215</height>
-            </size>
-           </property>
-           <property name="text">
-            <string>&amp;Select file(s)</string>
-           </property>
-           <property name="shortcut">
-            <string>Ctrl+S</string>
-           </property>
-          </widget>
+          <layout class="QHBoxLayout" name="hlayout_13">
+           <item>
+            <widget class="QPushButton" name="m_decTabFileImport">
+             <property name="maximumSize">
+              <size>
+               <width>100</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>&amp;Select file(s)</string>
+             </property>
+             <property name="shortcut">
+              <string>Ctrl+S</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="m_decTabFileClear">
+             <property name="maximumSize">
+              <size>
+               <width>100</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>&amp;Clear</string>
+             </property>
+             <property name="shortcut">
+              <string>Ctrl+C</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_3">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
          </item>
          <item>
           <widget class="QPlainTextEdit" name="m_decTabFileSelected">

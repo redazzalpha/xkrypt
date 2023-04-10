@@ -4,7 +4,7 @@
 using namespace CryptoPP;
 using namespace std;
 
-const QString RsaSSA::ModeName = "SSA";
+const std::string RsaSSA::ModeName = "SSA";
 
 // constructors
 RsaSSA::RsaSSA() {}
@@ -13,7 +13,7 @@ RsaSSA::RsaSSA() {}
 RsaSSA::~RsaSSA() {};
 
 // virtual methods
-QString RsaSSA::getModeName() const
+std::string RsaSSA::getModeName() const
 {
     return RsaSSA::ModeName;
 }
@@ -26,11 +26,11 @@ string RsaSSA::decryptText(const string& cipher, const KeyGen& keygen, const Enc
 {
     std::cout << "cipher Rsa ssa decrypt" << std::endl;
 }
-bool RsaSSA::encryptFile(const string& path, const KeyGen& keygen, const Encoding encoding) const noexcept(false)
+void  RsaSSA::encryptFile(const string& path, const KeyGen& keygen, const Encoding encoding) const noexcept(false)
 {
 
 }
-bool RsaSSA::decryptFile(const string& path, const KeyGen& keygen, const Encoding encoding) const noexcept(false)
+void RsaSSA::decryptFile(const string& path, const KeyGen& keygen, const Encoding encoding) const noexcept(false)
 {
 
 }

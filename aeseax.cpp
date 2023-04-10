@@ -7,7 +7,7 @@
 using namespace CryptoPP;
 using namespace std;
 
-const QString AesEAX::ModeName = "EAX";
+const std::string AesEAX::ModeName = "EAX";
 
 // constructors
 AesEAX::AesEAX() {}
@@ -16,7 +16,7 @@ AesEAX::AesEAX() {}
 AesEAX::~AesEAX() {};
 
 // virtual methods
-QString AesEAX::getModeName() const {
+std::string AesEAX::getModeName() const {
     return AesEAX::ModeName;
 }
 
@@ -59,11 +59,11 @@ string AesEAX::decryptText(const string& cipher, const KeyGen& keygen, const Enc
 
     return recover;
 }
-bool AesEAX::encryptFile(const string& path, const KeyGen& keygen, const Encoding encoding) const noexcept(false)
+void AesEAX::encryptFile(const string& path, const KeyGen& keygen, const Encoding encoding) const noexcept(false)
 {
 
 }
-bool AesEAX::decryptFile(const string& path, const KeyGen& keygen, const Encoding encoding) const noexcept(false)
+void AesEAX::decryptFile(const string& path, const KeyGen& keygen, const Encoding encoding) const noexcept(false)
 {
 
 }

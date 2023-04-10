@@ -3,7 +3,7 @@
 using namespace CryptoPP;
 using namespace std;
 
-const QString RsaOEAP::ModeName = "ES-OAEP-SHA";
+const std::string RsaOEAP::ModeName = "ES-OAEP-SHA";
 
 // constructors
 RsaOEAP::RsaOEAP() {}
@@ -12,7 +12,7 @@ RsaOEAP::RsaOEAP() {}
 RsaOEAP::~RsaOEAP() {};
 
 // methods
-QString RsaOEAP::getModeName() const
+std::string RsaOEAP::getModeName() const
 {
     return RsaOEAP::ModeName;
 }
@@ -25,11 +25,11 @@ string RsaOEAP::decryptText(const string& cipher, const KeyGen& keygen, const En
 {
     std::cout << "cipher Rsa oeap decrypt" << std::endl;
 }
-bool RsaOEAP::encryptFile(const string& path, const KeyGen& keygen, const Encoding encoding) const noexcept(false)
+void RsaOEAP::encryptFile(const string& path, const KeyGen& keygen, const Encoding encoding) const noexcept(false)
 {
 
 }
-bool RsaOEAP::decryptFile(const string& path, const KeyGen& keygen, const Encoding encoding) const noexcept(false)
+void  RsaOEAP::decryptFile(const string& path, const KeyGen& keygen, const Encoding encoding) const noexcept(false)
 {
 
 }

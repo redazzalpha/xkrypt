@@ -10,10 +10,10 @@ private:
     std::fstream* m_file = nullptr;
     std::vector<std::fstream> m_files;
     std::vector<std::string> m_filePaths;
+    const std::string m_delim = "/";
     std::string m_dir;
     std::string m_fname;
     std::string m_path;
-    const std::string m_delim = "/";
 
 public:
     // constructors
@@ -45,6 +45,8 @@ public:
     std::fstream* openRead(const std::string& path);
     std::fstream* openWriteTrunc(const std::string& path);
     std::fstream* openWriteApp(const std::string& path);
+
+    void clear();
 
 private:
     void setDirFname(const std::string& path);

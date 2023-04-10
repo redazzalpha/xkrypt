@@ -31,7 +31,9 @@ class MainWindow : public QMainWindow {
 private:
     Ui::MainWindow *ui;
     Serial m_serial;
-    FileImporter m_fi;
+    FileImporter m_fimporterEnc;
+    FileImporter m_fimporterDec;
+    FileImporter m_fimporterKey;
     std::string m_fname;
     std::string m_dir;
     KeyGen* m_keygen = new KeyGen;
@@ -44,18 +46,18 @@ private:
         new ActionQuit(),
     };
     QList<QString>* m_algorithms = new QList<QString> {
-        AbstractCipherAes::AlgName,
-        AbstractCipherRsa::AlgName
+        QString::fromStdString(AbstractCipherAes::AlgName),
+        QString::fromStdString(AbstractCipherRsa::AlgName),
     };
     QList<QString>* m_aesModes = new QList<QString>{
-        AesCBC::ModeName,
-        AesEAX::ModeName,
-        AesGCM::ModeName,
-        AesCCM::ModeName,
+        QString::fromStdString(AesCBC::ModeName),
+        QString::fromStdString(AesEAX::ModeName),
+        QString::fromStdString(AesGCM::ModeName),
+        QString::fromStdString(AesCCM::ModeName),
     };
     QList<QString>* m_rsaModes = new QList<QString>{
-        RsaOEAP::ModeName,
-        RsaSSA::ModeName,
+        QString::fromStdString(RsaOEAP::ModeName),
+        QString::fromStdString(RsaSSA::ModeName),
     };
     QList<QString>* m_aesKeys = new QList<QString>{
         QString::number(static_cast<int>(KeyLength::LENGTH_DEFAULT)),
@@ -110,6 +112,7 @@ private:
 
     void keyLoadedSelectable(const Qt::TextInteractionFlags flags) const;
     void setKeyLoadedStyle(const QString &style) const;
+    void setFilesLoadedStyle(const QString &style) const;
     void setKeyLoadedText(const QString &keyStr) const;
     void setKeyLoadedSelectable(const bool selectable) const;
 
@@ -118,6 +121,8 @@ private slots:
     void on_m_decTabFileImport_clicked();
     void on_m_encTabFileEncrypt_clicked();
     void on_m_decTabFileDecrypt_clicked();
+    void on_m_encTabFileClear_clicked();
+
 
     void on_m_encTabTextEncrypt_clicked();
     void on_m_decTabTextDecrypt_clicked();
@@ -129,7 +134,9 @@ private slots:
 
     void setComboModes(const QString& alg);
     void hideKey(const bool isChecked);
-    void colorKey();
+    void colorKeyLoaded();
+    void colorFilesLoaded();
     void flushKey();
+    void on_m_decTabFileClear_clicked();
 };
 #endif // MAINWINDOW_H

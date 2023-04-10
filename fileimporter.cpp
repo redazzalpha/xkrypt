@@ -137,6 +137,17 @@ fstream* FileImporter::openWriteApp(const string& path)
     return newFile(std::ios::out | std::ios::app | std::ios::binary);
 }
 
+void FileImporter::clear()
+{
+    delete m_file;
+    m_file = nullptr;
+    m_files.clear();
+    m_filePaths.clear();
+    m_path = "";
+    m_dir = "";
+    m_fname = "";
+}
+
 // private methods
 void FileImporter::setDirFname(const std::string& path)
 {
