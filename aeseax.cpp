@@ -1,5 +1,6 @@
 #include "aeseax.h"
 #include "eax.h"
+#include "files.h"
 
 #include <base64.h>
 #include <hex.h>
@@ -36,7 +37,6 @@ string AesEAX::encryptText(const string& plain, const KeyGen& keygen, const Enco
     case Encoding::NONE : aef->Attach(ss); break;
     default: aef->Attach(new Base64Encoder(ss));;
     }
-
     StringSource(plain, true, aef);
     return cipher;
 }
@@ -56,15 +56,44 @@ string AesEAX::decryptText(const string& cipher, const KeyGen& keygen, const Enc
     case Encoding::NONE : StringSource(cipher, true, aef); break;
     default: StringSource(cipher, true, new Base64Decoder(aef));
     }
-
     return recover;
 }
 void AesEAX::encryptFile(const string& path, const KeyGen& keygen, const Encoding encoding) const noexcept(false)
 {
+    DirFname dirfname = extractFname(path, m_delim);
+    const SecByteBlock& key = keygen.getKey();
+    const SecByteBlock& iv = keygen.getIv();
+    EAX<AES>::Encryption encryptor;
+    encryptor.SetKeyWithIV(key, key.size(), iv);
+    AuthenticatedEncryptionFilter* aef = new AuthenticatedEncryptionFilter(encryptor);
+    FileSink* fs = new FileSink((dirfname.m_dir + dirfname.m_delim + encryptText(dirfname.m_fname, keygen, Encoding::HEX)).c_str());
+
+    switch(encoding) {
+    case Encoding::BASE64 : aef->Attach(new Base64Encoder(fs)); break;
+    case Encoding::HEX : aef->Attach(new HexEncoder(fs)); break;
+    case Encoding::NONE : aef->Attach(fs); break;
+    default: aef->Attach(new Base64Encoder(fs));;
+    }
+    FileSource(path.c_str(), true, aef);
+    removeFile(path);
 
 }
 void AesEAX::decryptFile(const string& path, const KeyGen& keygen, const Encoding encoding) const noexcept(false)
 {
+    DirFname dirfname = extractFname(path, m_delim);
+    const SecByteBlock& key = keygen.getKey();
+    const SecByteBlock& iv = keygen.getIv();
+    EAX<AES>::Decryption decryptor;
+    decryptor.SetKeyWithIV(key, key.size(), iv);
+    FileSink* fs = new FileSink((dirfname.m_dir + dirfname.m_delim + decryptText(dirfname.m_fname, keygen, Encoding::HEX)).c_str());
+    AuthenticatedDecryptionFilter* aef = new AuthenticatedDecryptionFilter(decryptor, fs);
 
+    switch(encoding) {
+    case Encoding::BASE64 : FileSource(path.c_str(), true, new Base64Decoder(aef)); break;
+    case Encoding::HEX : FileSource(path.c_str(), true, new HexDecoder(aef)); break;
+    case Encoding::NONE : FileSource(path.c_str(), true, aef); break;
+    default: FileSource(path.c_str(), true, new Base64Decoder(aef));
+    }
+    removeFile(path);
 }
 

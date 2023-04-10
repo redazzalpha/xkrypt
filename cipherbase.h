@@ -14,6 +14,9 @@
 class AbstractCipherBase : public QObject {
     Q_OBJECT
 
+protected:
+    const std::string m_delim = "/";
+
 public:
     // constructors
     AbstractCipherBase();

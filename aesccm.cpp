@@ -1,7 +1,8 @@
 #include "aesccm.h"
 #include "base64.h"
+#include "files.h"
 #include "hex.h"
-#include "gcm.h"
+#include "ccm.h"
 
 using namespace CryptoPP;
 using namespace std;
@@ -26,7 +27,7 @@ string AesCCM::encryptText(const string& plain, const KeyGen& keygen, const Enco
     const SecByteBlock& key = keygen.getKey();
     const SecByteBlock& iv = keygen.getIv();
     StringSink* ss = new StringSink(cipher);
-    GCM<AES>::Encryption encryptor;
+    CCM<AES>::Encryption encryptor;
     AuthenticatedEncryptionFilter* aef = new AuthenticatedEncryptionFilter(encryptor);
     encryptor.SetKeyWithIV(key, key.size(), iv);
 
@@ -36,7 +37,6 @@ string AesCCM::encryptText(const string& plain, const KeyGen& keygen, const Enco
     case Encoding::NONE : aef->Attach(ss); break;
     default: aef->Attach(new Base64Encoder(ss));;
     }
-
     StringSource(plain, true, aef);
     return cipher;
 }
@@ -46,7 +46,7 @@ string AesCCM::decryptText(const string& cipher, const KeyGen& keygen, const Enc
     const SecByteBlock& key = keygen.getKey();
     const SecByteBlock& iv = keygen.getIv();
     StringSink* ss = new StringSink(recover);
-    GCM<AES>::Decryption decryptor;
+    CCM<AES>::Decryption decryptor;
     AuthenticatedDecryptionFilter* aef = new AuthenticatedDecryptionFilter(decryptor, ss);
     decryptor.SetKeyWithIV(key, key.size(), iv);
 
@@ -56,15 +56,44 @@ string AesCCM::decryptText(const string& cipher, const KeyGen& keygen, const Enc
     case Encoding::NONE : StringSource(cipher, true, aef); break;
     default: StringSource(cipher, true, new Base64Decoder(aef));
     }
-
     return recover;
 }
 void AesCCM::encryptFile(const string& path, const KeyGen& keygen, const Encoding encoding) const noexcept(false)
 {
+    DirFname dirfname = extractFname(path, m_delim);
+    const SecByteBlock& key = keygen.getKey();
+    const SecByteBlock& iv = keygen.getIv();
+    CCM<AES>::Encryption encryptor;
+    encryptor.SetKeyWithIV(key, key.size(), iv);
+    AuthenticatedEncryptionFilter* aef = new AuthenticatedEncryptionFilter(encryptor);
+    FileSink* fs = new FileSink((dirfname.m_dir + dirfname.m_delim + encryptText(dirfname.m_fname, keygen, Encoding::HEX)).c_str());
+
+    switch(encoding) {
+    case Encoding::BASE64 : aef->Attach(new Base64Encoder(fs)); break;
+    case Encoding::HEX : aef->Attach(new HexEncoder(fs)); break;
+    case Encoding::NONE : aef->Attach(fs); break;
+    default: aef->Attach(new Base64Encoder(fs));;
+    }
+    FileSource(path.c_str(), true, aef);
+    removeFile(path);
 
 }
 void AesCCM::decryptFile(const string& path, const KeyGen& keygen, const Encoding encoding) const noexcept(false)
 {
+    DirFname dirfname = extractFname(path, m_delim);
+    const SecByteBlock& key = keygen.getKey();
+    const SecByteBlock& iv = keygen.getIv();
+    CCM<AES>::Decryption decryptor;
+    decryptor.SetKeyWithIV(key, key.size(), iv);
+    FileSink* fs = new FileSink((dirfname.m_dir + dirfname.m_delim + decryptText(dirfname.m_fname, keygen, Encoding::HEX)).c_str());
+    AuthenticatedDecryptionFilter* aef = new AuthenticatedDecryptionFilter(decryptor, fs);
 
+    switch(encoding) {
+    case Encoding::BASE64 : FileSource(path.c_str(), true, new Base64Decoder(aef)); break;
+    case Encoding::HEX : FileSource(path.c_str(), true, new HexDecoder(aef)); break;
+    case Encoding::NONE : FileSource(path.c_str(), true, aef); break;
+    default: FileSource(path.c_str(), true, new Base64Decoder(aef));
+    }
+    removeFile(path);
 }
 

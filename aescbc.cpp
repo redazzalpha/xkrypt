@@ -41,9 +41,7 @@ string AesCBC::encryptText(const string& plain, const KeyGen& keygen, const Enco
     case Encoding::NONE : stf->Attach(ss); break;
     default: stf->Attach(new Base64Encoder(ss));;
     }
-
     StringSource(plain, true, stf);
-
     return cipher;
 }
 string AesCBC::decryptText(const string& cipher, const KeyGen& keygen, const Encoding encoding) const noexcept(false)
@@ -62,12 +60,11 @@ string AesCBC::decryptText(const string& cipher, const KeyGen& keygen, const Enc
     case Encoding::NONE : StringSource(cipher, true, stf); break;
     default: StringSource(cipher, true, new Base64Decoder(stf));
     }
-
     return recover;
 }
 void AesCBC::encryptFile(const string& path, const KeyGen& keygen, const Encoding encoding) const noexcept(false)
 {
-    DirFname dirfname = extractFname(path, "/");
+    DirFname dirfname = extractFname(path, m_delim);
     const SecByteBlock& key = keygen.getKey();
     const SecByteBlock& iv = keygen.getIv();
     CBC_Mode<AES>::Encryption encryptor;
@@ -86,7 +83,7 @@ void AesCBC::encryptFile(const string& path, const KeyGen& keygen, const Encodin
 }
 void AesCBC::decryptFile(const string& path, const KeyGen& keygen, const Encoding encoding) const noexcept(false)
 {
-    DirFname dirfname = extractFname(path, "/");
+    DirFname dirfname = extractFname(path, m_delim);
     const SecByteBlock& key = keygen.getKey();
     const SecByteBlock& iv = keygen.getIv();
     CBC_Mode<AES>::Decryption decryptor;
