@@ -7,7 +7,7 @@
 
 class FileImporter {
 private:
-    std::fstream* m_file = nullptr;
+    std::fstream* m_file = new std::fstream;
     std::vector<std::fstream> m_files;
     std::vector<std::string> m_filePaths;
     const std::string m_delim = "/";

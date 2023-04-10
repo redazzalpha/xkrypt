@@ -224,31 +224,34 @@ bool MainWindow::isFileExist(const string& filename) const
 }
 QMessageBox::ButtonRole MainWindow::dialogFileExists(const string& message)
 {
-    string text = MESSAGE_FILE_EXISTS_START + message + MESSAGE_FILE_EXISTS_END;
-    QMessageBox msg(this);
-    QPushButton* changeDirectory =  msg.addButton("Change directory", QMessageBox::AcceptRole);
-    QPushButton* override =  msg.addButton("Override file", QMessageBox::ApplyRole);
-    QPushButton* create =  msg.addButton("Create file", QMessageBox::ActionRole);
-    QPushButton* cancel =  msg.addButton("Cancel", QMessageBox::RejectRole);
+    if(m_warning) {
+        string text = MESSAGE_FILE_EXISTS_START + message + MESSAGE_FILE_EXISTS_END;
+        QMessageBox msg(this);
+        QPushButton* changeDirectory =  msg.addButton("Change directory", QMessageBox::AcceptRole);
+        QPushButton* override =  msg.addButton("Override file", QMessageBox::ApplyRole);
+        QPushButton* create =  msg.addButton("Create file", QMessageBox::ActionRole);
+        QPushButton* cancel =  msg.addButton("Cancel", QMessageBox::RejectRole);
 
-    cancel->setVisible(false);
-    msg.setWindowTitle("xKrypt - Warning");
-    msg.setWindowIcon(QIcon(QPixmap(ICON_WARNING)));
-    msg.setText(QString::fromStdString(text));
-    msg.setDefaultButton(changeDirectory);
-    msg.setEscapeButton(cancel);
-    msg.setModal(true);
-    msg.exec();
+        cancel->setVisible(false);
+        msg.setWindowTitle("xKrypt - Warning");
+        msg.setWindowIcon(QIcon(QPixmap(ICON_WARNING)));
+        msg.setText(QString::fromStdString(text));
+        msg.setDefaultButton(changeDirectory);
+        msg.setEscapeButton(cancel);
+        msg.setModal(true);
+        msg.exec();
 
-    if(msg.clickedButton() == changeDirectory)
-        return QMessageBox::AcceptRole;
-    else if(msg.clickedButton() == override)
-        return dialogConfirm("Are you sure you want to override file?<br />This operation cannot be undone!")? QMessageBox::ApplyRole : QMessageBox::RejectRole;
-    else if(msg.clickedButton() == create)
-        return dialogInsertFilename("Please insert filename")? QMessageBox::ActionRole: QMessageBox::RejectRole;
-    else if(msg.clickedButton() == cancel)
+        if(msg.clickedButton() == changeDirectory)
+            return QMessageBox::AcceptRole;
+        else if(msg.clickedButton() == override)
+            return dialogConfirm("Are you sure you want to override file?<br />This operation cannot be undone!")? QMessageBox::ApplyRole : QMessageBox::RejectRole;
+        else if(msg.clickedButton() == create)
+            return dialogInsertFilename("Please insert filename")? QMessageBox::ActionRole: QMessageBox::RejectRole;
+        else if(msg.clickedButton() == cancel)
+            return QMessageBox::RejectRole;
         return QMessageBox::RejectRole;
-    return QMessageBox::RejectRole;
+    }
+    return QMessageBox::ApplyRole;
 }
 bool MainWindow::dialogInsertFilename(const string& message) {
     string text = MESSAGE_INSERT_FNAME_START + message + MESSAGE_INSERT_FNAME_END;
@@ -270,37 +273,41 @@ bool MainWindow::dialogInsertFilename(const string& message) {
 }
 bool MainWindow::dialogConfirm(const string& message)
 {
-    string text = MESSAGE_CONFIRM_START + message + MESSAGE_CONFIRM_END;
-    QMessageBox msg(this);
-    QPushButton* ok =  msg.addButton("Ok", QMessageBox::AcceptRole);
-    QPushButton* cancel =  msg.addButton("Cancel", QMessageBox::RejectRole);
-    bool isConfirmed = false;
+    bool isConfirmed = true;
+    if(m_warning) {
+        string text = MESSAGE_CONFIRM_START + message + MESSAGE_CONFIRM_END;
+        QMessageBox msg(this);
+        QPushButton* ok =  msg.addButton("Ok", QMessageBox::AcceptRole);
+        QPushButton* cancel =  msg.addButton("Cancel", QMessageBox::RejectRole);
 
-    msg.setWindowTitle("xKrypt - Warning");
-    msg.setWindowIcon(QIcon(QPixmap(ICON_WARNING)));
-    msg.setText(QString::fromStdString(text));
-    msg.setDefaultButton(cancel);
-    msg.setEscapeButton(cancel);
-    msg.setModal(true);
-    msg.exec();
+        msg.setWindowTitle("xKrypt - Warning");
+        msg.setWindowIcon(QIcon(QPixmap(ICON_WARNING)));
+        msg.setText(QString::fromStdString(text));
+        msg.setDefaultButton(cancel);
+        msg.setEscapeButton(cancel);
+        msg.setModal(true);
+        msg.exec();
 
-    if(msg.clickedButton() == ok) isConfirmed = true;
+        if(msg.clickedButton() == ok) isConfirmed = true;
+    }
 
     return isConfirmed;
 }
 void MainWindow::dialogSuccessMessage(const string& message)
 {
-    string text = MESSAGE_SUCCESS_START+ message + MESSAGE_SUCCESS_END;
-    QMessageBox msg(this);
-    QPushButton* ok =  msg.addButton("Ok", QMessageBox::AcceptRole);
+    if(m_warning) {
+        string text = MESSAGE_SUCCESS_START+ message + MESSAGE_SUCCESS_END;
+        QMessageBox msg(this);
+        QPushButton* ok =  msg.addButton("Ok", QMessageBox::AcceptRole);
 
-    msg.setWindowTitle("xKrypt - Success");
-    msg.setWindowIcon(QIcon(QPixmap(ICON_ERROR)));
-    msg.setText(QString::fromStdString(text));
-    msg.setDefaultButton(ok);
-    msg.setEscapeButton(ok);
-    msg.setModal(true);
-    msg.exec();
+        msg.setWindowTitle("xKrypt - Success");
+        msg.setWindowIcon(QIcon(QPixmap(ICON_ERROR)));
+        msg.setText(QString::fromStdString(text));
+        msg.setDefaultButton(ok);
+        msg.setEscapeButton(ok);
+        msg.setModal(true);
+        msg.exec();
+    }
 }
 void MainWindow::dialogErrorMessage(const string& message)
 {
@@ -371,9 +378,12 @@ void MainWindow::on_m_encTabFileImport_clicked()
 {
     m_fimporterEnc.clear();
     m_fimporterEnc.importFiles();
-    stringstream ss;
 
-    for(const string& path : m_fimporterEnc.getFilePaths()) ss << path << "\n";
+    stringstream ss;
+    auto paths = m_fimporterEnc.getFilePaths();
+    if(paths.size() > 0)
+        for(const string& path : paths) ss << path << "\n";
+    else ss << NO_FILE_LOADED;
     ui->m_encTabFileSelected->setPlainText(QString::fromStdString(ss.str()));
 }
 void MainWindow::on_m_decTabFileImport_clicked()
@@ -381,8 +391,11 @@ void MainWindow::on_m_decTabFileImport_clicked()
     m_fimporterDec.clear();
     m_fimporterDec.importFiles();
     stringstream ss;
+    auto paths = m_fimporterDec.getFilePaths();
 
-    for(const string& path : m_fimporterDec.getFilePaths()) ss << path << "\n";
+    if(paths.size() > 0)
+        for(const string& path : m_fimporterDec.getFilePaths()) ss << path << "\n";
+    else ss << NO_FILE_LOADED;
     ui->m_decTabFileSelected->setPlainText(QString::fromStdString(ss.str()));
 }
 void MainWindow::on_m_encTabFileEncrypt_clicked()
@@ -495,6 +508,11 @@ void MainWindow::on_m_keyMImport_clicked()
     if(type == AbstractCipherAes::AlgName) importSymmectric();
     if(type == AbstractCipherRsa::AlgName)importAsymmectric();
 }
+void MainWindow::on_m_keyMDisable_toggled(bool checked)
+{
+    if(checked) m_warning = false;
+    else m_warning = true;
+}
 
 void MainWindow::setComboModes(const QString& alg)
 {
@@ -549,6 +567,8 @@ void MainWindow::flushKey()
     ui->m_keyMHide->setChecked(false);
     setKeyLoadedText(NO_KEY_LOADED);
 }
+
+
 
 
 

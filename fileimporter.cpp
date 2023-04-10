@@ -58,13 +58,11 @@ fstream* FileImporter::getFile() const
 {
     return m_file;
 }
-
 const std::vector<fstream>& FileImporter::getFiles()
 {
     return m_files;
 }
-
-const std::vector<string> &FileImporter::getFilePaths()
+const std::vector<string>& FileImporter::getFilePaths()
 {
     return m_filePaths;
 }

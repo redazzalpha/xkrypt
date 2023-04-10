@@ -80,6 +80,7 @@ private:
         "Hex",
     };
 
+    bool m_warning = true;
 public:
     // constructors
     MainWindow(QWidget *parent = nullptr);
@@ -131,6 +132,7 @@ private slots:
 
     void on_m_keyMGenerate_clicked();
     void on_m_keyMImport_clicked();
+    void on_m_keyMDisable_toggled(bool checked);
 
     void setComboModes(const QString& alg);
     void hideKey(const bool isChecked);

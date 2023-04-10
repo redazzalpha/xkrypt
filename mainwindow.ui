@@ -47,6 +47,13 @@
       </property>
       <layout class="QVBoxLayout" name="vlayout">
        <item>
+        <widget class="QCheckBox" name="m_keyMDisable">
+         <property name="text">
+          <string>Disable warnings</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <spacer name="spacer">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -54,7 +61,7 @@
          <property name="sizeHint" stdset="0">
           <size>
            <width>20</width>
-           <height>220</height>
+           <height>200</height>
           </size>
          </property>
         </spacer>
@@ -487,7 +494,7 @@
           <bool>false</bool>
          </property>
          <property name="styleSheet">
-          <string notr="true">background-color: rgba(0, 0, 0, 0);color:red;</string>
+          <string notr="true">background-color: rgba(0, 0, 0, 0);color:rgba(255, 175, 50, 1);</string>
          </property>
          <property name="frameShape">
           <enum>QFrame::NoFrame</enum>
@@ -545,7 +552,7 @@
        <string notr="true"/>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="m_encTabFile">
        <attribute name="title">
@@ -580,7 +587,7 @@
             <bool>false</bool>
            </property>
            <property name="styleSheet">
-            <string notr="true">background-color: rgba(0, 0, 0, 0);color:red;</string>
+            <string notr="true">background-color: rgba(0, 0, 0, 0);color:rgba(255, 175, 50, 1);</string>
            </property>
            <property name="frameShape">
             <enum>QFrame::NoFrame</enum>
@@ -699,7 +706,7 @@
             <bool>false</bool>
            </property>
            <property name="styleSheet">
-            <string notr="true">background-color: rgba(0, 0, 0, 0);color: red;</string>
+            <string notr="true">background-color: rgba(0, 0, 0, 0);color: rgba(255, 175, 50, 1);</string>
            </property>
            <property name="frameShape">
             <enum>QFrame::NoFrame</enum>
@@ -929,7 +936,7 @@
             <bool>false</bool>
            </property>
            <property name="styleSheet">
-            <string notr="true">background-color: rgba(0, 0, 0, 0);color:red;</string>
+            <string notr="true">background-color: rgba(0, 0, 0, 0);color:rgba(255, 175, 50, 1);</string>
            </property>
            <property name="frameShape">
             <enum>QFrame::NoFrame</enum>
@@ -1197,7 +1204,7 @@
             <bool>false</bool>
            </property>
            <property name="styleSheet">
-            <string notr="true">background-color: rgba(0, 0, 0, 0);color: red;</string>
+            <string notr="true">background-color: rgba(0, 0, 0, 0);color: rgba(255, 175, 50, 1);</string>
            </property>
            <property name="frameShape">
             <enum>QFrame::NoFrame</enum>
@@ -1316,7 +1323,7 @@
             <bool>false</bool>
            </property>
            <property name="styleSheet">
-            <string notr="true">background-color: rgba(0, 0, 0, 0);color: red;</string>
+            <string notr="true">background-color: rgba(0, 0, 0, 0);color: rgba(255, 175, 50, 1);</string>
            </property>
            <property name="frameShape">
             <enum>QFrame::NoFrame</enum>
@@ -1528,7 +1535,7 @@
             <bool>false</bool>
            </property>
            <property name="styleSheet">
-            <string notr="true">background-color: rgba(0, 0, 0, 0);color:red;</string>
+            <string notr="true">background-color: rgba(0, 0, 0, 0);color:rgba(255, 175, 50, 1);</string>
            </property>
            <property name="frameShape">
             <enum>QFrame::NoFrame</enum>

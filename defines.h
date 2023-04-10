@@ -15,7 +15,7 @@
 
 #define STYLE_NORMAL "background-color:rgba(0,0,0,0);"
 #define STYLE_BLANK "background-color:rgba(0,0,0,0); color:rgba(0,0,0,0)"
-#define STYLE_RED "background-color:rgba(0,0,0,0); color:red;"
+#define STYLE_RED "background-color:rgba(0,0,0,0); color:rgba(255, 175, 50, 1);"
 
 #define TAB_NAME_FILE "File"
 #define TAB_NAME_TEXT "Text"
