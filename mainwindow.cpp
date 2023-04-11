@@ -13,6 +13,7 @@
 #include <iostream>
 #include <fstream>
 #include <regex>
+#include <QProgressDialog>
 
 
 using namespace std;
@@ -108,6 +109,46 @@ void MainWindow::generateKey(Encoding encoding)
     m_keygen->generateKey();
     setKeyLoadedText(QString::fromStdString(m_serial.keyToString(*m_keygen, encoding)));
 }
+void MainWindow::progressEnc(const string& title, const int max)
+{
+    QProgressDialog progress(QString::fromStdString(title), "Cancel", 0, max, this);
+    progress.setWindowModality(Qt::WindowModal);
+    progress.setMinimumWidth(PROGRESS_BAR_WIDTH);
+    progress.setMinimumDuration(0);
+
+    string alg = ui->m_encTabFileAlgs->currentText().toStdString();
+    string mode = ui->m_encTabFileModes->currentText().toStdString();
+    Encoding encoding = static_cast<Encoding>(ui->m_encTabFileEncodings->currentIndex());
+    m_cipherFrom(alg, mode);
+
+        int counter = 1;
+        for(const string &fname : m_fimporterEnc.getFilePaths()) {
+            progress.setValue(counter++);
+            if (progress.wasCanceled()) break;
+            m_cipher->encryptFile(fname, *m_keygen, encoding);
+        }
+        progress.setValue(max);
+}
+void MainWindow::progressDec(const string& title, const int max)
+{
+    QProgressDialog progress(QString::fromStdString(title), "Cancel", 0, max, this);
+    progress.setWindowModality(Qt::WindowModal);
+    progress.setMinimumWidth(PROGRESS_BAR_WIDTH);
+
+    string alg = ui->m_decTabFileAlgs->currentText().toStdString();
+    string mode = ui->m_decTabFileModes->currentText().toStdString();
+    Encoding encoding = static_cast<Encoding>(ui->m_decTabFileEncodings->currentIndex());
+    m_cipherFrom(alg, mode);
+
+    int counter = 1;
+    for(const string &fname : m_fimporterDec.getFilePaths()) {
+        progress.setValue(counter++);
+        if (progress.wasCanceled()) break;
+        m_cipher->decryptFile(fname, *m_keygen, encoding);
+    }
+    progress.setValue(max);
+}
+
 void MainWindow::saveOnFile(const Encoding encoding)
 {
     bool m_override = false;
@@ -398,17 +439,16 @@ void MainWindow::on_m_decTabFileImport_clicked()
     else ss << NO_FILE_LOADED;
     ui->m_decTabFileSelected->setPlainText(QString::fromStdString(ss.str()));
 }
+
 void MainWindow::on_m_encTabFileEncrypt_clicked()
 {
     try {
-        if(m_fimporterEnc.getFilePaths().size() < 1)
-            throw FileSelectedException();
-        string alg = ui->m_encTabFileAlgs->currentText().toStdString();
-        string mode = ui->m_encTabFileModes->currentText().toStdString();
-        Encoding encoding = static_cast<Encoding>(ui->m_encTabFileEncodings->currentIndex());
-        m_cipherFrom(alg, mode);
-        for(const string &fname : m_fimporterEnc.getFilePaths())
-            m_cipher->encryptFile(fname, *m_keygen, encoding);
+        size_t size = 0;
+        size =  m_fimporterEnc.getFilePaths().size();
+        if(size < 1) throw FileSelectedException();
+
+        progressEnc("Encrypting file(s)! Please wait...", size);
+
         string message = "file(s) successfully encrypted!<br />";
         message += "Using: " + m_cipher->getAlgName() += (" - " + m_cipher->getModeName()) + " mode";
         dialogSuccessMessage(message);
@@ -420,14 +460,12 @@ void MainWindow::on_m_encTabFileEncrypt_clicked()
 void MainWindow::on_m_decTabFileDecrypt_clicked()
 {
     try {
-        if(m_fimporterDec.getFilePaths().size() < 1)
-            throw FileSelectedException();
-        string alg = ui->m_decTabFileAlgs->currentText().toStdString();
-        string mode = ui->m_decTabFileModes->currentText().toStdString();
-        Encoding encoding = static_cast<Encoding>(ui->m_decTabFileEncodings->currentIndex());
-        m_cipherFrom(alg, mode);
-        for(const string &fname : m_fimporterDec.getFilePaths())
-            m_cipher->decryptFile(fname, *m_keygen, encoding);
+        size_t size = 0;
+        size =  m_fimporterDec.getFilePaths().size();
+        if(size < 1) throw FileSelectedException();
+
+        progressDec("Decrypting file(s)! Please wait...", size);
+
         string message = "file(s) successfully decrypted!<br />";
         message += "Using: " + m_cipher->getAlgName() += (" - " + m_cipher->getModeName()) + " mode";
         dialogSuccessMessage(message);
@@ -567,13 +605,6 @@ void MainWindow::flushKey()
     ui->m_keyMHide->setChecked(false);
     setKeyLoadedText(NO_KEY_LOADED);
 }
-
-
-
-
-
-
-
 
 
 

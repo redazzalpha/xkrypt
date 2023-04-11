@@ -31,7 +31,7 @@ SOURCES += \
     rsaoeap.cpp \
     rsassa.cpp \
     serial.cpp \
-    structures.cpp
+    structures.cpp \
 
 HEADERS += \
     action.h \
@@ -57,7 +57,7 @@ HEADERS += \
     rsaoeap.h \
     rsassa.h \
     serial.h \
-    structures.h
+    structures.h \
 
 FORMS += \
     mainwindow.ui
@@ -67,9 +67,6 @@ INCLUDEPATH += \
 
 LIBS += \
     -L /usr/local/lib/ -l:libcryptopp.a
-
-
-
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

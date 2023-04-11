@@ -11,8 +11,10 @@
  * class for cipher algorithms
  */
 
-class AbstractCipherBase : public QObject {
-    Q_OBJECT
+class AbstractCipherBase {
+
+protected:
+    const std::string m_delim = "/";
 
 public:
     // constructors

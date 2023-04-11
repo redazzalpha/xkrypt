@@ -9,6 +9,7 @@
 #define WINDOW_HEIGHT 600
 #define WINDOW_ICON_WIDTH 35
 #define WINDOW_ICON_HEIGHT 35
+#define PROGRESS_BAR_WIDTH 500
 
 #define NO_KEY_LOADED "no key loaded!"
 #define NO_FILE_LOADED "no file loaded!"

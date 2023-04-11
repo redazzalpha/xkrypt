@@ -19,7 +19,7 @@
 #include <QList>
 #include <QString>
 #include <QMessageBox>
-
+#include <QThread>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -89,20 +89,19 @@ public:
     ~MainWindow();
 
 private:
-
     // methods
     void uiInit();
     void connectItems() const;
     void generateKey(Encoding encodingIndex);
-    void saveSuccess(Encoding encoding);
-    void processEncrypt(QObject* sender);
-    void processDecrypt(QObject *sender);
+    void progressEnc(const std::string& title, const int max);
+    void progressDec(const std::string& title, const int max);
     void importAsymmectric();
     void importSymmectric();
     void m_cipherFrom(const std::string& alg, const std::string& mode);
     KeyLength keylengthFrom(const int index);
 
     void saveOnFile(const Encoding encoding);
+    void saveSuccess(Encoding encoding);
     bool isFileExist(const std::string& filename) const;
     QMessageBox::ButtonRole dialogFileExists(const std::string& message);
     bool dialogInsertFilename(const std::string& message);
@@ -117,13 +116,14 @@ private:
     void setKeyLoadedText(const QString &keyStr) const;
     void setKeyLoadedSelectable(const bool selectable) const;
 
+
 private slots:
     void on_m_encTabFileImport_clicked();
     void on_m_decTabFileImport_clicked();
+
     void on_m_encTabFileEncrypt_clicked();
     void on_m_decTabFileDecrypt_clicked();
     void on_m_encTabFileClear_clicked();
-
 
     void on_m_encTabTextEncrypt_clicked();
     void on_m_decTabTextDecrypt_clicked();
@@ -141,4 +141,5 @@ private slots:
     void flushKey();
     void on_m_decTabFileClear_clicked();
 };
+
 #endif // MAINWINDOW_H
