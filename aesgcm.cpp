@@ -58,7 +58,7 @@ string AesGCM::decryptText(const string& cipher, const KeyGen& keygen, const Enc
     }
     return recover;
 }
-void AesGCM::encryptFile(const vector<string> paths, const KeyGen& keygen, const Encoding encoding) const noexcept(false)
+void AesGCM::encryptFile(const vector<string>& paths, const KeyGen& keygen, const Encoding encoding) const noexcept(false)
 {
     const SecByteBlock& key = keygen.getKey();
     const SecByteBlock& iv = keygen.getIv();
@@ -80,7 +80,7 @@ void AesGCM::encryptFile(const vector<string> paths, const KeyGen& keygen, const
         removeFile(path);
     }
 }
-void AesGCM::decryptFile(const vector<string> paths, const KeyGen& keygen, const Encoding encoding) const noexcept(false)
+void AesGCM::decryptFile(const vector<string>& paths, const KeyGen& keygen, const Encoding encoding) const noexcept(false)
 {
     const SecByteBlock& key = keygen.getKey();
     const SecByteBlock& iv = keygen.getIv();

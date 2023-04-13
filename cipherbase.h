@@ -29,8 +29,8 @@ public:
 
     virtual std::string encryptText(const std::string& plain, const KeyGen& keygen, const Encoding encoding) const noexcept(false) = 0;
     virtual std::string decryptText(const std::string& cipher, const KeyGen& keygen, const Encoding encoding) const noexcept(false) = 0;
-    virtual void decryptFile(const std::vector<std::string> paths, const KeyGen& keygen, const Encoding encoding) const noexcept(false) = 0;
-    virtual void encryptFile(const std::vector<std::string> paths, const KeyGen& keygen, const Encoding encoding) const noexcept(false) = 0;
+    virtual void decryptFile(const std::vector<std::string>& paths, const KeyGen& keygen, const Encoding encoding) const noexcept(false) = 0;
+    virtual void encryptFile(const std::vector<std::string>& paths, const KeyGen& keygen, const Encoding encoding) const noexcept(false) = 0;
 
 protected :
     void removeFile(const std::string& filePath) const;

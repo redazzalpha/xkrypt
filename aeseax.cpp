@@ -58,7 +58,7 @@ string AesEAX::decryptText(const string& cipher, const KeyGen& keygen, const Enc
     }
     return recover;
 }
-void AesEAX::encryptFile(const vector<string> paths, const KeyGen& keygen, const Encoding encoding) const noexcept(false)
+void AesEAX::encryptFile(const vector<string>& paths, const KeyGen& keygen, const Encoding encoding) const noexcept(false)
 {
     const SecByteBlock& key = keygen.getKey();
     const SecByteBlock& iv = keygen.getIv();
@@ -81,7 +81,7 @@ void AesEAX::encryptFile(const vector<string> paths, const KeyGen& keygen, const
     }
 
 }
-void AesEAX::decryptFile(const vector<string> paths, const KeyGen& keygen, const Encoding encoding) const noexcept(false)
+void AesEAX::decryptFile(const vector<string>& paths, const KeyGen& keygen, const Encoding encoding) const noexcept(false)
 {
     const SecByteBlock& key = keygen.getKey();
     const SecByteBlock& iv = keygen.getIv();
