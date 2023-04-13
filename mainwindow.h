@@ -93,11 +93,11 @@ private:
     void uiInit();
     void connectItems() const;
     void generateKey(Encoding encodingIndex);
-    void progressEnc(const std::string& title, const int max);
-    void progressDec(const std::string& title, const int max);
+    void progressEnc(std::vector<std::string> paths);
+    void progressDec(std::vector<std::string> paths);
     void importAsymmectric();
     void importSymmectric();
-    void m_cipherFrom(const std::string& alg, const std::string& mode);
+    void m_cipherNew(const std::string& alg, const std::string& mode);
     KeyLength keylengthFrom(const int index);
 
     void saveOnFile(const Encoding encoding);
