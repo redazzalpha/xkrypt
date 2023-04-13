@@ -109,44 +109,23 @@ void MainWindow::generateKey(Encoding encoding)
     m_keygen->generateKey();
     setKeyLoadedText(QString::fromStdString(m_serial.keyToString(*m_keygen, encoding)));
 }
-void MainWindow::progressEnc(const string& title, const int max)
+void MainWindow::progressEnc(vector<string> paths)
 {
-    QProgressDialog progress(QString::fromStdString(title), "Cancel", 0, max, this);
-    progress.setWindowModality(Qt::WindowModal);
-    progress.setMinimumWidth(PROGRESS_BAR_WIDTH);
-    progress.setMinimumDuration(0);
-
     string alg = ui->m_encTabFileAlgs->currentText().toStdString();
     string mode = ui->m_encTabFileModes->currentText().toStdString();
     Encoding encoding = static_cast<Encoding>(ui->m_encTabFileEncodings->currentIndex());
-    m_cipherFrom(alg, mode);
+    m_cipherNew(alg, mode);
 
-        int counter = 1;
-        for(const string &fname : m_fimporterEnc.getFilePaths()) {
-            progress.setValue(counter++);
-            if (progress.wasCanceled()) break;
-            m_cipher->encryptFile(fname, *m_keygen, encoding);
-        }
-        progress.setValue(max);
+    m_cipher->encryptFile(paths, *m_keygen, encoding);
 }
-void MainWindow::progressDec(const string& title, const int max)
+void MainWindow::progressDec(vector<string> paths)
 {
-    QProgressDialog progress(QString::fromStdString(title), "Cancel", 0, max, this);
-    progress.setWindowModality(Qt::WindowModal);
-    progress.setMinimumWidth(PROGRESS_BAR_WIDTH);
-
     string alg = ui->m_decTabFileAlgs->currentText().toStdString();
     string mode = ui->m_decTabFileModes->currentText().toStdString();
     Encoding encoding = static_cast<Encoding>(ui->m_decTabFileEncodings->currentIndex());
-    m_cipherFrom(alg, mode);
+    m_cipherNew(alg, mode);
 
-    int counter = 1;
-    for(const string &fname : m_fimporterDec.getFilePaths()) {
-        progress.setValue(counter++);
-        if (progress.wasCanceled()) break;
-        m_cipher->decryptFile(fname, *m_keygen, encoding);
-    }
-    progress.setValue(max);
+    m_cipher->decryptFile(paths, *m_keygen, encoding);
 }
 
 void MainWindow::saveOnFile(const Encoding encoding)
@@ -211,7 +190,7 @@ void MainWindow::importSymmectric()
 void MainWindow::importAsymmectric()
 {
 }
-void MainWindow::m_cipherFrom(const string& alg, const string& mode)
+void MainWindow::m_cipherNew(const string& alg, const string& mode)
 {
     delete m_cipher;
     m_cipher = nullptr;
@@ -443,11 +422,11 @@ void MainWindow::on_m_decTabFileImport_clicked()
 void MainWindow::on_m_encTabFileEncrypt_clicked()
 {
     try {
-        size_t size = 0;
-        size =  m_fimporterEnc.getFilePaths().size();
+        vector<string> paths = m_fimporterEnc.getFilePaths();
+        size_t size = paths.size();
         if(size < 1) throw FileSelectedException();
 
-        progressEnc("Encrypting file(s)! Please wait...", size);
+        progressEnc(paths);
 
         string message = "file(s) successfully encrypted!<br />";
         message += "Using: " + m_cipher->getAlgName() += (" - " + m_cipher->getModeName()) + " mode";
@@ -461,10 +440,11 @@ void MainWindow::on_m_decTabFileDecrypt_clicked()
 {
     try {
         size_t size = 0;
-        size =  m_fimporterDec.getFilePaths().size();
+        vector<string> paths = m_fimporterDec.getFilePaths();
+        size =  paths.size();
         if(size < 1) throw FileSelectedException();
 
-        progressDec("Decrypting file(s)! Please wait...", size);
+        progressDec(paths);
 
         string message = "file(s) successfully decrypted!<br />";
         message += "Using: " + m_cipher->getAlgName() += (" - " + m_cipher->getModeName()) + " mode";
@@ -495,7 +475,7 @@ void MainWindow::on_m_encTabTextEncrypt_clicked()
         string selectedAlg = ui->m_encTabTextAlgs->currentText().toStdString();
         string selectedMode = ui->m_encTabTextModes->currentText().toStdString();
         Encoding selectedEncoding = static_cast<Encoding>(ui->m_encTabTextEncodings->currentIndex());
-        m_cipherFrom(selectedAlg, selectedMode);
+        m_cipherNew(selectedAlg, selectedMode);
 
         if(!m_cipher) throw BadCipherException();
         string cipherText = m_cipher->encryptText(plainText, *m_keygen, selectedEncoding);
@@ -515,7 +495,7 @@ void MainWindow::on_m_decTabTextDecrypt_clicked()
         string selectedAlg = ui->m_decTabTextAlgs->currentText().toStdString();
         string selectedMode = ui->m_decTabTextModes->currentText().toStdString();
         Encoding selectedEncoding = static_cast<Encoding>(ui->m_decTabTextEncodings->currentIndex());
-        m_cipherFrom(selectedAlg, selectedMode);
+        m_cipherNew(selectedAlg, selectedMode);
 
         if(!m_cipher) throw BadCipherException();
         string recoverText = m_cipher->decryptText(cipherText, *m_keygen, selectedEncoding);
