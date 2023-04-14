@@ -14,10 +14,19 @@
 #include <fstream>
 #include <regex>
 #include <QProgressDialog>
-
+#include <thread>
 
 using namespace std;
 using namespace CryptoPP;
+
+
+
+
+class Foo {
+public:
+    void bar(vector<string>* paths, Encoding encoding, Keygen& keygen) {}
+
+};
 
 // constructors
 MainWindow::MainWindow(QWidget *parent)
@@ -109,23 +118,25 @@ void MainWindow::generateKey(Encoding encoding)
     m_keygen->generateKey();
     setKeyLoadedText(QString::fromStdString(m_serial.keyToString(*m_keygen, encoding)));
 }
-void MainWindow::progressEnc(vector<string> paths)
+void MainWindow::progressEnc(vector<string>* paths)
 {
     string alg = ui->m_encTabFileAlgs->currentText().toStdString();
     string mode = ui->m_encTabFileModes->currentText().toStdString();
     Encoding encoding = static_cast<Encoding>(ui->m_encTabFileEncodings->currentIndex());
     m_cipherNew(alg, mode);
 
-    m_cipher->encryptFile(paths, *m_keygen, encoding);
+    std::thread t(&AbstractCipherBase::encryptFile, m_cipher, paths, m_keygen, encoding);
+    t.join();
 }
-void MainWindow::progressDec(vector<string> paths)
+void MainWindow::progressDec(vector<string>* paths)
 {
     string alg = ui->m_decTabFileAlgs->currentText().toStdString();
     string mode = ui->m_decTabFileModes->currentText().toStdString();
-    Encoding encoding = static_cast<Encoding>(ui->m_decTabFileEncodings->currentIndex());
+    const Encoding encoding = static_cast<Encoding>(ui->m_decTabFileEncodings->currentIndex());
     m_cipherNew(alg, mode);
 
-    m_cipher->decryptFile(paths, *m_keygen, encoding);
+    std::thread t(&AbstractCipherBase::decryptFile, m_cipher, paths, m_keygen, encoding);
+    t.join();
 }
 
 void MainWindow::saveOnFile(const Encoding encoding)
@@ -426,7 +437,7 @@ void MainWindow::on_m_encTabFileEncrypt_clicked()
         size_t size = paths.size();
         if(size < 1) throw FileSelectedException();
 
-        progressEnc(paths);
+        progressEnc(&paths);
 
         string message = "file(s) successfully encrypted!<br />";
         message += "Using: " + m_cipher->getAlgName() += (" - " + m_cipher->getModeName()) + " mode";
@@ -444,7 +455,7 @@ void MainWindow::on_m_decTabFileDecrypt_clicked()
         size =  paths.size();
         if(size < 1) throw FileSelectedException();
 
-        progressDec(paths);
+        progressDec(&paths);
 
         string message = "file(s) successfully decrypted!<br />";
         message += "Using: " + m_cipher->getAlgName() += (" - " + m_cipher->getModeName()) + " mode";
@@ -478,7 +489,7 @@ void MainWindow::on_m_encTabTextEncrypt_clicked()
         m_cipherNew(selectedAlg, selectedMode);
 
         if(!m_cipher) throw BadCipherException();
-        string cipherText = m_cipher->encryptText(plainText, *m_keygen, selectedEncoding);
+        string cipherText = m_cipher->encryptText(plainText, m_keygen, selectedEncoding);
         ui->m_encTabTextField->setPlainText(QString::fromStdString(cipherText));
     }
     catch(exception& e) {
@@ -498,7 +509,7 @@ void MainWindow::on_m_decTabTextDecrypt_clicked()
         m_cipherNew(selectedAlg, selectedMode);
 
         if(!m_cipher) throw BadCipherException();
-        string recoverText = m_cipher->decryptText(cipherText, *m_keygen, selectedEncoding);
+        string recoverText = m_cipher->decryptText(cipherText, m_keygen, selectedEncoding);
         ui->m_decTabTextField->setPlainText(QString::fromStdString(recoverText));
     }
     catch(exception& e) {

@@ -5,7 +5,7 @@
 #include "secblock.h"
 #include "enums.h"
 
-class KeyGen {
+class Keygen {
 private:
     CryptoPP::AutoSeededRandomPool m_prng;
     CryptoPP::SecByteBlock m_key {0};
@@ -14,8 +14,8 @@ private:
 
 public:
     // constructors
-    KeyGen();
-    KeyGen(KeyLength keyLength);
+    Keygen();
+    Keygen(KeyLength keyLength);
 
     // methods
     void setKey(CryptoPP::SecByteBlock key);

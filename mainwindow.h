@@ -36,7 +36,7 @@ private:
     FileImporter m_fimporterKey;
     std::string m_fname;
     std::string m_dir;
-    KeyGen* m_keygen = new KeyGen;
+    Keygen* m_keygen = new Keygen;
     AbstractCipherBase* m_cipher = new AesGCM;
 
     QList<AbstractActionBase*> m_actions = QList<AbstractActionBase*> {
@@ -93,8 +93,8 @@ private:
     void uiInit();
     void connectItems() const;
     void generateKey(Encoding encodingIndex);
-    void progressEnc(std::vector<std::string> paths);
-    void progressDec(std::vector<std::string> paths);
+    void progressEnc(std::vector<std::string>* paths);
+    void progressDec(std::vector<std::string>* paths);
     void importAsymmectric();
     void importSymmectric();
     void m_cipherNew(const std::string& alg, const std::string& mode);
@@ -115,7 +115,6 @@ private:
     void setFilesLoadedStyle(const QString &style) const;
     void setKeyLoadedText(const QString &keyStr) const;
     void setKeyLoadedSelectable(const bool selectable) const;
-
 
 private slots:
     void on_m_encTabFileImport_clicked();

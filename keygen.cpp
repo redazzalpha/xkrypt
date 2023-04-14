@@ -4,34 +4,34 @@
 using namespace CryptoPP;
 
 // constructors
-KeyGen::KeyGen(){}
-KeyGen::KeyGen(KeyLength keyLength): m_keyLength(keyLength){}
+Keygen::Keygen(){}
+Keygen::Keygen(KeyLength keyLength): m_keyLength(keyLength){}
 
 // methods
-void KeyGen::setKey(CryptoPP::SecByteBlock key)
+void Keygen::setKey(CryptoPP::SecByteBlock key)
 {
     m_key.CleanNew(0);
     m_key = key;
 }
-void KeyGen::setIv(CryptoPP::SecByteBlock iv)
+void Keygen::setIv(CryptoPP::SecByteBlock iv)
 {
     m_iv.CleanNew(0);
     m_iv = iv;
 }
-void KeyGen::setKeyLength(KeyLength keyLength)
+void Keygen::setKeyLength(KeyLength keyLength)
 {
     m_keyLength = keyLength;
 }
-const SecByteBlock& KeyGen::getKey() const
+const SecByteBlock& Keygen::getKey() const
 {
     return m_key;
 }
-const SecByteBlock& KeyGen::getIv() const
+const SecByteBlock& Keygen::getIv() const
 {
     return m_iv;
 }
 
-void KeyGen::generateKey()
+void Keygen::generateKey()
 {
     m_key.CleanNew(0);
     m_iv.CleanNew(0);
@@ -42,11 +42,11 @@ void KeyGen::generateKey()
         m_prng.GenerateBlock(m_iv, m_iv.size());
     }
 }
-bool KeyGen::isReady() const
+bool Keygen::isReady() const
 {
     return !m_key.empty() && !m_iv.empty();
 }
-void KeyGen::flush()
+void Keygen::flush()
 {
     m_key.CleanNew(0);
     m_iv.CleanNew(0);

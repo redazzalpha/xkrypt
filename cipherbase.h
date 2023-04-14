@@ -29,11 +29,11 @@ public:
     // methods
     virtual std::string getAlgName() const = 0;
     virtual std::string getModeName() const = 0;
-
-    virtual std::string encryptText(const std::string& plain, const KeyGen& keygen, const Encoding encoding) const noexcept(false) = 0;
-    virtual std::string decryptText(const std::string& cipher, const KeyGen& keygen, const Encoding encoding) const noexcept(false) = 0;
-    virtual void decryptFile(const std::vector<std::string>& paths, const KeyGen& keygen, const Encoding encoding) const noexcept(false) = 0;
-    virtual void encryptFile(const std::vector<std::string>& paths, const KeyGen& keygen, const Encoding encoding) const noexcept(false) = 0;
+    
+    virtual std::string encryptText(const std::string& plain, Keygen* keygen, const Encoding encoding) const noexcept(false) = 0;
+    virtual std::string decryptText(const std::string& cipher, Keygen* keygen, const Encoding encoding) const noexcept(false) = 0;
+    virtual void decryptFile(std::vector<std::string>* paths, Keygen* keygen, const Encoding encoding) const noexcept(false) = 0;
+    virtual void encryptFile(std::vector<std::string>* paths, Keygen* keygen, const Encoding encoding) const noexcept(false) = 0;
 
 protected :
     void removeFile(const std::string& filePath) const;

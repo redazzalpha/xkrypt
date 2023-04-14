@@ -21,11 +21,11 @@ std::string AesGCM::getModeName() const
     return AesGCM::AlgName;
 }
 
-string AesGCM::encryptText(const string& plain, const KeyGen& keygen, const Encoding encoding) const noexcept(false)
+string AesGCM::encryptText(const string& plain, Keygen* keygen, const Encoding encoding) const noexcept(false)
 {
     std::string cipher = "";
-    const SecByteBlock& key = keygen.getKey();
-    const SecByteBlock& iv = keygen.getIv();
+    const SecByteBlock& key = keygen->getKey();
+    const SecByteBlock& iv = keygen->getIv();
     StringSink* ss = new StringSink(cipher);
     GCM<AES>::Encryption encryptor;
     AuthenticatedEncryptionFilter* aef = new AuthenticatedEncryptionFilter(encryptor);
@@ -40,11 +40,11 @@ string AesGCM::encryptText(const string& plain, const KeyGen& keygen, const Enco
     StringSource(plain, true, aef);
     return cipher;
 }
-string AesGCM::decryptText(const string& cipher, const KeyGen& keygen, const Encoding encoding) const noexcept(false)
+string AesGCM::decryptText(const string& cipher, Keygen* keygen, const Encoding encoding) const noexcept(false)
 {
     std::string recover;
-    const SecByteBlock& key = keygen.getKey();
-    const SecByteBlock& iv = keygen.getIv();
+    const SecByteBlock& key = keygen->getKey();
+    const SecByteBlock& iv = keygen->getIv();
     StringSink* ss = new StringSink(recover);
     GCM<AES>::Decryption decryptor;
     AuthenticatedDecryptionFilter* aef = new AuthenticatedDecryptionFilter(decryptor, ss);
@@ -58,14 +58,14 @@ string AesGCM::decryptText(const string& cipher, const KeyGen& keygen, const Enc
     }
     return recover;
 }
-void AesGCM::encryptFile(const vector<string>& paths, const KeyGen& keygen, const Encoding encoding) const noexcept(false)
+void AesGCM::encryptFile(vector<string>* paths, Keygen* keygen, const Encoding encoding) const noexcept(false)
 {
-    const SecByteBlock& key = keygen.getKey();
-    const SecByteBlock& iv = keygen.getIv();
+    const SecByteBlock& key = keygen->getKey();
+    const SecByteBlock& iv = keygen->getIv();
     GCM<AES>::Encryption encryptor;
     encryptor.SetKeyWithIV(key, key.size(), iv);
 
-    for(string path : paths) {
+    for(const string& path : *paths) {
         DirFname dirfname = extractFname(path, m_delim);
         FileSink* fs = new FileSink((dirfname.m_dir + dirfname.m_delim + encryptText(dirfname.m_fname, keygen, Encoding::HEX)).c_str());
         AuthenticatedEncryptionFilter* aef = new AuthenticatedEncryptionFilter(encryptor);
@@ -80,14 +80,14 @@ void AesGCM::encryptFile(const vector<string>& paths, const KeyGen& keygen, cons
         removeFile(path);
     }
 }
-void AesGCM::decryptFile(const vector<string>& paths, const KeyGen& keygen, const Encoding encoding) const noexcept(false)
+void AesGCM::decryptFile(vector<string>* paths, Keygen* keygen, const Encoding encoding) const noexcept(false)
 {
-    const SecByteBlock& key = keygen.getKey();
-    const SecByteBlock& iv = keygen.getIv();
+    const SecByteBlock& key = keygen->getKey();
+    const SecByteBlock& iv = keygen->getIv();
     GCM<AES>::Decryption decryptor;
     decryptor.SetKeyWithIV(key, key.size(), iv);
 
-    for(string path : paths) {
+    for(const string& path : *paths) {
         DirFname dirfname = extractFname(path, m_delim);
         FileSink* fs = new FileSink((dirfname.m_dir + dirfname.m_delim + decryptText(dirfname.m_fname, keygen, Encoding::HEX)).c_str());
         AuthenticatedDecryptionFilter* aef = new AuthenticatedDecryptionFilter(decryptor, fs);

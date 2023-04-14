@@ -16,7 +16,7 @@ using namespace std;
 Serial::Serial(){};
 
 // methods
-bool Serial::importKeygen(KeyGen* keygen, ifstream* file) const noexcept(false)
+bool Serial::importKeygen(Keygen* keygen, ifstream* file) const noexcept(false)
 {
     bool imported = false;
 
@@ -49,7 +49,7 @@ bool Serial::importKeygen(KeyGen* keygen, ifstream* file) const noexcept(false)
 
     return imported;
 }
-void Serial::keyToFile(const string& path, KeyGen& keygen, const Encoding encoding) const
+void Serial::keyToFile(const string& path, Keygen& keygen, const Encoding encoding) const
 {
     size_t ivSize = keygen.getIv().size();
     size_t keySize = keygen.getKey().size();
@@ -86,7 +86,7 @@ void Serial::keyToFile(const string& path, KeyGen& keygen, const Encoding encodi
     refsSource.PumpAll();
     keyIvSource.PumpAll();
 }
-string Serial::keyToString(KeyGen& keygen, const Encoding encoding) const
+string Serial::keyToString(Keygen& keygen, const Encoding encoding) const
 {
     StringSource keySource(keygen.getKey().BytePtr(), keygen.getKey().size(), false);
     string key;

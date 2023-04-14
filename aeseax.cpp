@@ -21,11 +21,11 @@ std::string AesEAX::getModeName() const {
     return AesEAX::ModeName;
 }
 
-string AesEAX::encryptText(const string& plain, const KeyGen& keygen, const Encoding encoding) const noexcept(false)
+string AesEAX::encryptText(const string& plain, Keygen* keygen, const Encoding encoding) const noexcept(false)
 {
     std::string cipher = "";
-    const SecByteBlock& key = keygen.getKey();
-    const SecByteBlock& iv = keygen.getIv();
+    const SecByteBlock& key = keygen->getKey();
+    const SecByteBlock& iv = keygen->getIv();
     StringSink* ss = new StringSink(cipher);
     EAX<AES>::Encryption encryptor;
     AuthenticatedEncryptionFilter* aef = new AuthenticatedEncryptionFilter(encryptor);
@@ -40,11 +40,11 @@ string AesEAX::encryptText(const string& plain, const KeyGen& keygen, const Enco
     StringSource(plain, true, aef);
     return cipher;
 }
-string AesEAX::decryptText(const string& cipher, const KeyGen& keygen, const Encoding encoding) const noexcept(false)
+string AesEAX::decryptText(const string& cipher, Keygen* keygen, const Encoding encoding) const noexcept(false)
 {
     std::string recover;
-    const SecByteBlock& key = keygen.getKey();
-    const SecByteBlock& iv = keygen.getIv();
+    const SecByteBlock& key = keygen->getKey();
+    const SecByteBlock& iv = keygen->getIv();
     StringSink* ss = new StringSink(recover);
     EAX<AES>::Decryption decryptor;
     AuthenticatedDecryptionFilter* aef = new AuthenticatedDecryptionFilter(decryptor, ss);
@@ -58,14 +58,14 @@ string AesEAX::decryptText(const string& cipher, const KeyGen& keygen, const Enc
     }
     return recover;
 }
-void AesEAX::encryptFile(const vector<string>& paths, const KeyGen& keygen, const Encoding encoding) const noexcept(false)
+void AesEAX::encryptFile(vector<string>* paths, Keygen* keygen, const Encoding encoding) const noexcept(false)
 {
-    const SecByteBlock& key = keygen.getKey();
-    const SecByteBlock& iv = keygen.getIv();
+    const SecByteBlock& key = keygen->getKey();
+    const SecByteBlock& iv = keygen->getIv();
     EAX<AES>::Encryption encryptor;
     encryptor.SetKeyWithIV(key, key.size(), iv);
 
-    for(string path : paths) {
+    for(const string& path : *paths) {
         DirFname dirfname = extractFname(path, m_delim);
         FileSink* fs = new FileSink((dirfname.m_dir + dirfname.m_delim + encryptText(dirfname.m_fname, keygen, Encoding::HEX)).c_str());
         AuthenticatedEncryptionFilter* aef = new AuthenticatedEncryptionFilter(encryptor);
@@ -81,14 +81,14 @@ void AesEAX::encryptFile(const vector<string>& paths, const KeyGen& keygen, cons
     }
 
 }
-void AesEAX::decryptFile(const vector<string>& paths, const KeyGen& keygen, const Encoding encoding) const noexcept(false)
+void AesEAX::decryptFile(vector<string>* paths, Keygen* keygen, const Encoding encoding) const noexcept(false)
 {
-    const SecByteBlock& key = keygen.getKey();
-    const SecByteBlock& iv = keygen.getIv();
+    const SecByteBlock& key = keygen->getKey();
+    const SecByteBlock& iv = keygen->getIv();
     EAX<AES>::Decryption decryptor;
     decryptor.SetKeyWithIV(key, key.size(), iv);
 
-    for(string path : paths) {
+    for(const string& path : *paths) {
         DirFname dirfname = extractFname(path, m_delim);
         FileSink* fs = new FileSink((dirfname.m_dir + dirfname.m_delim + decryptText(dirfname.m_fname, keygen, Encoding::HEX)).c_str());
         AuthenticatedDecryptionFilter* aef = new AuthenticatedDecryptionFilter(decryptor, fs);
