@@ -22,11 +22,11 @@ public:
     // methods
     virtual std::string getAlgName() const final;
     virtual std::string getModeName() const override = 0 ;
-
-    virtual std::string encryptText(const std::string& plain, const KeyGen& keygen, const Encoding encoding) const noexcept(false) override = 0;
-    virtual std::string decryptText(const std::string& cipher, const KeyGen& keygen, const Encoding encoding) const noexcept(false) override = 0;
-    virtual void encryptFile(const std::vector<std::string>& paths, const KeyGen& keygen, const Encoding encoding) const noexcept(false) override = 0;
-    virtual void decryptFile(const std::vector<std::string>& paths, const KeyGen& keygen, const Encoding encoding) const noexcept(false) override = 0;
+    
+    virtual std::string encryptText(const std::string& plain, Keygen* keygen, const Encoding encoding) const noexcept(false) override = 0;
+    virtual std::string decryptText(const std::string& cipher, Keygen* keygen, const Encoding encoding) const noexcept(false) override = 0;
+    virtual void encryptFile(std::vector<std::string>* paths, Keygen* keygen, const Encoding encoding) const noexcept(false) override = 0;
+    virtual void decryptFile(std::vector<std::string>* paths, Keygen* keygen, const Encoding encoding) const noexcept(false) override = 0;
 };
 
 #endif // CIPHERAES_H

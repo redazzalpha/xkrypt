@@ -17,19 +17,19 @@ std::string RsaOEAP::getModeName() const
     return RsaOEAP::ModeName;
 }
 
-string RsaOEAP::encryptText(const string& plain, const KeyGen& keygen, const Encoding encoding) const noexcept(false)
+string RsaOEAP::encryptText(const string& plain, Keygen* keygen, const Encoding encoding) const noexcept(false)
 {
     std::cout << "cipher Rsa oeap encrypt" << std::endl;
 }
-string RsaOEAP::decryptText(const string& cipher, const KeyGen& keygen, const Encoding encoding) const noexcept(false)
+string RsaOEAP::decryptText(const string& cipher, Keygen* keygen, const Encoding encoding) const noexcept(false)
 {
     std::cout << "cipher Rsa oeap decrypt" << std::endl;
 }
-void RsaOEAP::encryptFile(const vector<string>& paths, const KeyGen& keygen, const Encoding encoding) const noexcept(false)
+void RsaOEAP::encryptFile(vector<string>* paths, Keygen* keygen, const Encoding encoding) const noexcept(false)
 {
 
 }
-void  RsaOEAP::decryptFile(const vector<string>& paths, const KeyGen& keygen, const Encoding encoding) const noexcept(false)
+void  RsaOEAP::decryptFile(vector<string>* paths, Keygen* keygen, const Encoding encoding) const noexcept(false)
 {
 
 }

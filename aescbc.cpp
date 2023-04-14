@@ -25,11 +25,11 @@ std::string AesCBC::getModeName() const
     return AesCBC::ModeName;
 }
 
-string AesCBC::encryptText(const string& plain, const KeyGen& keygen, const Encoding encoding) const noexcept(false)
+string AesCBC::encryptText(const string& plain, Keygen* keygen, const Encoding encoding) const noexcept(false)
 {
     std::string cipher = "";
-    const SecByteBlock& key = keygen.getKey();
-    const SecByteBlock& iv = keygen.getIv();
+    const SecByteBlock& key = keygen->getKey();
+    const SecByteBlock& iv = keygen->getIv();
     StringSink* ss = new StringSink(cipher);
     CBC_Mode<AES>::Encryption encryptor;
     StreamTransformationFilter* stf = new StreamTransformationFilter(encryptor);
@@ -44,11 +44,11 @@ string AesCBC::encryptText(const string& plain, const KeyGen& keygen, const Enco
     StringSource(plain, true, stf);
     return cipher;
 }
-string AesCBC::decryptText(const string& cipher, const KeyGen& keygen, const Encoding encoding) const noexcept(false)
+string AesCBC::decryptText(const string& cipher, Keygen* keygen, const Encoding encoding) const noexcept(false)
 {
     std::string recover;
-    const SecByteBlock& key = keygen.getKey();
-    const SecByteBlock& iv = keygen.getIv();
+    const SecByteBlock& key = keygen->getKey();
+    const SecByteBlock& iv = keygen->getIv();
     StringSink* ss = new StringSink(recover);
     CBC_Mode<AES>::Decryption decryptor;
     StreamTransformationFilter* stf = new StreamTransformationFilter(decryptor, ss);
@@ -62,14 +62,14 @@ string AesCBC::decryptText(const string& cipher, const KeyGen& keygen, const Enc
     }
     return recover;
 }
-void AesCBC::encryptFile(const vector<string>& paths, const KeyGen& keygen, const Encoding encoding) const noexcept(false)
+void AesCBC::encryptFile(vector<string>* paths, Keygen* keygen, const Encoding encoding) const noexcept(false)
 {
-    const SecByteBlock& key = keygen.getKey();
-    const SecByteBlock& iv = keygen.getIv();
+    const SecByteBlock& key = keygen->getKey();
+    const SecByteBlock& iv = keygen->getIv();
     CBC_Mode<AES>::Encryption encryptor;
     encryptor.SetKeyWithIV(key, key.size(), iv);
 
-    for(const string& path : paths) {
+    for(const string& path : *paths) {
         DirFname dirfname = extractFname(path, m_delim);
         FileSink* fs = new FileSink((dirfname.m_dir + dirfname.m_delim + encryptText(dirfname.m_fname, keygen, Encoding::HEX)).c_str());
         StreamTransformationFilter* stf = new StreamTransformationFilter(encryptor);
@@ -84,14 +84,14 @@ void AesCBC::encryptFile(const vector<string>& paths, const KeyGen& keygen, cons
         removeFile(path);
     }
 }
-void AesCBC::decryptFile(const vector<string>& paths, const KeyGen& keygen, const Encoding encoding) const noexcept(false)
+void AesCBC::decryptFile(vector<string>* paths, Keygen* keygen, const Encoding encoding) const noexcept(false)
 {
-    const SecByteBlock& key = keygen.getKey();
-    const SecByteBlock& iv = keygen.getIv();
+    const SecByteBlock& key = keygen->getKey();
+    const SecByteBlock& iv = keygen->getIv();
     CBC_Mode<AES>::Decryption decryptor;
     decryptor.SetKeyWithIV(key, key.size(), iv);
 
-    for(const string path: paths) {
+    for(const string& path: *paths) {
         DirFname dirfname = extractFname(path, m_delim);
         FileSink* fs = new FileSink((dirfname.m_dir + dirfname.m_delim + decryptText(dirfname.m_fname, keygen, Encoding::HEX)).c_str());
         StreamTransformationFilter* stf  = new StreamTransformationFilter(decryptor, fs);

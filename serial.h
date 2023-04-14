@@ -13,9 +13,9 @@ public:
     Serial();
 
     // methods
-    bool importKeygen(KeyGen *keygen, std::ifstream* file) const noexcept(false);
-    void keyToFile(const std::string& path, KeyGen& keygen, const Encoding encoding) const;
-    std::string keyToString(KeyGen& keygen, const Encoding encoding) const;
+    bool importKeygen(Keygen *keygen, std::ifstream* file) const noexcept(false);
+    void keyToFile(const std::string& path, Keygen& keygen, const Encoding encoding) const;
+    std::string keyToString(Keygen& keygen, const Encoding encoding) const;
     std::string encodingToString(const Encoding encoding) const;
 };
 
