@@ -125,9 +125,8 @@ void MainWindow::progressEnc(vector<string>* paths)
     Encoding encoding = static_cast<Encoding>(ui->m_encTabFileEncodings->currentIndex());
     m_cipherNew(alg, mode);
 
-    m_cipher->encryptFile(paths, m_keygen, encoding);
-//    std::thread t(&AbstractCipherBase::encryptFile, m_cipher, paths, m_keygen, encoding);
-//    t.join();
+    std::thread t(&AbstractCipherBase::encryptFile, m_cipher, paths, m_keygen, encoding);
+    t.join();
 }
 void MainWindow::progressDec(vector<string>* paths)
 {
@@ -136,10 +135,8 @@ void MainWindow::progressDec(vector<string>* paths)
     const Encoding encoding = static_cast<Encoding>(ui->m_decTabFileEncodings->currentIndex());
     m_cipherNew(alg, mode);
 
-
-    m_cipher->decryptFile(paths, m_keygen, encoding);
-//    std::thread t(&AbstractCipherBase::decryptFile, m_cipher, paths, m_keygen, encoding);
-//    t.join();
+    std::thread t(&AbstractCipherBase::decryptFile, m_cipher, paths, m_keygen, encoding);
+    t.join();
 }
 
 void MainWindow::saveOnFile(const Encoding encoding)
