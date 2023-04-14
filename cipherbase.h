@@ -16,9 +16,6 @@ class AbstractCipherBase {
 protected:
     const std::string m_delim = "/";
 
-protected:
-    const std::string m_delim = "/";
-
 public:
     // constructors
     AbstractCipherBase();
