@@ -19,15 +19,6 @@
 using namespace std;
 using namespace CryptoPP;
 
-
-
-
-class Foo {
-public:
-    void bar(vector<string>* paths, Encoding encoding, Keygen& keygen) {}
-
-};
-
 // constructors
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -35,12 +26,15 @@ MainWindow::MainWindow(QWidget *parent)
 {
     uiInit();
     connectItems();
+    shortcuts();
+    toolTips();
     setFixedSize(WINDOW_WIDTH, WINDOW_HEIGHT);
     setIconSize(QSize(WINDOW_ICON_WIDTH, WINDOW_ICON_HEIGHT));
 }
 // destructor
 MainWindow::~MainWindow()
 {
+    m_thread.wait();
     delete ui;
     delete m_keygen;
     delete m_cipher;
@@ -82,8 +76,18 @@ void MainWindow::uiInit()
     ui->m_decTabTextModes->addItems(*m_aesModes);
     ui->m_decTabTextEncodings->addItems(*m_enc_dec_encodings);
 }
-void MainWindow::connectItems() const
+void MainWindow::connectItems()
 {
+    QObject::connect(this, &MainWindow::initProcess, &m_process, &ProcessBar::init);
+    QObject::connect(this, &MainWindow::initProcess, &m_process, &ProcessBar::init);
+    QObject::connect(&m_thread, &QThread::started, &m_process, &ProcessBar::process);
+    QObject::connect(&m_process, &ProcessBar::finished, &m_thread, &QThread::quit);
+    m_process.moveToThread(&m_thread);
+    m_thread.start();
+
+    // cipher
+    QObject::connect(m_cipher, &AbstractCipherBase::error, this, &MainWindow::cipherError);
+
     // connect combos
     QObject::connect(ui->m_encTabFileAlgs, &QComboBox::textActivated, this, &MainWindow::setComboModes);
     QObject::connect(ui->m_decTabFileAlgs, &QComboBox::textActivated, this, &MainWindow::setComboModes);
@@ -118,7 +122,20 @@ void MainWindow::generateKey(Encoding encoding)
     m_keygen->generateKey();
     setKeyLoadedText(QString::fromStdString(m_serial.keyToString(*m_keygen, encoding)));
 }
-void MainWindow::progressEnc(vector<string>* paths)
+
+void MainWindow::shortcuts()
+{
+    m_actions[0]->setShortcut(QKeySequence("Alt+k"));
+    m_actions[1]->setShortcut(QKeySequence("Alt+e"));
+    m_actions[2]->setShortcut(QKeySequence("Alt+d"));
+}
+void MainWindow::toolTips()
+{
+    m_actions[0]->setToolTip("Alt+k");
+    m_actions[1]->setToolTip("Alt+e");
+    m_actions[2]->setToolTip("Alt+d");
+}
+void MainWindow::processEnc(vector<string>* paths)
 {
     string alg = ui->m_encTabFileAlgs->currentText().toStdString();
     string mode = ui->m_encTabFileModes->currentText().toStdString();
@@ -128,11 +145,11 @@ void MainWindow::progressEnc(vector<string>* paths)
     std::thread t(&AbstractCipherBase::encryptFile, m_cipher, paths, m_keygen, encoding);
     t.join();
 }
-void MainWindow::progressDec(vector<string>* paths)
+void MainWindow::processDec(vector<string>* paths)
 {
     string alg = ui->m_decTabFileAlgs->currentText().toStdString();
     string mode = ui->m_decTabFileModes->currentText().toStdString();
-    const Encoding encoding = static_cast<Encoding>(ui->m_decTabFileEncodings->currentIndex());
+    Encoding encoding = static_cast<Encoding>(ui->m_decTabFileEncodings->currentIndex());
     m_cipherNew(alg, mode);
 
     std::thread t(&AbstractCipherBase::decryptFile, m_cipher, paths, m_keygen, encoding);
@@ -404,14 +421,24 @@ void MainWindow::setKeyLoadedSelectable(const bool selectable) const
     else keyLoadedSelectable(Qt::NoTextInteraction);
 }
 
+// protected methods
+void MainWindow::closeEvent(QCloseEvent*)
+{
+    m_process.kill();
+    QMainWindow::close();
+}
+
 // slots
 void MainWindow::on_m_encTabFileImport_clicked()
 {
+//    m_process.progress().hide();
+
     m_fimporterEnc.clear();
     m_fimporterEnc.importFiles();
 
     stringstream ss;
     auto paths = m_fimporterEnc.getFilePaths();
+
     if(paths.size() > 0)
         for(const string& path : paths) ss << path << "\n";
     else ss << NO_FILE_LOADED;
@@ -421,6 +448,7 @@ void MainWindow::on_m_decTabFileImport_clicked()
 {
     m_fimporterDec.clear();
     m_fimporterDec.importFiles();
+
     stringstream ss;
     auto paths = m_fimporterDec.getFilePaths();
 
@@ -437,7 +465,7 @@ void MainWindow::on_m_encTabFileEncrypt_clicked()
         size_t size = paths.size();
         if(size < 1) throw FileSelectedException();
 
-        progressEnc(&paths);
+        processEnc(&paths);
 
         string message = "file(s) successfully encrypted!<br />";
         message += "Using: " + m_cipher->getAlgName() += (" - " + m_cipher->getModeName()) + " mode";
@@ -455,7 +483,7 @@ void MainWindow::on_m_decTabFileDecrypt_clicked()
         size =  paths.size();
         if(size < 1) throw FileSelectedException();
 
-        progressDec(&paths);
+        processDec(&paths);
 
         string message = "file(s) successfully decrypted!<br />";
         message += "Using: " + m_cipher->getAlgName() += (" - " + m_cipher->getModeName()) + " mode";
@@ -474,6 +502,11 @@ void MainWindow::on_m_decTabFileClear_clicked()
 {
     m_fimporterDec.clear();
     ui->m_decTabFileSelected->setPlainText(NO_FILE_LOADED);
+}
+
+void MainWindow::cipherError(const std::string& err)
+{
+    dialogErrorMessage(err);
 }
 
 void MainWindow::on_m_encTabTextEncrypt_clicked()

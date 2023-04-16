@@ -32,7 +32,7 @@ SOURCES += \
     rsaoeap.cpp \
     rsassa.cpp \
     serial.cpp \
-    structures.cpp \
+    structures.cpp
 
 HEADERS += \
     action.h \
@@ -59,7 +59,7 @@ HEADERS += \
     rsaoeap.h \
     rsassa.h \
     serial.h \
-    structures.h \
+    structures.h
 
 FORMS += \
     mainwindow.ui

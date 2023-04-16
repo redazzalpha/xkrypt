@@ -4,6 +4,7 @@
 #include "aesgcm.h"
 #include "aescbc.h"
 #include "aeseax.h"
+#include "processbar.h"
 #include "serial.h"
 #include "keygen.h"
 #include "rsassa.h"
@@ -29,6 +30,8 @@ class MainWindow : public QMainWindow {
     Q_OBJECT
 
 private:
+    QThread m_thread;
+    ProcessBar m_process;
     Ui::MainWindow *ui;
     Serial m_serial;
     FileImporter m_fimporterEnc;
@@ -62,13 +65,6 @@ private:
     QList<QString>* m_aesKeys = new QList<QString>{
         QString::number(static_cast<int>(KeyLength::LENGTH_DEFAULT)),
         QString::number(static_cast<int>(KeyLength::LENGTH_32)),
-//        AES SIZES NOT DEFINED YET CANNOT USE THEM!
-//        QString::number(static_cast<int>(KeyLength::LENGTH_64)),
-//        QString::number(static_cast<int>(KeyLength::LENGTH_128)),
-//        QString::number(static_cast<int>(KeyLength::LENGTH_256)),
-//        QString::number(static_cast<int>(KeyLength::LENGTH_512)),
-//        QString::number(static_cast<int>(KeyLength::LENGTH_1024)),
-//        QString::number(static_cast<int>(KeyLength::LENGTH_2048)),
     };
     QList<QString>* m_keyEncodings = new QList<QString>{
         "Base64",
@@ -91,10 +87,12 @@ public:
 private:
     // methods
     void uiInit();
-    void connectItems() const;
+    void connectItems();
     void generateKey(Encoding encodingIndex);
-    void progressEnc(std::vector<std::string>* paths);
-    void progressDec(std::vector<std::string>* paths);
+    void shortcuts();
+    void toolTips();
+    void processEnc(std::vector<std::string>* paths);
+    void processDec(std::vector<std::string>* paths);
     void importAsymmectric();
     void importSymmectric();
     void m_cipherNew(const std::string& alg, const std::string& mode);
@@ -115,6 +113,10 @@ private:
     void setFilesLoadedStyle(const QString &style) const;
     void setKeyLoadedText(const QString &keyStr) const;
     void setKeyLoadedSelectable(const bool selectable) const;
+
+protected:
+    void closeEvent(QCloseEvent* event) override;
+
 
 private slots:
     void on_m_encTabFileImport_clicked();
@@ -139,6 +141,11 @@ private slots:
     void colorFilesLoaded();
     void flushKey();
     void on_m_decTabFileClear_clicked();
+
+    void cipherError(const std::string &err);
+
+signals:
+    void initProcess();
 };
 
 #endif // MAINWINDOW_H
