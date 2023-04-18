@@ -89,13 +89,14 @@ private:
     void generateKey(Encoding encodingIndex);
     void shortcuts();
     void toolTips();
-    void processEncFile(std::vector<std::string>& paths);
-    void processDecFile(std::vector<std::string>& paths);
-    void processEncText();
-    void processDecText();
     void importAsymmectric();
     void importSymmectric();
     KeyLength keylengthFrom(const int index);
+
+    void processEncText();
+    void processDecText();
+    void processEncFile(std::vector<std::string>& paths);
+    void processDecFile(std::vector<std::string>& paths);
     void m_cipherNew(const std::string& alg, const std::string& mode);
 
     void saveOnFile(const Encoding encoding);

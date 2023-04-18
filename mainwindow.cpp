@@ -116,7 +116,6 @@ void MainWindow::generateKey(Encoding encoding)
     m_keygen->generateKey();
     setKeyLoadedText(QString::fromStdString(m_serial.keyToString(*m_keygen, encoding)));
 }
-
 void MainWindow::shortcuts()
 {
     m_actions[0]->setShortcut(QKeySequence("Alt+k"));
@@ -130,26 +129,46 @@ void MainWindow::toolTips()
     m_actions[1]->setToolTip("Alt+e");
     m_actions[2]->setToolTip("Alt+d");
 }
-void MainWindow::processEncFile(vector<string>& paths)
+KeyLength MainWindow::keylengthFrom(const int index)
 {
-    string alg = ui->m_encTabFileAlgs->currentText().toStdString();
-    string mode = ui->m_encTabFileModes->currentText().toStdString();
-    Encoding encoding = static_cast<Encoding>(ui->m_encTabFileEncodings->currentIndex());
-    m_cipherNew(alg, mode);
-
-    m_threadCipher.start();
-    emit encryptFile(paths[0], m_keygen, encoding);
+    KeyLength keylength;
+    switch(index) {
+    case 0 : keylength = KeyLength::LENGTH_DEFAULT; break;
+    case 1 : keylength = KeyLength::LENGTH_32; break;
+    case 2 : keylength = KeyLength::LENGTH_64; break;
+    case 3 : keylength = KeyLength::LENGTH_128; break;
+    case 4 : keylength = KeyLength::LENGTH_256; break;
+    case 5 : keylength = KeyLength::LENGTH_512; break;
+    case 6 : keylength = KeyLength::LENGTH_1024; break;
+    case 7 : keylength = KeyLength::LENGTH_2048; break;
+    default: keylength = static_cast<KeyLength>(0);
+    }
+    return keylength;
 }
-void MainWindow::processDecFile(vector<string>& paths)
+void MainWindow::importSymmectric()
 {
-    string alg = ui->m_decTabFileAlgs->currentText().toStdString();
-    string mode = ui->m_decTabFileModes->currentText().toStdString();
-    Encoding encoding = static_cast<Encoding>(ui->m_decTabFileEncodings->currentIndex());
-    m_cipherNew(alg, mode);
+    try {
+        m_fimporterKey.clear();
+        Encoding encoding = static_cast<Encoding>(ui->m_keyMEncodingsI->currentIndex());
+        bool imported = m_serial.importKeygen(m_keygen, (ifstream*)m_fimporterKey.importFile());
+        if(m_keygen->isReady() && imported) {
+            string keyStr = m_serial.keyToString(*m_keygen, encoding);
+            setKeyLoadedText(QString::fromStdString(keyStr));
 
-    m_threadCipher.start();
-    emit decryptFile(paths[0], m_keygen, encoding);
+            string message = "key " + std::to_string(m_keygen->getKey().size()) + " bytes - encoded ";
+            message += m_serial.encodingToString(encoding);
+            message += "<br />has been successfully imported";
+            dialogSuccessMessage(message);
+        }
+    }
+    catch(exception& e) {
+        dialogErrorMessage(e.what());
+    }
 }
+void MainWindow::importAsymmectric()
+{
+}
+
 void MainWindow::processEncText()
 {
     if(!m_keygen->isReady()) throw UnreadyKeyException();
@@ -180,6 +199,59 @@ void MainWindow::processDecText()
     if(!m_cipher) throw BadCipherException();
     m_threadCipher.start();
     emit decryptText(cipherText, m_keygen, encoding);
+}
+void MainWindow::processEncFile(vector<string>& paths)
+{
+    string alg = ui->m_encTabFileAlgs->currentText().toStdString();
+    string mode = ui->m_encTabFileModes->currentText().toStdString();
+    Encoding encoding = static_cast<Encoding>(ui->m_encTabFileEncodings->currentIndex());
+    m_cipherNew(alg, mode);
+
+    m_threadCipher.start();
+    emit encryptFile(paths[0], m_keygen, encoding);
+}
+void MainWindow::processDecFile(vector<string>& paths)
+{
+    string alg = ui->m_decTabFileAlgs->currentText().toStdString();
+    string mode = ui->m_decTabFileModes->currentText().toStdString();
+    Encoding encoding = static_cast<Encoding>(ui->m_decTabFileEncodings->currentIndex());
+    m_cipherNew(alg, mode);
+
+    m_threadCipher.start();
+    emit decryptFile(paths[0], m_keygen, encoding);
+}
+void MainWindow::m_cipherNew(const string& alg, const string& mode)
+{
+    delete m_cipher;
+    m_cipher = nullptr;
+
+    // aes algs
+    if(alg == AbstractCipherAes::AlgName) {
+
+        if(mode == AesCBC::ModeName) m_cipher = new AesCBC;
+        else if(mode == AesEAX::ModeName) m_cipher = new AesEAX;
+        else if(mode == AesGCM::ModeName) m_cipher = new AesGCM;
+        else if(mode == AesCCM::ModeName) m_cipher = new AesCCM;
+        else if(mode == AesGCM::ModeName) m_cipher = new AesGCM;
+        else if(mode == AesGCM::ModeName) m_cipher = new AesGCM;
+        else if(mode == AesGCM::ModeName) m_cipher = new AesGCM;
+        else if(mode == AesGCM::ModeName) m_cipher = new AesGCM;
+        // default. shouldn't go here but used to remove clang warnings
+        else m_cipher = new AesCBC;
+    }
+
+    // rsa algs
+    else if(alg == AbstractCipherRsa::AlgName) {
+        if(mode == RsaOEAP::ModeName) m_cipher = new RsaOEAP;
+        else if(mode == RsaSSA::ModeName) m_cipher = new RsaSSA;
+        // default. shouldn't go here but used to remove clang warnings
+        else m_cipher = new RsaOEAP;
+    }
+
+    // default. shouldn't go here but used to remove clang warnings
+    else m_cipher = new AesCBC;
+
+    connectCipher();
 }
 
 void MainWindow::saveOnFile(const Encoding encoding)
@@ -221,79 +293,6 @@ void MainWindow::saveSuccess(Encoding encoding) {
     dialogSuccessMessage(message);
     ui->m_keyMSaveOnF->setChecked(false);
 }
-void MainWindow::importSymmectric()
-{
-    try {
-        m_fimporterKey.clear();
-        Encoding encoding = static_cast<Encoding>(ui->m_keyMEncodingsI->currentIndex());
-        bool imported = m_serial.importKeygen(m_keygen, (ifstream*)m_fimporterKey.importFile());
-        if(m_keygen->isReady() && imported) {
-            string keyStr = m_serial.keyToString(*m_keygen, encoding);
-            setKeyLoadedText(QString::fromStdString(keyStr));
-
-            string message = "key " + std::to_string(m_keygen->getKey().size()) + " bytes - encoded ";
-            message += m_serial.encodingToString(encoding);
-            message += "<br />has been successfully imported";
-            dialogSuccessMessage(message);
-        }
-    }
-    catch(exception& e) {
-        dialogErrorMessage(e.what());
-    }
-}
-void MainWindow::importAsymmectric()
-{
-}
-KeyLength MainWindow::keylengthFrom(const int index)
-{
-    KeyLength keylength;
-    switch(index) {
-    case 0 : keylength = KeyLength::LENGTH_DEFAULT; break;
-    case 1 : keylength = KeyLength::LENGTH_32; break;
-    case 2 : keylength = KeyLength::LENGTH_64; break;
-    case 3 : keylength = KeyLength::LENGTH_128; break;
-    case 4 : keylength = KeyLength::LENGTH_256; break;
-    case 5 : keylength = KeyLength::LENGTH_512; break;
-    case 6 : keylength = KeyLength::LENGTH_1024; break;
-    case 7 : keylength = KeyLength::LENGTH_2048; break;
-    default: keylength = static_cast<KeyLength>(0);
-    }
-    return keylength;
-}
-void MainWindow::m_cipherNew(const string& alg, const string& mode)
-{
-    delete m_cipher;
-    m_cipher = nullptr;
-
-    // aes algs
-    if(alg == AbstractCipherAes::AlgName) {
-
-        if(mode == AesCBC::ModeName) m_cipher = new AesCBC;
-        else if(mode == AesEAX::ModeName) m_cipher = new AesEAX;
-        else if(mode == AesGCM::ModeName) m_cipher = new AesGCM;
-        else if(mode == AesCCM::ModeName) m_cipher = new AesCCM;
-        else if(mode == AesGCM::ModeName) m_cipher = new AesGCM;
-        else if(mode == AesGCM::ModeName) m_cipher = new AesGCM;
-        else if(mode == AesGCM::ModeName) m_cipher = new AesGCM;
-        else if(mode == AesGCM::ModeName) m_cipher = new AesGCM;
-        // default. shouldn't go here but used to remove clang warnings
-        else m_cipher = new AesCBC;
-    }
-
-    // rsa algs
-    else if(alg == AbstractCipherRsa::AlgName) {
-        if(mode == RsaOEAP::ModeName) m_cipher = new RsaOEAP;
-        else if(mode == RsaSSA::ModeName) m_cipher = new RsaSSA;
-        // default. shouldn't go here but used to remove clang warnings
-        else m_cipher = new RsaOEAP;
-    }
-
-    // default. shouldn't go here but used to remove clang warnings
-    else m_cipher = new AesCBC;
-
-    connectCipher();
-}
-
 bool MainWindow::isFileExist(const string& filename) const
 {
     return std::fstream(filename, ios::in | ios::binary).good();
