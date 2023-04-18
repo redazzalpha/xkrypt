@@ -78,6 +78,18 @@ void MainWindow::uiInit()
 }
 void MainWindow::connectItems()
 {
+
+
+    // process
+    m_process.moveToThread(&m_threadProcess);
+    QObject::connect(this, &MainWindow::initProcess, &m_process, &ProcessBar::init);
+    QObject::connect(this, &MainWindow::startProcess, &m_process, &ProcessBar::process);
+    QObject::connect(&m_process, &ProcessBar::finished, &m_threadProcess, &QThread::quit);
+    m_threadProcess.start();
+    emit initProcess();
+    emit startProcess();
+
+
     // cipher
     m_cipher->moveToThread(&m_threadCipher);
     connectCipher();
@@ -107,6 +119,18 @@ void MainWindow::connectItems()
         QObject::connect(action, &AbstractActionBase::setStackPage, ui->m_mainStack, &QStackedWidget::setCurrentIndex);
     }
 }
+void MainWindow::connectCipher()
+{
+    QObject::connect(this, &MainWindow::encryptText, m_cipher, &AbstractCipherBase::encryptText);
+    QObject::connect(this, &MainWindow::decryptText, m_cipher, &AbstractCipherBase::decryptText);
+    QObject::connect(this, &MainWindow::encryptFile, m_cipher, &AbstractCipherBase::encryptFile);
+    QObject::connect(this, &MainWindow::decryptFile, m_cipher, &AbstractCipherBase::decryptFile);
+    QObject::connect(m_cipher, &AbstractCipherBase::cipherText, this, &MainWindow::cipherText);
+    QObject::connect(m_cipher, &AbstractCipherBase::recoverText, this, &MainWindow::recoverText);
+    QObject::connect(m_cipher, &AbstractCipherBase::finished, &m_threadCipher, &QThread::quit);
+    QObject::connect(m_cipher, &AbstractCipherBase::error, &m_threadCipher, &QThread::quit);
+    QObject::connect(m_cipher, &AbstractCipherBase::error, this, &MainWindow::cipherError);
+}
 void MainWindow::generateKey(Encoding encoding)
 {
     const int keylengthIndex = ui->m_keyMLength->currentIndex();
@@ -130,26 +154,6 @@ void MainWindow::toolTips()
     m_actions[1]->setToolTip("Alt+e");
     m_actions[2]->setToolTip("Alt+d");
 }
-void MainWindow::processEncFile(vector<string>& paths)
-{
-    string alg = ui->m_encTabFileAlgs->currentText().toStdString();
-    string mode = ui->m_encTabFileModes->currentText().toStdString();
-    Encoding encoding = static_cast<Encoding>(ui->m_encTabFileEncodings->currentIndex());
-    m_cipherNew(alg, mode);
-
-    m_threadCipher.start();
-    emit encryptFile(paths[0], m_keygen, encoding);
-}
-void MainWindow::processDecFile(vector<string>& paths)
-{
-    string alg = ui->m_decTabFileAlgs->currentText().toStdString();
-    string mode = ui->m_decTabFileModes->currentText().toStdString();
-    Encoding encoding = static_cast<Encoding>(ui->m_decTabFileEncodings->currentIndex());
-    m_cipherNew(alg, mode);
-
-    m_threadCipher.start();
-    emit decryptFile(paths[0], m_keygen, encoding);
-}
 void MainWindow::processEncText()
 {
     if(!m_keygen->isReady()) throw UnreadyKeyException();
@@ -160,6 +164,8 @@ void MainWindow::processEncText()
     string selectedMode = ui->m_encTabTextModes->currentText().toStdString();
     Encoding encoding = static_cast<Encoding>(ui->m_encTabTextEncodings->currentIndex());
     m_cipherNew(selectedAlg, selectedMode);
+
+    emit startProcess();
 
     if(!m_cipher) throw BadCipherException();
     m_threadCipher.start();
@@ -177,9 +183,38 @@ void MainWindow::processDecText()
     Encoding encoding = static_cast<Encoding>(ui->m_decTabTextEncodings->currentIndex());
     m_cipherNew(selectedAlg, selectedMode);
 
+    emit startProcess();
+
     if(!m_cipher) throw BadCipherException();
     m_threadCipher.start();
     emit decryptText(cipherText, m_keygen, encoding);
+}
+void MainWindow::processEncFile(vector<string>& paths)
+{
+    string alg = ui->m_encTabFileAlgs->currentText().toStdString();
+    string mode = ui->m_encTabFileModes->currentText().toStdString();
+    Encoding encoding = static_cast<Encoding>(ui->m_encTabFileEncodings->currentIndex());
+    m_cipherNew(alg, mode);
+
+    emit startProcess();
+    m_threadCipher.start();
+    for(const string& path : paths) {
+        emit encryptFile(path, m_keygen, encoding);
+    }
+    emit m_cipher->finished();
+}
+void MainWindow::processDecFile(vector<string>& paths)
+{
+    string alg = ui->m_decTabFileAlgs->currentText().toStdString();
+    string mode = ui->m_decTabFileModes->currentText().toStdString();
+    Encoding encoding = static_cast<Encoding>(ui->m_decTabFileEncodings->currentIndex());
+    m_cipherNew(alg, mode);
+
+    emit startProcess();
+    m_threadCipher.start();
+    for(const string& path : paths)
+        emit decryptFile(path, m_keygen, encoding);
+    emit m_cipher->finished();
 }
 
 void MainWindow::saveOnFile(const Encoding encoding)
@@ -447,19 +482,6 @@ void MainWindow::setKeyLoadedSelectable(const bool selectable) const
 {
     if(selectable)keyLoadedSelectable(Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard);
     else keyLoadedSelectable(Qt::NoTextInteraction);
-}
-
-void MainWindow::connectCipher()
-{
-    QObject::connect(this, &MainWindow::encryptText, m_cipher, &AbstractCipherBase::encryptText);
-    QObject::connect(this, &MainWindow::decryptText, m_cipher, &AbstractCipherBase::decryptText);
-    QObject::connect(this, &MainWindow::encryptFile, m_cipher, &AbstractCipherBase::encryptFile);
-    QObject::connect(this, &MainWindow::decryptFile, m_cipher, &AbstractCipherBase::decryptFile);
-    QObject::connect(m_cipher, &AbstractCipherBase::cipherText, this, &MainWindow::cipherText);
-    QObject::connect(m_cipher, &AbstractCipherBase::recoverText, this, &MainWindow::recoverText);
-    QObject::connect(m_cipher, &AbstractCipherBase::finished, &m_threadCipher, &QThread::quit);
-    QObject::connect(m_cipher, &AbstractCipherBase::error, &m_threadCipher, &QThread::quit);
-    QObject::connect(m_cipher, &AbstractCipherBase::error, this, &MainWindow::cipherError);
 }
 
 // protected methods

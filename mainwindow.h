@@ -4,6 +4,7 @@
 #include "aesgcm.h"
 #include "aescbc.h"
 #include "aeseax.h"
+#include "process.h"
 #include "serial.h"
 #include "keygen.h"
 #include "rsassa.h"
@@ -29,8 +30,11 @@ class MainWindow : public QMainWindow {
     Q_OBJECT
 
 private:
-    QThread m_threadCipher;
     Ui::MainWindow *ui;
+    QThread m_threadCipher;
+    QThread m_threadProcess;
+    AbstractCipherBase* m_cipher = new AesCBC;
+    ProcessBar m_process;
     Serial m_serial;
     FileImporter m_fimporterEnc;
     FileImporter m_fimporterDec;
@@ -38,7 +42,6 @@ private:
     std::string m_fname;
     std::string m_dir;
     Keygen* m_keygen = new Keygen;
-    AbstractCipherBase* m_cipher = new AesCBC;
 
     QList<AbstractActionBase*> m_actions = QList<AbstractActionBase*> {
         new ActionKeyMgr(),
@@ -148,11 +151,14 @@ private slots:
     void cipherText(const std::string &cipherText);
     void cipherError(const std::string &error);
 
+
 signals:
     void encryptText(const std::string& plain, Keygen* keygen, const Encoding encoding);
     void decryptText(const std::string& cipher, Keygen* keygen, const Encoding encoding);
     void encryptFile(const std::string& path, Keygen* keygen, const Encoding encoding);
     void decryptFile(const std::string& path, Keygen* keygen, const Encoding encoding);
+    void initProcess();
+    void startProcess();
 };
 
 #endif // MAINWINDOW_H
