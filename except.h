@@ -107,5 +107,16 @@ public:
     // methods
     virtual const char* what() const noexcept;
 };
+class CipherException : public std::exception {
+private:
+    const char* m_message;
+
+public:
+    // constructors
+    CipherException(const char* message = "-- error: bad file(s)");
+
+    // methods
+    virtual const char* what() const noexcept;
+};
 
 #endif // EXCEPT_H

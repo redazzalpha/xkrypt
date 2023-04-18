@@ -81,3 +81,11 @@ const char*  FileSelectedException::what() const noexcept
 {
     return m_message;
 }
+CipherException::CipherException(const char* message)
+{
+    m_message = message;
+}
+const char*  CipherException::what() const noexcept
+{
+    return m_message;
+}

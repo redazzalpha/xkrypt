@@ -4,7 +4,6 @@
 #include "aesgcm.h"
 #include "aescbc.h"
 #include "aeseax.h"
-#include "processbar.h"
 #include "serial.h"
 #include "keygen.h"
 #include "rsassa.h"
@@ -30,8 +29,7 @@ class MainWindow : public QMainWindow {
     Q_OBJECT
 
 private:
-    QThread m_thread;
-    ProcessBar m_process;
+    QThread m_threadCipher;
     Ui::MainWindow *ui;
     Serial m_serial;
     FileImporter m_fimporterEnc;
@@ -40,7 +38,7 @@ private:
     std::string m_fname;
     std::string m_dir;
     Keygen* m_keygen = new Keygen;
-    AbstractCipherBase* m_cipher = new AesGCM;
+    AbstractCipherBase* m_cipher = new AesCBC;
 
     QList<AbstractActionBase*> m_actions = QList<AbstractActionBase*> {
         new ActionKeyMgr(),
@@ -91,12 +89,14 @@ private:
     void generateKey(Encoding encodingIndex);
     void shortcuts();
     void toolTips();
-    void processEnc(std::vector<std::string>* paths);
-    void processDec(std::vector<std::string>* paths);
+    void processEncFile(std::vector<std::string>& paths);
+    void processDecFile(std::vector<std::string>& paths);
+    void processEncText();
+    void processDecText();
     void importAsymmectric();
     void importSymmectric();
-    void m_cipherNew(const std::string& alg, const std::string& mode);
     KeyLength keylengthFrom(const int index);
+    void m_cipherNew(const std::string& alg, const std::string& mode);
 
     void saveOnFile(const Encoding encoding);
     void saveSuccess(Encoding encoding);
@@ -105,7 +105,7 @@ private:
     bool dialogInsertFilename(const std::string& message);
     bool dialogConfirm(const std::string& message);
     void dialogSuccessMessage(const std::string& message);
-    void dialogErrorMessage(const std::string& message);
+    void dialogErrorMessage(std::string message);
     void dialogNoKeyMessage(const std::string& action);
 
     void keyLoadedSelectable(const Qt::TextInteractionFlags flags) const;
@@ -113,6 +113,8 @@ private:
     void setFilesLoadedStyle(const QString &style) const;
     void setKeyLoadedText(const QString &keyStr) const;
     void setKeyLoadedSelectable(const bool selectable) const;
+
+    void connectCipher();
 
 protected:
     void closeEvent(QCloseEvent* event) override;
@@ -142,10 +144,15 @@ private slots:
     void flushKey();
     void on_m_decTabFileClear_clicked();
 
-    void cipherError(const std::string &err);
+    void recoverText(const std::string &recoverText);
+    void cipherText(const std::string &cipherText);
+    void cipherError(const std::string &error);
 
 signals:
-    void initProcess();
+    void encryptText(const std::string& plain, Keygen* keygen, const Encoding encoding);
+    void decryptText(const std::string& cipher, Keygen* keygen, const Encoding encoding);
+    void encryptFile(const std::string& path, Keygen* keygen, const Encoding encoding);
+    void decryptFile(const std::string& path, Keygen* keygen, const Encoding encoding);
 };
 
 #endif // MAINWINDOW_H

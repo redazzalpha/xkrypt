@@ -20,3 +20,4 @@ DirFname AbstractCipherBase::extractFname(const std::string& path, const string&
     string fname = path.substr(pos+1, path.size() - pos);
     return DirFname(dir, fname, delim);
 }
+

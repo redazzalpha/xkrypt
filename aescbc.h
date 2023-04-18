@@ -17,10 +17,11 @@ public:
     // methods
     virtual std::string getModeName() const override;
     
-    virtual std::string encryptText(const std::string& plain, Keygen* keygen, const Encoding encoding) noexcept(false) override;
-    virtual std::string decryptText(const std::string& cipher, Keygen* keygen, const Encoding encoding) noexcept(false) override;
-    virtual void encryptFile(std::vector<std::string>* paths, Keygen* keygen, const Encoding encoding) noexcept(false) override;
-    virtual void decryptFile(std::vector<std::string>* paths, Keygen* keygen, const Encoding encoding) noexcept(false) override;
+public slots:
+    virtual std::string encryptText(const std::string& plain, Keygen* keygen, const Encoding encoding) override;
+    virtual std::string decryptText(const std::string& cipher, Keygen* keygen, const Encoding encoding) override;
+    virtual void encryptFile(const std::string& path, Keygen* keygen, const Encoding encoding) override;
+    virtual void decryptFile(const std::string& path, Keygen* keygen, const Encoding encoding) override;
 };
 
 #endif // AESCBC_H

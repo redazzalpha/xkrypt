@@ -16,6 +16,7 @@
 #include <QProgressDialog>
 #include <thread>
 
+
 using namespace std;
 using namespace CryptoPP;
 
@@ -34,7 +35,6 @@ MainWindow::MainWindow(QWidget *parent)
 // destructor
 MainWindow::~MainWindow()
 {
-    m_thread.wait();
     delete ui;
     delete m_keygen;
     delete m_cipher;
@@ -78,15 +78,9 @@ void MainWindow::uiInit()
 }
 void MainWindow::connectItems()
 {
-    QObject::connect(this, &MainWindow::initProcess, &m_process, &ProcessBar::init);
-    QObject::connect(this, &MainWindow::initProcess, &m_process, &ProcessBar::init);
-    QObject::connect(&m_thread, &QThread::started, &m_process, &ProcessBar::process);
-    QObject::connect(&m_process, &ProcessBar::finished, &m_thread, &QThread::quit);
-    m_process.moveToThread(&m_thread);
-    m_thread.start();
-
     // cipher
-    QObject::connect(m_cipher, &AbstractCipherBase::error, this, &MainWindow::cipherError);
+    m_cipher->moveToThread(&m_threadCipher);
+    connectCipher();
 
     // connect combos
     QObject::connect(ui->m_encTabFileAlgs, &QComboBox::textActivated, this, &MainWindow::setComboModes);
@@ -128,6 +122,7 @@ void MainWindow::shortcuts()
     m_actions[0]->setShortcut(QKeySequence("Alt+k"));
     m_actions[1]->setShortcut(QKeySequence("Alt+e"));
     m_actions[2]->setShortcut(QKeySequence("Alt+d"));
+    m_actions[3]->setShortcut(QKeySequence("Alt+q"));
 }
 void MainWindow::toolTips()
 {
@@ -135,25 +130,56 @@ void MainWindow::toolTips()
     m_actions[1]->setToolTip("Alt+e");
     m_actions[2]->setToolTip("Alt+d");
 }
-void MainWindow::processEnc(vector<string>* paths)
+void MainWindow::processEncFile(vector<string>& paths)
 {
     string alg = ui->m_encTabFileAlgs->currentText().toStdString();
     string mode = ui->m_encTabFileModes->currentText().toStdString();
     Encoding encoding = static_cast<Encoding>(ui->m_encTabFileEncodings->currentIndex());
     m_cipherNew(alg, mode);
 
-    std::thread t(&AbstractCipherBase::encryptFile, m_cipher, paths, m_keygen, encoding);
-    t.join();
+    m_threadCipher.start();
+    emit encryptFile(paths[0], m_keygen, encoding);
 }
-void MainWindow::processDec(vector<string>* paths)
+void MainWindow::processDecFile(vector<string>& paths)
 {
     string alg = ui->m_decTabFileAlgs->currentText().toStdString();
     string mode = ui->m_decTabFileModes->currentText().toStdString();
     Encoding encoding = static_cast<Encoding>(ui->m_decTabFileEncodings->currentIndex());
     m_cipherNew(alg, mode);
 
-    std::thread t(&AbstractCipherBase::decryptFile, m_cipher, paths, m_keygen, encoding);
-    t.join();
+    m_threadCipher.start();
+    emit decryptFile(paths[0], m_keygen, encoding);
+}
+void MainWindow::processEncText()
+{
+    if(!m_keygen->isReady()) throw UnreadyKeyException();
+    string plainText = ui->m_encTabTextField->toPlainText().toStdString();
+
+    if(plainText.empty()) throw EmptyTextException();
+    string selectedAlg = ui->m_encTabTextAlgs->currentText().toStdString();
+    string selectedMode = ui->m_encTabTextModes->currentText().toStdString();
+    Encoding encoding = static_cast<Encoding>(ui->m_encTabTextEncodings->currentIndex());
+    m_cipherNew(selectedAlg, selectedMode);
+
+    if(!m_cipher) throw BadCipherException();
+    m_threadCipher.start();
+    emit encryptText(plainText, m_keygen, encoding);
+
+}
+void MainWindow::processDecText()
+{
+    if(!m_keygen->isReady()) throw UnreadyKeyException();
+    string cipherText = ui->m_decTabTextField->toPlainText().toStdString();
+
+    if(cipherText.empty()) throw EmptyTextException();
+    string selectedAlg = ui->m_decTabTextAlgs->currentText().toStdString();
+    string selectedMode = ui->m_decTabTextModes->currentText().toStdString();
+    Encoding encoding = static_cast<Encoding>(ui->m_decTabTextEncodings->currentIndex());
+    m_cipherNew(selectedAlg, selectedMode);
+
+    if(!m_cipher) throw BadCipherException();
+    m_threadCipher.start();
+    emit decryptText(cipherText, m_keygen, encoding);
 }
 
 void MainWindow::saveOnFile(const Encoding encoding)
@@ -218,6 +244,22 @@ void MainWindow::importSymmectric()
 void MainWindow::importAsymmectric()
 {
 }
+KeyLength MainWindow::keylengthFrom(const int index)
+{
+    KeyLength keylength;
+    switch(index) {
+    case 0 : keylength = KeyLength::LENGTH_DEFAULT; break;
+    case 1 : keylength = KeyLength::LENGTH_32; break;
+    case 2 : keylength = KeyLength::LENGTH_64; break;
+    case 3 : keylength = KeyLength::LENGTH_128; break;
+    case 4 : keylength = KeyLength::LENGTH_256; break;
+    case 5 : keylength = KeyLength::LENGTH_512; break;
+    case 6 : keylength = KeyLength::LENGTH_1024; break;
+    case 7 : keylength = KeyLength::LENGTH_2048; break;
+    default: keylength = static_cast<KeyLength>(0);
+    }
+    return keylength;
+}
 void MainWindow::m_cipherNew(const string& alg, const string& mode)
 {
     delete m_cipher;
@@ -248,22 +290,8 @@ void MainWindow::m_cipherNew(const string& alg, const string& mode)
 
     // default. shouldn't go here but used to remove clang warnings
     else m_cipher = new AesCBC;
-}
-KeyLength MainWindow::keylengthFrom(const int index)
-{
-    KeyLength keylength;
-    switch(index) {
-    case 0 : keylength = KeyLength::LENGTH_DEFAULT; break;
-    case 1 : keylength = KeyLength::LENGTH_32; break;
-    case 2 : keylength = KeyLength::LENGTH_64; break;
-    case 3 : keylength = KeyLength::LENGTH_128; break;
-    case 4 : keylength = KeyLength::LENGTH_256; break;
-    case 5 : keylength = KeyLength::LENGTH_512; break;
-    case 6 : keylength = KeyLength::LENGTH_1024; break;
-    case 7 : keylength = KeyLength::LENGTH_2048; break;
-    default: keylength = static_cast<KeyLength>(0);
-    }
-    return keylength;
+
+    connectCipher();
 }
 
 bool MainWindow::isFileExist(const string& filename) const
@@ -357,7 +385,7 @@ void MainWindow::dialogSuccessMessage(const string& message)
         msg.exec();
     }
 }
-void MainWindow::dialogErrorMessage(const string& message)
+void MainWindow::dialogErrorMessage(string message)
 {
     string text = MESSAGE_ERROR_START+ message + MESSAGE_ERROR_END;
     QMessageBox msg(this);
@@ -421,18 +449,28 @@ void MainWindow::setKeyLoadedSelectable(const bool selectable) const
     else keyLoadedSelectable(Qt::NoTextInteraction);
 }
 
+void MainWindow::connectCipher()
+{
+    QObject::connect(this, &MainWindow::encryptText, m_cipher, &AbstractCipherBase::encryptText);
+    QObject::connect(this, &MainWindow::decryptText, m_cipher, &AbstractCipherBase::decryptText);
+    QObject::connect(this, &MainWindow::encryptFile, m_cipher, &AbstractCipherBase::encryptFile);
+    QObject::connect(this, &MainWindow::decryptFile, m_cipher, &AbstractCipherBase::decryptFile);
+    QObject::connect(m_cipher, &AbstractCipherBase::cipherText, this, &MainWindow::cipherText);
+    QObject::connect(m_cipher, &AbstractCipherBase::recoverText, this, &MainWindow::recoverText);
+    QObject::connect(m_cipher, &AbstractCipherBase::finished, &m_threadCipher, &QThread::quit);
+    QObject::connect(m_cipher, &AbstractCipherBase::error, &m_threadCipher, &QThread::quit);
+    QObject::connect(m_cipher, &AbstractCipherBase::error, this, &MainWindow::cipherError);
+}
+
 // protected methods
 void MainWindow::closeEvent(QCloseEvent*)
 {
-    m_process.kill();
     QMainWindow::close();
 }
 
 // slots
 void MainWindow::on_m_encTabFileImport_clicked()
 {
-//    m_process.progress().hide();
-
     m_fimporterEnc.clear();
     m_fimporterEnc.importFiles();
 
@@ -465,13 +503,12 @@ void MainWindow::on_m_encTabFileEncrypt_clicked()
         size_t size = paths.size();
         if(size < 1) throw FileSelectedException();
 
-        processEnc(&paths);
+        processEncFile(paths);
 
         string message = "file(s) successfully encrypted!<br />";
         message += "Using: " + m_cipher->getAlgName() += (" - " + m_cipher->getModeName()) + " mode";
         dialogSuccessMessage(message);
-    }
-    catch(exception& e) {
+    } catch (exception &e) {
         dialogErrorMessage(e.what());
     }
 }
@@ -483,7 +520,7 @@ void MainWindow::on_m_decTabFileDecrypt_clicked()
         size =  paths.size();
         if(size < 1) throw FileSelectedException();
 
-        processDec(&paths);
+        processDecFile(paths);
 
         string message = "file(s) successfully decrypted!<br />";
         message += "Using: " + m_cipher->getAlgName() += (" - " + m_cipher->getModeName()) + " mode";
@@ -504,26 +541,10 @@ void MainWindow::on_m_decTabFileClear_clicked()
     ui->m_decTabFileSelected->setPlainText(NO_FILE_LOADED);
 }
 
-void MainWindow::cipherError(const std::string& err)
-{
-    dialogErrorMessage(err);
-}
-
 void MainWindow::on_m_encTabTextEncrypt_clicked()
 {    
     try {
-        if(!m_keygen->isReady()) throw UnreadyKeyException();
-        string plainText = ui->m_encTabTextField->toPlainText().toStdString();
-
-        if(plainText.empty()) throw EmptyTextException();
-        string selectedAlg = ui->m_encTabTextAlgs->currentText().toStdString();
-        string selectedMode = ui->m_encTabTextModes->currentText().toStdString();
-        Encoding selectedEncoding = static_cast<Encoding>(ui->m_encTabTextEncodings->currentIndex());
-        m_cipherNew(selectedAlg, selectedMode);
-
-        if(!m_cipher) throw BadCipherException();
-        string cipherText = m_cipher->encryptText(plainText, m_keygen, selectedEncoding);
-        ui->m_encTabTextField->setPlainText(QString::fromStdString(cipherText));
+        processEncText();
     }
     catch(exception& e) {
         dialogErrorMessage(e.what());
@@ -532,18 +553,7 @@ void MainWindow::on_m_encTabTextEncrypt_clicked()
 void MainWindow::on_m_decTabTextDecrypt_clicked()
 {
     try {
-        if(!m_keygen->isReady()) throw UnreadyKeyException();
-        string cipherText = ui->m_decTabTextField->toPlainText().toStdString();
-
-        if(cipherText.empty()) throw EmptyTextException();
-        string selectedAlg = ui->m_decTabTextAlgs->currentText().toStdString();
-        string selectedMode = ui->m_decTabTextModes->currentText().toStdString();
-        Encoding selectedEncoding = static_cast<Encoding>(ui->m_decTabTextEncodings->currentIndex());
-        m_cipherNew(selectedAlg, selectedMode);
-
-        if(!m_cipher) throw BadCipherException();
-        string recoverText = m_cipher->decryptText(cipherText, m_keygen, selectedEncoding);
-        ui->m_decTabTextField->setPlainText(QString::fromStdString(recoverText));
+        processDecText();
     }
     catch(exception& e) {
         dialogErrorMessage(e.what());
@@ -630,6 +640,20 @@ void MainWindow::flushKey()
     setKeyLoadedText(NO_KEY_LOADED);
 }
 
+void MainWindow::recoverText(const std::string &recoverText)
+{
+    ui->m_decTabTextField->setPlainText(QString::fromStdString(recoverText));
+}
+void MainWindow::cipherText(const std::string &cipherText)
+{
+    ui->m_encTabTextField->setPlainText(QString::fromStdString(cipherText));
+}
+void MainWindow::cipherError(const std::string& error)
+{
+    char* msg = new char[error.size()];
+    for(size_t i = 0; i < error.size(); i++) msg[i] = error[i];
+    throw CipherException(msg);
+}
 
 
 
