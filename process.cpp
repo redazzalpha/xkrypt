@@ -1,45 +1,47 @@
 #include "process.h"
 #include "defines.h"
-
 #include <QProgressDialog>
 #include <thread>
 #include <iostream>
+#include "mainwindow.h"
 
 using namespace std;
 
-// slots
+// constructors
 ProcessBar::ProcessBar(const std::string &label, const std::string &cancelButton, const int min, const int max)
     : m_label(label), m_cancelButton(cancelButton), m_min(min), m_max(max)
 {}
 
+// destructor
 ProcessBar::~ProcessBar()
-{
-    delete m_progress;
-}
+{}
 
-void ProcessBar::setValue(const int value)
+// slots
+void ProcessBar::process(MainWindow* win, MainWindow_ptr f, QStringList paths)
 {
-    m_progress->setValue(value);
-}
-void ProcessBar::init()
-{
-    std::cout << "init process here" << std::endl;
+    size_t size = paths.size();
+    QProgressDialog progress("processing please wait...", "cancel operation", 0, 0);
+    progress.setMinimumDuration(0);
+    progress.setMinimumWidth(PROCESS_BAR_WIDTH);
+    progress.setWindowModality(Qt::WindowModal);
+    progress.setMaximum(size);
+    progress.setValue(0);
 
-    m_progress = new QProgressDialog("processing please wait...", "cancel operation", 0, 100);
-    m_progress->setMinimumDuration(0);
-    m_progress->setMinimumWidth(PROCESS_BAR_WIDTH);
-    m_progress->setWindowModality(Qt::WindowModal);
-}
-void ProcessBar::process()
-{
-
-    for (int i = 1; i < 100; i++) {
-        m_progress->setValue(i);
-        if(m_progress->wasCanceled()) break;
-        std::cout << "in the process thread round : " << i << std::endl;
-        std::this_thread::sleep_for(1s);
+    size_t i;
+    for (i = 0; i < size; i++) {
+        progress.setValue(i);
+        if(progress.wasCanceled()) break;
+        (win->*f)(paths[i].toStdString());
+        std::cout << "process thread round : " << i << std::endl;
     }
-    m_progress->setValue(100);
+    progress.setValue(size);
     emit finished();
-}
 
+    string message = "Operation done successfully!<br />";
+    message += "Using: " +
+        win->cipher()->getAlgName() +=
+        (" - " + win->cipher()->getModeName()) +
+        " mode" + "<br />Succeeded: " + std::to_string(i) +
+        " - Failed: " + std::to_string(size - i);
+    emit success(message);
+}

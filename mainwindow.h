@@ -4,7 +4,6 @@
 #include "aesgcm.h"
 #include "aescbc.h"
 #include "aeseax.h"
-#include "process.h"
 #include "serial.h"
 #include "keygen.h"
 #include "rsassa.h"
@@ -16,6 +15,7 @@
 #include "actionquit.h"
 #include "aesccm.h"
 #include "fileimporter.h"
+#include "process.h"
 #include <QMainWindow>
 #include <QList>
 #include <QString>
@@ -26,15 +26,16 @@ QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
 
+using MainWindow_ptr = void (MainWindow::*)(const std::string&);
+
 class MainWindow : public QMainWindow {
     Q_OBJECT
 
 private:
     Ui::MainWindow *ui;
-    QThread m_threadCipher;
     QThread m_threadProcess;
-    AbstractCipherBase* m_cipher = new AesCBC;
     ProcessBar m_process;
+    AbstractCipherBase* m_cipher = new AesCBC;
     Serial m_serial;
     FileImporter m_fimporterEnc;
     FileImporter m_fimporterDec;
@@ -85,6 +86,8 @@ public:
     // destructor
     ~MainWindow();
 
+    AbstractCipherBase *cipher() const;
+
 private:
     // methods
     void uiInit();
@@ -92,8 +95,8 @@ private:
     void generateKey(Encoding encodingIndex);
     void shortcuts();
     void toolTips();
-    void processEncFile(std::vector<std::string>& paths);
-    void processDecFile(std::vector<std::string>& paths);
+    void processEncFile(const std::string &path);
+    void processDecFile(const std::string &path);
     void processEncText();
     void processDecText();
     void importAsymmectric();
@@ -107,8 +110,6 @@ private:
     QMessageBox::ButtonRole dialogFileExists(const std::string& message);
     bool dialogInsertFilename(const std::string& message);
     bool dialogConfirm(const std::string& message);
-    void dialogSuccessMessage(const std::string& message);
-    void dialogErrorMessage(std::string message);
     void dialogNoKeyMessage(const std::string& action);
 
     void keyLoadedSelectable(const Qt::TextInteractionFlags flags) const;
@@ -117,11 +118,8 @@ private:
     void setKeyLoadedText(const QString &keyStr) const;
     void setKeyLoadedSelectable(const bool selectable) const;
 
-    void connectCipher();
-
 protected:
     void closeEvent(QCloseEvent* event) override;
-
 
 private slots:
     void on_m_encTabFileImport_clicked();
@@ -150,15 +148,11 @@ private slots:
     void recoverText(const std::string &recoverText);
     void cipherText(const std::string &cipherText);
     void cipherError(const std::string &error);
-
+    void dialogSuccessMessage(const std::string& message);
+    void dialogErrorMessage(const std::string& message);
 
 signals:
-    void encryptText(const std::string& plain, Keygen* keygen, const Encoding encoding);
-    void decryptText(const std::string& cipher, Keygen* keygen, const Encoding encoding);
-    void encryptFile(const std::string& path, Keygen* keygen, const Encoding encoding);
-    void decryptFile(const std::string& path, Keygen* keygen, const Encoding encoding);
-    void initProcess();
-    void startProcess();
+    void startProcess(MainWindow* win, MainWindow_ptr f, QStringList type);
 };
 
 #endif // MAINWINDOW_H

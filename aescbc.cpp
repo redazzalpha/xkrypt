@@ -101,7 +101,7 @@ void AesCBC::encryptFile(const string& path, Keygen* keygen, const Encoding enco
         }
         FileSource(path.c_str(), true, stf);
         removeFile(path);
-//        emit finished();
+        emit finished();
     }
     catch(exception& e) {
         emit error(e.what());
@@ -126,7 +126,7 @@ void AesCBC::decryptFile(const string& path, Keygen* keygen, const Encoding enco
         default: FileSource(path.c_str(), true, new Base64Decoder(stf));
         }
         removeFile(path);
-//        emit finished();
+        emit finished();
     }
     catch(exception& e) {
         emit error(e.what());

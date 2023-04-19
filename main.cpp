@@ -2,6 +2,10 @@
 #include <QApplication>
 
 using namespace std;
+namespace kkk{
+    QMetaType type = QMetaType::fromName("std::vector<std::string>&");
+
+}
 
 int main(int argc, char *argv[])
 {

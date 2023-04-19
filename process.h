@@ -1,13 +1,16 @@
 #ifndef PROCESS_H
 #define PROCESS_H
 
+
 #include <QObject>
 #include <QProgressDialog>
 
+class MainWindow;
+using MainWindow_ptr = void (MainWindow::*)(const std::string&);
 
 class ProcessBar : public QObject {
     Q_OBJECT
-    QProgressDialog* m_progress;
+private:
     std::string m_label;
     std::string m_cancelButton;
     int m_min;
@@ -25,10 +28,12 @@ public :
     void setValue(const int value);
 
 public slots:
-    void init();
-    void process();
+    void process(MainWindow *win, MainWindow_ptr f, QStringList paths);
+
 signals:
     void finished();
+    void success(const std::string& success);
+    void fail(const std::string& fail);
 
 };
 
