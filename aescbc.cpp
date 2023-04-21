@@ -81,33 +81,38 @@ string AesCBC::decryptText(const string& cipher, Keygen* keygen, const Encoding 
     }
     return recover;
 }
-void AesCBC::encryptFile(const string& path, Keygen* keygen, const Encoding encoding)
+void AesCBC::encryptFile(vector<string> paths, Keygen* keygen, const Encoding encoding)
 {
+    std::cout << "start encrypt here" << std::endl;
     try {
         const SecByteBlock& key = keygen->getKey();
         const SecByteBlock& iv = keygen->getIv();
         CBC_Mode<AES>::Encryption encryptor;
         encryptor.SetKeyWithIV(key, key.size(), iv);
 
-        DirFname dirfname = extractFname(path, m_delim);
-        FileSink* fs = new FileSink((dirfname.m_dir + dirfname.m_delim + encryptText(dirfname.m_fname, keygen, Encoding::HEX)).c_str());
-        StreamTransformationFilter* stf = new StreamTransformationFilter(encryptor);
+        for(const string& path : paths) {
+            DirFname dirfname = extractFname(path, m_delim);
+            FileSink* fs = new FileSink((dirfname.m_dir + dirfname.m_delim + encryptText(dirfname.m_fname, keygen, Encoding::HEX)).c_str());
+            StreamTransformationFilter* stf = new StreamTransformationFilter(encryptor);
 
-        switch(encoding) {
-        case Encoding::BASE64 : stf->Attach(new Base64Encoder(fs)); break;
-        case Encoding::HEX : stf->Attach(new HexEncoder(fs)); break;
-        case Encoding::NONE : stf->Attach(fs); break;
-        default: stf->Attach(new Base64Encoder(fs));;
+            switch(encoding) {
+            case Encoding::BASE64 : stf->Attach(new Base64Encoder(fs)); break;
+            case Encoding::HEX : stf->Attach(new HexEncoder(fs)); break;
+            case Encoding::NONE : stf->Attach(fs); break;
+            default: stf->Attach(new Base64Encoder(fs));;
+            }
+            FileSource(path.c_str(), true, stf);
+            removeFile(path);
         }
-        FileSource(path.c_str(), true, stf);
-        removeFile(path);
         emit finished();
     }
     catch(exception& e) {
+        std::cout << "error: " << e.what() << std::endl;
         emit error(e.what());
+        emit finished();
     }
 }
-void AesCBC::decryptFile(const string& path, Keygen* keygen, const Encoding encoding)
+void AesCBC::decryptFile(vector<string> paths, Keygen* keygen, const Encoding encoding)
 {
     try {
         const SecByteBlock& key = keygen->getKey();
@@ -115,17 +120,19 @@ void AesCBC::decryptFile(const string& path, Keygen* keygen, const Encoding enco
         CBC_Mode<AES>::Decryption decryptor;
         decryptor.SetKeyWithIV(key, key.size(), iv);
 
-        DirFname dirfname = extractFname(path, m_delim);
-        FileSink* fs = new FileSink((dirfname.m_dir + dirfname.m_delim + decryptText(dirfname.m_fname, keygen, Encoding::HEX)).c_str());
-        StreamTransformationFilter* stf  = new StreamTransformationFilter(decryptor, fs);
+        for(const string& path : paths) {
+            DirFname dirfname = extractFname(path, m_delim);
+            FileSink* fs = new FileSink((dirfname.m_dir + dirfname.m_delim + decryptText(dirfname.m_fname, keygen, Encoding::HEX)).c_str());
+            StreamTransformationFilter* stf  = new StreamTransformationFilter(decryptor, fs);
 
-        switch(encoding) {
-        case Encoding::BASE64 : FileSource(path.c_str(), true, new Base64Decoder(stf)); break;
-        case Encoding::HEX : FileSource(path.c_str(), true, new HexDecoder(stf)); break;
-        case Encoding::NONE : FileSource(path.c_str(), true, stf); break;
-        default: FileSource(path.c_str(), true, new Base64Decoder(stf));
+            switch(encoding) {
+            case Encoding::BASE64 : FileSource(path.c_str(), true, new Base64Decoder(stf)); break;
+            case Encoding::HEX : FileSource(path.c_str(), true, new HexDecoder(stf)); break;
+            case Encoding::NONE : FileSource(path.c_str(), true, stf); break;
+            default: FileSource(path.c_str(), true, new Base64Decoder(stf));
+            }
+            removeFile(path);
         }
-        removeFile(path);
         emit finished();
     }
     catch(exception& e) {

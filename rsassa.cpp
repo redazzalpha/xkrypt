@@ -28,11 +28,11 @@ string RsaSSA::decryptText(const string& cipher, Keygen* keygen, const Encoding 
 }
 
 // slots
-void RsaSSA::encryptFile(const string& path, Keygen* keygen, const Encoding encoding)
+void RsaSSA::encryptFile(std::vector<std::string> paths, Keygen* keygen, const Encoding encoding)
 {
     std::cout<< "in the rsa ssa slot encrypt" << std::endl;
 }
-void RsaSSA::decryptFile(const string& path, Keygen* keygen, const Encoding encoding)
+void RsaSSA::decryptFile(std::vector<std::string> paths, Keygen* keygen, const Encoding encoding)
 {
     std::cout<< "in the rsa ssa slot derypt" << std::endl;
 }

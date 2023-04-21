@@ -3,7 +3,6 @@
 #include <QProgressDialog>
 #include <thread>
 #include <iostream>
-#include "mainwindow.h"
 
 using namespace std;
 
@@ -17,31 +16,22 @@ ProcessBar::~ProcessBar()
 {}
 
 // slots
-void ProcessBar::process(MainWindow* win, MainWindow_ptr f, QStringList paths)
+void ProcessBar::process()
 {
-    size_t size = paths.size();
     QProgressDialog progress("processing please wait...", "cancel operation", 0, 0);
     progress.setMinimumDuration(0);
     progress.setMinimumWidth(PROCESS_BAR_WIDTH);
-    progress.setWindowModality(Qt::WindowModal);
-    progress.setMaximum(size);
+    progress.setModal(false);
     progress.setValue(0);
 
-    size_t i;
-    for (i = 0; i < size; i++) {
+    std::cout << "process start here ! " << std::endl;
+    for (int i = 0; i < 100; i++) {
         progress.setValue(i);
         if(progress.wasCanceled()) break;
-        (win->*f)(paths[i].toStdString());
         std::cout << "process thread round : " << i << std::endl;
+        std::this_thread::sleep_for(1s);
     }
-    progress.setValue(size);
+    progress.setValue(100);
     emit finished();
 
-    string message = "Operation done successfully!<br />";
-    message += "Using: " +
-        win->cipher()->getAlgName() +=
-        (" - " + win->cipher()->getModeName()) +
-        " mode" + "<br />Succeeded: " + std::to_string(i) +
-        " - Failed: " + std::to_string(size - i);
-    emit success(message);
 }

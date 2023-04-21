@@ -32,8 +32,8 @@ MainWindow::MainWindow(QWidget *parent)
     toolTips();
     setFixedSize(WINDOW_WIDTH, WINDOW_HEIGHT);
     setIconSize(QSize(WINDOW_ICON_WIDTH, WINDOW_ICON_HEIGHT));
-    m_process.moveToThread(&m_threadProcess);
 }
+
 // destructor
 MainWindow::~MainWindow()
 {
@@ -80,10 +80,17 @@ void MainWindow::uiInit()
 }
 void MainWindow::connectItems()
 {
+    m_process.moveToThread(&m_threadProcess);
+//    m_cipher->moveToThread(&m_threadCipher);
+    m_threadProcess.start();
+//    m_threadCipher.start();
+
     QObject::connect(this, &MainWindow::startProcess, &m_process, &ProcessBar::process);
     QObject::connect(&m_process, &ProcessBar::finished, &m_threadProcess, &QThread::quit);
-    QObject::connect(&m_process, &ProcessBar::success, this, &MainWindow::dialogSuccessMessage);
-    QObject::connect(&m_process, &ProcessBar::fail, this, &MainWindow::dialogErrorMessage);
+    QObject::connect(this, &MainWindow::startEncrypt, m_cipher, &AbstractCipherBase::encryptFile);
+    QObject::connect(this, &MainWindow::startDecrypt, m_cipher, &AbstractCipherBase::decryptFile);
+    QObject::connect(m_cipher, &AbstractCipherBase::finished, &m_threadCipher, &QThread::quit);
+
 
     // connect combos
     QObject::connect(ui->m_encTabFileAlgs, &QComboBox::textActivated, this, &MainWindow::setComboModes);
@@ -133,6 +140,7 @@ void MainWindow::toolTips()
     m_actions[1]->setToolTip("Alt+e");
     m_actions[2]->setToolTip("Alt+d");
 }
+
 void MainWindow::processEncText()
 {
     if(!m_keygen->isReady()) throw UnreadyKeyException();
@@ -158,26 +166,24 @@ void MainWindow::processDecText()
     m_cipherNew(selectedAlg, selectedMode);
 
     m_cipher->encryptText(cipherText, m_keygen, encoding);
-
-
 }
-void MainWindow::processEncFile(const string& path)
+void MainWindow::processEncFile(vector<string> paths)
 {
     string alg = ui->m_encTabFileAlgs->currentText().toStdString();
     string mode = ui->m_encTabFileModes->currentText().toStdString();
     Encoding encoding = static_cast<Encoding>(ui->m_encTabFileEncodings->currentIndex());
     m_cipherNew(alg, mode);
 
-    m_cipher->encryptFile(path, m_keygen, encoding);
+    m_cipher->encryptFile(paths, m_keygen, encoding);
 }
-void MainWindow::processDecFile(const string& path)
+void MainWindow::processDecFile(vector<string> paths)
 {
     string alg = ui->m_decTabFileAlgs->currentText().toStdString();
     string mode = ui->m_decTabFileModes->currentText().toStdString();
     Encoding encoding = static_cast<Encoding>(ui->m_decTabFileEncodings->currentIndex());
     m_cipherNew(alg, mode);
 
-    m_cipher->decryptFile(path, m_keygen, encoding);
+    m_cipher->decryptFile(paths, m_keygen, encoding);
 }
 
 void MainWindow::saveOnFile(const Encoding encoding)
@@ -457,21 +463,18 @@ void MainWindow::on_m_decTabFileImport_clicked()
 
 void MainWindow::on_m_encTabFileEncrypt_clicked()
 {
-    try {
-        vector<string> paths = m_fimporterEnc.getFilePaths();
-        size_t size = paths.size();
-        if(size < 1) throw FileSelectedException();
+    vector<string> paths = m_fimporterEnc.getFilePaths();
+    size_t size = paths.size();
+    if(size < 1) throw FileSelectedException();
 
-        QStringList list(paths.size());
-        for(int i = 0; i < list.size(); i++)
-            list[i] = QString::fromStdString(paths[i]);
+    string alg = ui->m_encTabFileAlgs->currentText().toStdString();
+    string mode = ui->m_encTabFileModes->currentText().toStdString();
+    Encoding encoding = static_cast<Encoding>(ui->m_encTabFileEncodings->currentIndex());
+    m_cipherNew(alg, mode);
 
-        m_threadProcess.start();
-        emit startProcess(this, &MainWindow::processEncFile, list);
-
-    } catch (exception &e) {
-        dialogErrorMessage(e.what());
-    }
+    emit startProcess();
+//    emit startEncrypt(paths, m_keygen, encoding);
+    m_cipher->encryptFile(paths, m_keygen, encoding);
 }
 void MainWindow::on_m_decTabFileDecrypt_clicked()
 {
@@ -481,13 +484,13 @@ void MainWindow::on_m_decTabFileDecrypt_clicked()
         size =  paths.size();
         if(size < 1) throw FileSelectedException();
 
-        QStringList list(paths.size());
-        for(int i = 0; i < list.size(); i++)
-            list[i] = QString::fromStdString(paths[i]);
+        string alg = ui->m_decTabFileAlgs->currentText().toStdString();
+        string mode = ui->m_decTabFileModes->currentText().toStdString();
+        Encoding encoding = static_cast<Encoding>(ui->m_decTabFileEncodings->currentIndex());
+        m_cipherNew(alg, mode);
 
-        m_threadProcess.start();
-        emit startProcess(this, &MainWindow::processDecFile, list);
-
+        emit startProcess();
+        emit startDecrypt(paths, m_keygen, encoding);
     }
     catch(exception& e) {
         dialogErrorMessage(e.what());
@@ -505,7 +508,7 @@ void MainWindow::on_m_decTabFileClear_clicked()
 }
 
 void MainWindow::on_m_encTabTextEncrypt_clicked()
-{    
+{
     try {
         processEncText();
     }
@@ -647,21 +650,5 @@ void MainWindow::dialogErrorMessage(const string &message)
     msg.setModal(true);
     msg.exec();
 }
-
-//void MainWindow::success(const string &success)
-//{
-//    string message = "file(s) successfully encrypted!<br />";
-//    message += "Using: " + m_cipher->getAlgName() += (" - " + m_cipher->getModeName()) + " mode";
-//    dialogSuccessMessage(success);
-//}
-//void MainWindow::fail(const std::string &fail)
-//{
-//    string message = "file(s) successfully encrypted!<br />";
-//    message += "Using: " + m_cipher->getAlgName() += (" - " + m_cipher->getModeName()) + " mode";
-//    dialogErrorMessage(fail);
-//}
-
-
-
 
 

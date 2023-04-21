@@ -75,7 +75,7 @@ string AesGCM::decryptText(const string& cipher, Keygen* keygen, const Encoding 
     }
     return recover;
 }
-void AesGCM::encryptFile(const string& path, Keygen* keygen, const Encoding encoding)
+void AesGCM::encryptFile(vector<string> paths, Keygen* keygen, const Encoding encoding)
 {
     try {
         const SecByteBlock& key = keygen->getKey();
@@ -83,25 +83,27 @@ void AesGCM::encryptFile(const string& path, Keygen* keygen, const Encoding enco
         GCM<AES>::Encryption encryptor;
         encryptor.SetKeyWithIV(key, key.size(), iv);
 
-        DirFname dirfname = extractFname(path, m_delim);
-        FileSink* fs = new FileSink((dirfname.m_dir + dirfname.m_delim + encryptText(dirfname.m_fname, keygen, Encoding::HEX)).c_str());
-        AuthenticatedEncryptionFilter* aef = new AuthenticatedEncryptionFilter(encryptor);
+        for(const string& path : paths) {
+            DirFname dirfname = extractFname(path, m_delim);
+            FileSink* fs = new FileSink((dirfname.m_dir + dirfname.m_delim + encryptText(dirfname.m_fname, keygen, Encoding::HEX)).c_str());
+            AuthenticatedEncryptionFilter* aef = new AuthenticatedEncryptionFilter(encryptor);
 
-        switch(encoding) {
-        case Encoding::BASE64 : aef->Attach(new Base64Encoder(fs)); break;
-        case Encoding::HEX : aef->Attach(new HexEncoder(fs)); break;
-        case Encoding::NONE : aef->Attach(fs); break;
-        default: aef->Attach(new Base64Encoder(fs));;
+            switch(encoding) {
+            case Encoding::BASE64 : aef->Attach(new Base64Encoder(fs)); break;
+            case Encoding::HEX : aef->Attach(new HexEncoder(fs)); break;
+            case Encoding::NONE : aef->Attach(fs); break;
+            default: aef->Attach(new Base64Encoder(fs));;
+            }
+            FileSource(path.c_str(), true, aef);
+            removeFile(path);
         }
-        FileSource(path.c_str(), true, aef);
-        removeFile(path);
         emit finished();
     }
     catch(exception& e) {
         emit error(e.what());
     }
 }
-void AesGCM::decryptFile(const string& path, Keygen* keygen, const Encoding encoding)
+void AesGCM::decryptFile(vector<string> paths, Keygen* keygen, const Encoding encoding)
 {
     try {
         const SecByteBlock& key = keygen->getKey();
@@ -109,17 +111,20 @@ void AesGCM::decryptFile(const string& path, Keygen* keygen, const Encoding enco
         GCM<AES>::Decryption decryptor;
         decryptor.SetKeyWithIV(key, key.size(), iv);
 
-        DirFname dirfname = extractFname(path, m_delim);
-        FileSink* fs = new FileSink((dirfname.m_dir + dirfname.m_delim + decryptText(dirfname.m_fname, keygen, Encoding::HEX)).c_str());
-        AuthenticatedDecryptionFilter* aef = new AuthenticatedDecryptionFilter(decryptor, fs);
+        for(const string& path : paths) {
+            DirFname dirfname = extractFname(path, m_delim);
+            FileSink* fs = new FileSink((dirfname.m_dir + dirfname.m_delim + decryptText(dirfname.m_fname, keygen, Encoding::HEX)).c_str());
+            AuthenticatedDecryptionFilter* aef = new AuthenticatedDecryptionFilter(decryptor, fs);
 
-        switch(encoding) {
-        case Encoding::BASE64 : FileSource(path.c_str(), true, new Base64Decoder(aef)); break;
-        case Encoding::HEX : FileSource(path.c_str(), true, new HexDecoder(aef)); break;
-        case Encoding::NONE : FileSource(path.c_str(), true, aef); break;
-        default: FileSource(path.c_str(), true, new Base64Decoder(aef));
+            switch(encoding) {
+            case Encoding::BASE64 : FileSource(path.c_str(), true, new Base64Decoder(aef)); break;
+            case Encoding::HEX : FileSource(path.c_str(), true, new HexDecoder(aef)); break;
+            case Encoding::NONE : FileSource(path.c_str(), true, aef); break;
+            default: FileSource(path.c_str(), true, new Base64Decoder(aef));
+            }
+            removeFile(path);
         }
-        removeFile(path);
+
         emit finished();
     }
     catch(exception& e) {

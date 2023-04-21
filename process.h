@@ -5,9 +5,6 @@
 #include <QObject>
 #include <QProgressDialog>
 
-class MainWindow;
-using MainWindow_ptr = void (MainWindow::*)(const std::string&);
-
 class ProcessBar : public QObject {
     Q_OBJECT
 private:
@@ -28,13 +25,10 @@ public :
     void setValue(const int value);
 
 public slots:
-    void process(MainWindow *win, MainWindow_ptr f, QStringList paths);
+    void process();
 
 signals:
     void finished();
-    void success(const std::string& success);
-    void fail(const std::string& fail);
-
 };
 
 #endif // PROCESS_H

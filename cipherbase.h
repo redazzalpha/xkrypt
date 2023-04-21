@@ -36,8 +36,8 @@ protected :
 public slots:
     virtual std::string encryptText(const std::string& plain, Keygen* keygen, const Encoding encoding) = 0;
     virtual std::string decryptText(const std::string& cipher, Keygen* keygen, const Encoding encoding) = 0;
-    virtual void encryptFile(const std::string& path, Keygen* keygen, const Encoding encoding) = 0;
-    virtual void decryptFile(const std::string& path, Keygen* keygen, const Encoding encoding) = 0;
+    virtual void encryptFile(std::vector<std::string>  paths, Keygen* keygen, const Encoding encoding) = 0;
+    virtual void decryptFile(std::vector<std::string>  paths, Keygen* keygen, const Encoding encoding) = 0;
 
 signals:
     void finished();

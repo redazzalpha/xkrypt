@@ -16,7 +16,6 @@
 #include "aesccm.h"
 #include "fileimporter.h"
 #include "process.h"
-#include <QMainWindow>
 #include <QList>
 #include <QString>
 #include <QMessageBox>
@@ -26,14 +25,13 @@ QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
 
-using MainWindow_ptr = void (MainWindow::*)(const std::string&);
-
 class MainWindow : public QMainWindow {
     Q_OBJECT
 
 private:
     Ui::MainWindow *ui;
     QThread m_threadProcess;
+    QThread m_threadCipher;
     ProcessBar m_process;
     AbstractCipherBase* m_cipher = new AesCBC;
     Serial m_serial;
@@ -95,10 +93,10 @@ private:
     void generateKey(Encoding encodingIndex);
     void shortcuts();
     void toolTips();
-    void processEncFile(const std::string &path);
-    void processDecFile(const std::string &path);
     void processEncText();
     void processDecText();
+    void processEncFile(std::vector<std::string> paths);
+    void processDecFile(std::vector<std::string> path);
     void importAsymmectric();
     void importSymmectric();
     KeyLength keylengthFrom(const int index);
@@ -152,7 +150,9 @@ private slots:
     void dialogErrorMessage(const std::string& message);
 
 signals:
-    void startProcess(MainWindow* win, MainWindow_ptr f, QStringList type);
+    void startProcess();
+    void startEncrypt(std::vector<std::string> paths, Keygen* keygen, const Encoding encoding);
+    void startDecrypt(std::vector<std::string> paths, Keygen* keygen, const Encoding encoding);
 };
 
 #endif // MAINWINDOW_H
