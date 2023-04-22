@@ -83,13 +83,13 @@ string AesCBC::decryptText(const string& cipher, Keygen* keygen, const Encoding 
 }
 void AesCBC::encryptFile(vector<string> paths, Keygen* keygen, const Encoding encoding)
 {
-    std::cout << "start encrypt here" << std::endl;
     try {
         const SecByteBlock& key = keygen->getKey();
         const SecByteBlock& iv = keygen->getIv();
         CBC_Mode<AES>::Encryption encryptor;
         encryptor.SetKeyWithIV(key, key.size(), iv);
 
+        int progress = 1;
         for(const string& path : paths) {
             DirFname dirfname = extractFname(path, m_delim);
             FileSink* fs = new FileSink((dirfname.m_dir + dirfname.m_delim + encryptText(dirfname.m_fname, keygen, Encoding::HEX)).c_str());
@@ -103,6 +103,7 @@ void AesCBC::encryptFile(vector<string> paths, Keygen* keygen, const Encoding en
             }
             FileSource(path.c_str(), true, stf);
             removeFile(path);
+            emit proceed(progress++);
         }
         emit finished();
     }
@@ -120,6 +121,7 @@ void AesCBC::decryptFile(vector<string> paths, Keygen* keygen, const Encoding en
         CBC_Mode<AES>::Decryption decryptor;
         decryptor.SetKeyWithIV(key, key.size(), iv);
 
+        int progress = 1;
         for(const string& path : paths) {
             DirFname dirfname = extractFname(path, m_delim);
             FileSink* fs = new FileSink((dirfname.m_dir + dirfname.m_delim + decryptText(dirfname.m_fname, keygen, Encoding::HEX)).c_str());
@@ -132,6 +134,7 @@ void AesCBC::decryptFile(vector<string> paths, Keygen* keygen, const Encoding en
             default: FileSource(path.c_str(), true, new Base64Decoder(stf));
             }
             removeFile(path);
+            emit proceed(progress++);
         }
         emit finished();
     }

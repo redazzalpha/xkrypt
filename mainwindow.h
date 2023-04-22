@@ -95,8 +95,6 @@ private:
     void toolTips();
     void processEncText();
     void processDecText();
-    void processEncFile(std::vector<std::string> paths);
-    void processDecFile(std::vector<std::string> path);
     void importAsymmectric();
     void importSymmectric();
     KeyLength keylengthFrom(const int index);
@@ -148,11 +146,13 @@ private slots:
     void cipherError(const std::string &error);
     void dialogSuccessMessage(const std::string& message);
     void dialogErrorMessage(const std::string& message);
+    void killProcess();
 
 signals:
-    void startProcess();
-    void startEncrypt(std::vector<std::string> paths, Keygen* keygen, const Encoding encoding);
-    void startDecrypt(std::vector<std::string> paths, Keygen* keygen, const Encoding encoding);
+    void cipherProceed(const int progress);
+    void process(const int progress);
+    void encryptFile(std::vector<std::string> paths, Keygen* keygen, const Encoding encoding);
+    void decryptFile(std::vector<std::string> paths, Keygen* keygen, const Encoding encoding);
 };
 
 #endif // MAINWINDOW_H

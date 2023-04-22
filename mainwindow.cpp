@@ -81,16 +81,18 @@ void MainWindow::uiInit()
 void MainWindow::connectItems()
 {
     m_process.moveToThread(&m_threadProcess);
-//    m_cipher->moveToThread(&m_threadCipher);
-    m_threadProcess.start();
-//    m_threadCipher.start();
+    m_cipher->moveToThread(&m_threadCipher);
 
-    QObject::connect(this, &MainWindow::startProcess, &m_process, &ProcessBar::process);
-    QObject::connect(&m_process, &ProcessBar::finished, &m_threadProcess, &QThread::quit);
-    QObject::connect(this, &MainWindow::startEncrypt, m_cipher, &AbstractCipherBase::encryptFile);
-    QObject::connect(this, &MainWindow::startDecrypt, m_cipher, &AbstractCipherBase::decryptFile);
+    QObject::connect(this, &MainWindow::encryptFile, m_cipher, &AbstractCipherBase::encryptFile);
+    QObject::connect(this, &MainWindow::decryptFile, m_cipher, &AbstractCipherBase::decryptFile);
+    QObject::connect(this, &MainWindow::process, &m_process, &ProcessBar::processing);
+
+    QObject::connect(m_cipher, &AbstractCipherBase::proceed, this, &MainWindow::cipherProceed);
+    QObject::connect(this, &MainWindow::cipherProceed, &m_process, &ProcessBar::processing);
+
     QObject::connect(m_cipher, &AbstractCipherBase::finished, &m_threadCipher, &QThread::quit);
-
+    QObject::connect(&m_process, &ProcessBar::finished, &m_threadProcess, &QThread::quit);
+    QObject::connect(&m_threadProcess, &QThread::finished, this, &MainWindow::killProcess);
 
     // connect combos
     QObject::connect(ui->m_encTabFileAlgs, &QComboBox::textActivated, this, &MainWindow::setComboModes);
@@ -166,24 +168,6 @@ void MainWindow::processDecText()
     m_cipherNew(selectedAlg, selectedMode);
 
     m_cipher->encryptText(cipherText, m_keygen, encoding);
-}
-void MainWindow::processEncFile(vector<string> paths)
-{
-    string alg = ui->m_encTabFileAlgs->currentText().toStdString();
-    string mode = ui->m_encTabFileModes->currentText().toStdString();
-    Encoding encoding = static_cast<Encoding>(ui->m_encTabFileEncodings->currentIndex());
-    m_cipherNew(alg, mode);
-
-    m_cipher->encryptFile(paths, m_keygen, encoding);
-}
-void MainWindow::processDecFile(vector<string> paths)
-{
-    string alg = ui->m_decTabFileAlgs->currentText().toStdString();
-    string mode = ui->m_decTabFileModes->currentText().toStdString();
-    Encoding encoding = static_cast<Encoding>(ui->m_decTabFileEncodings->currentIndex());
-    m_cipherNew(alg, mode);
-
-    m_cipher->decryptFile(paths, m_keygen, encoding);
 }
 
 void MainWindow::saveOnFile(const Encoding encoding)
@@ -294,6 +278,13 @@ void MainWindow::m_cipherNew(const string& alg, const string& mode)
 
     // default. shouldn't go here but used to remove clang warnings
     else m_cipher = new AesCBC;
+
+    m_cipher->moveToThread(&m_threadCipher);
+
+    QObject::connect(this, &MainWindow::encryptFile, m_cipher, &AbstractCipherBase::encryptFile);
+    QObject::connect(this, &MainWindow::decryptFile, m_cipher, &AbstractCipherBase::decryptFile);
+    QObject::connect(m_cipher, &AbstractCipherBase::proceed, this, &MainWindow::cipherProceed);
+    QObject::connect(m_cipher, &AbstractCipherBase::finished, &m_threadCipher, &QThread::quit);
 }
 
 bool MainWindow::isFileExist(const string& filename) const
@@ -472,9 +463,12 @@ void MainWindow::on_m_encTabFileEncrypt_clicked()
     Encoding encoding = static_cast<Encoding>(ui->m_encTabFileEncodings->currentIndex());
     m_cipherNew(alg, mode);
 
-    emit startProcess();
-//    emit startEncrypt(paths, m_keygen, encoding);
-    m_cipher->encryptFile(paths, m_keygen, encoding);
+    m_threadProcess.start(QThread::TimeCriticalPriority);
+    m_threadCipher.start();
+    m_process.init(size);
+    emit process(0);
+    emit encryptFile(paths, m_keygen, encoding);
+
 }
 void MainWindow::on_m_decTabFileDecrypt_clicked()
 {
@@ -489,8 +483,11 @@ void MainWindow::on_m_decTabFileDecrypt_clicked()
         Encoding encoding = static_cast<Encoding>(ui->m_decTabFileEncodings->currentIndex());
         m_cipherNew(alg, mode);
 
-        emit startProcess();
-        emit startDecrypt(paths, m_keygen, encoding);
+        m_threadProcess.start(QThread::TimeCriticalPriority);
+        m_threadCipher.start();
+        m_process.init(size);
+        emit process(0);
+        emit decryptFile(paths, m_keygen, encoding);
     }
     catch(exception& e) {
         dialogErrorMessage(e.what());
@@ -649,6 +646,11 @@ void MainWindow::dialogErrorMessage(const string &message)
     msg.setEscapeButton(ok);
     msg.setModal(true);
     msg.exec();
+}
+
+void MainWindow::killProcess()
+{
+    m_process.kill();
 }
 
 

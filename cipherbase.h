@@ -41,6 +41,7 @@ public slots:
 
 signals:
     void finished();
+    void proceed(const int progress);
     void error(const std::string& error);
     void cipherText(const std::string& cipherText);
     void recoverText(const std::string& recoverText);
