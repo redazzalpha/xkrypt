@@ -8,6 +8,7 @@
 class ProcessBar : public QObject {
     Q_OBJECT
 private:
+    QWidget* m_parent;
     QProgressDialog* m_progress = nullptr;
     std::string m_label;
     std::string m_cancelButton;
@@ -17,6 +18,7 @@ private:
 public :
     //constructor
     ProcessBar(
+        QWidget* parent = nullptr,
         const std::string& label = "Processing please wait...",
         const std::string& cancelButton = "Cancel operation",
         const int min = 0, const int max = 0

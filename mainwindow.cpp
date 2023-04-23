@@ -415,6 +415,7 @@ void MainWindow::setKeyLoadedSelectable(const bool selectable) const
 // protected methods
 void MainWindow::closeEvent(QCloseEvent*)
 {
+    m_process.kill();
     QMainWindow::close();
 }
 
@@ -468,7 +469,6 @@ void MainWindow::on_m_encTabFileEncrypt_clicked()
     m_process.init(size);
     emit process(0);
     emit encryptFile(paths, m_keygen, encoding);
-
 }
 void MainWindow::on_m_decTabFileDecrypt_clicked()
 {

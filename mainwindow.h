@@ -32,7 +32,7 @@ private:
     Ui::MainWindow *ui;
     QThread m_threadProcess;
     QThread m_threadCipher;
-    ProcessBar m_process;
+    ProcessBar m_process = ProcessBar(this);
     AbstractCipherBase* m_cipher = new AesCBC;
     Serial m_serial;
     FileImporter m_fimporterEnc;
