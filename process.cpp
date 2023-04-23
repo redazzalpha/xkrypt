@@ -22,20 +22,24 @@ ProcessBar::~ProcessBar()
 // methods
 void ProcessBar::init(const int max)
 {
-    std::cout << "int start int here ! " << std::endl;
-
     m_progress = new QProgressDialog(QString::fromStdString(m_label), QString::fromStdString(m_cancelButton), m_min, m_max, m_parent);
     m_progress->setMinimumDuration(0);
     m_progress->setMinimumWidth(PROCESS_BAR_WIDTH);
     m_progress->setWindowModality(Qt::WindowModal);
     m_progress->setMaximum(0);
+    m_progress->setAutoClose(false);
     m_max = max;
+
+    QObject::connect(m_progress, &QProgressDialog::canceled, this, &ProcessBar::kill);
+    QObject::connect(m_progress, &QProgressDialog::accepted, this, &ProcessBar::kill);
+
+    std::cout << "-- process bar initialized here  " << std::endl;
 }
 
 // slots
 void ProcessBar::processing(const int progress)
 {
-    std::cout << "process start process here ! " << std::endl;
+    std::cout << "-- process bar start process here ! " << std::endl;
 
     if(progress > 0 && progress < m_max) {
         m_progress->setMaximum(m_max);
@@ -45,6 +49,8 @@ void ProcessBar::processing(const int progress)
 }
 void ProcessBar::kill()
 {
+    std::cout << "-- process bar kill here !" << std::endl;
+
     if(m_progress) {
         m_progress->close();
         delete m_progress;

@@ -83,16 +83,18 @@ string AesCBC::decryptText(const string& cipher, Keygen* keygen, const Encoding 
 }
 void AesCBC::encryptFile(vector<string> paths, Keygen* keygen, const Encoding encoding)
 {
+    string output;
     try {
         const SecByteBlock& key = keygen->getKey();
         const SecByteBlock& iv = keygen->getIv();
         CBC_Mode<AES>::Encryption encryptor;
         encryptor.SetKeyWithIV(key, key.size(), iv);
 
-        int progress = 1;
+        int progress = 0;
         for(const string& path : paths) {
             DirFname dirfname = extractFname(path, m_delim);
-            FileSink* fs = new FileSink((dirfname.m_dir + dirfname.m_delim + encryptText(dirfname.m_fname, keygen, Encoding::HEX)).c_str());
+            output = (dirfname.m_dir + dirfname.m_delim + encryptText(dirfname.m_fname, keygen, Encoding::HEX));
+            FileSink* fs = new FileSink(output.c_str());
             StreamTransformationFilter* stf = new StreamTransformationFilter(encryptor);
 
             switch(encoding) {
@@ -103,28 +105,30 @@ void AesCBC::encryptFile(vector<string> paths, Keygen* keygen, const Encoding en
             }
             FileSource(path.c_str(), true, stf);
             removeFile(path);
-            emit proceed(progress++);
+            emit proceed(++progress);
         }
         emit finished();
+        emit success(successEncMsg(progress));
     }
     catch(exception& e) {
-        std::cout << "error: " << e.what() << std::endl;
+        removeFile(output);
         emit error(e.what());
         emit finished();
     }
 }
 void AesCBC::decryptFile(vector<string> paths, Keygen* keygen, const Encoding encoding)
 {
+    string output;
     try {
         const SecByteBlock& key = keygen->getKey();
         const SecByteBlock& iv = keygen->getIv();
         CBC_Mode<AES>::Decryption decryptor;
         decryptor.SetKeyWithIV(key, key.size(), iv);
-
-        int progress = 1;
+        int progress = 0;
         for(const string& path : paths) {
             DirFname dirfname = extractFname(path, m_delim);
-            FileSink* fs = new FileSink((dirfname.m_dir + dirfname.m_delim + decryptText(dirfname.m_fname, keygen, Encoding::HEX)).c_str());
+            output = (dirfname.m_dir + dirfname.m_delim + decryptText(dirfname.m_fname, keygen, Encoding::HEX));
+            FileSink* fs = new FileSink(output.c_str());
             StreamTransformationFilter* stf  = new StreamTransformationFilter(decryptor, fs);
 
             switch(encoding) {
@@ -134,12 +138,15 @@ void AesCBC::decryptFile(vector<string> paths, Keygen* keygen, const Encoding en
             default: FileSource(path.c_str(), true, new Base64Decoder(stf));
             }
             removeFile(path);
-            emit proceed(progress++);
+            emit proceed(++progress);
         }
         emit finished();
+        emit success(successDecMsg(progress));
     }
     catch(exception& e) {
+        removeFile(output);
         emit error(e.what());
+        emit finished();
     }
 }
 

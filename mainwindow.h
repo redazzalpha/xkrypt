@@ -114,6 +114,9 @@ private:
     void setKeyLoadedText(const QString &keyStr) const;
     void setKeyLoadedSelectable(const bool selectable) const;
 
+    void connectCipher();
+    void connectProcess();
+
 protected:
     void closeEvent(QCloseEvent* event) override;
 
@@ -149,10 +152,10 @@ private slots:
     void killProcess();
 
 signals:
-    void cipherProceed(const int progress);
-    void process(const int progress);
     void encryptFile(std::vector<std::string> paths, Keygen* keygen, const Encoding encoding);
     void decryptFile(std::vector<std::string> paths, Keygen* keygen, const Encoding encoding);
+    void cipherProceed(const int progress);
+    void process(const int progress = 0);
 };
 
 #endif // MAINWINDOW_H

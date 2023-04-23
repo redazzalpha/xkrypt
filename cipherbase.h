@@ -32,6 +32,8 @@ public:
 protected :
     void removeFile(const std::string& filePath) const;
     DirFname extractFname(const std::string& path, const std::string& delim) const;
+    std::string successEncMsg(const int succeed);
+    std::string successDecMsg(const int succeed);
 
 public slots:
     virtual std::string encryptText(const std::string& plain, Keygen* keygen, const Encoding encoding) = 0;
@@ -43,6 +45,7 @@ signals:
     void finished();
     void proceed(const int progress);
     void error(const std::string& error);
+    void success(const std::string& error);
     void cipherText(const std::string& cipherText);
     void recoverText(const std::string& recoverText);
 };
