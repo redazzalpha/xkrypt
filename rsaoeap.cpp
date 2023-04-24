@@ -27,11 +27,11 @@ string RsaOEAP::decryptText(const string& cipher, Keygen* keygen, const Encoding
 }
 
 // slots
-void RsaOEAP::encryptFile(const string& path, Keygen* keygen, const Encoding encoding)
+void RsaOEAP::encryptFile(std::vector<std::string> paths, Keygen* keygen, const Encoding encoding)
 {
     std::cout<< "in the rsa oeap slot encrypt" << std::endl;
 }
-void RsaOEAP::decryptFile(const string& path, Keygen* keygen, const Encoding encoding)
+void RsaOEAP::decryptFile(std::vector<std::string> paths, Keygen* keygen, const Encoding encoding)
 {
     std::cout<< "in the rsa oeap slot decrypt" << std::endl;
 }

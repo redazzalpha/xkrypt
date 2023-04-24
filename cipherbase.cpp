@@ -20,4 +20,20 @@ DirFname AbstractCipherBase::extractFname(const std::string& path, const string&
     string fname = path.substr(pos+1, path.size() - pos);
     return DirFname(dir, fname, delim);
 }
+string AbstractCipherBase::successEncMsg(const int succeed)
+{
+    return  "Encryption successfull!<br />" +
+        std::to_string(succeed) + "file(s) encrypted<br />"
+        "Using " +
+        getAlgName() + " - " + getModeName() +
+        " mode<br />";
+}
+string AbstractCipherBase::successDecMsg(const int succeed)
+{
+    return  "Decryption successfull!<br />" +
+        std::to_string(succeed) + "file(s) decrypted<br />" +
+        "Using " +
+        getAlgName() + " - " + getModeName() +
+        " mode<br />";
+}
 

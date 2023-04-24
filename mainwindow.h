@@ -15,7 +15,7 @@
 #include "actionquit.h"
 #include "aesccm.h"
 #include "fileimporter.h"
-#include <QMainWindow>
+#include "process.h"
 #include <QList>
 #include <QString>
 #include <QMessageBox>
@@ -29,8 +29,11 @@ class MainWindow : public QMainWindow {
     Q_OBJECT
 
 private:
-    QThread m_threadCipher;
     Ui::MainWindow *ui;
+    QThread m_threadProcess;
+    QThread m_threadCipher;
+    ProcessBar m_process = ProcessBar(this);
+    AbstractCipherBase* m_cipher = new AesCBC;
     Serial m_serial;
     FileImporter m_fimporterEnc;
     FileImporter m_fimporterDec;
@@ -38,7 +41,6 @@ private:
     std::string m_fname;
     std::string m_dir;
     Keygen* m_keygen = new Keygen;
-    AbstractCipherBase* m_cipher = new AesCBC;
 
     QList<AbstractActionBase*> m_actions = QList<AbstractActionBase*> {
         new ActionKeyMgr(),
@@ -82,10 +84,14 @@ public:
     // destructor
     ~MainWindow();
 
+    AbstractCipherBase *cipher() const;
+
 private:
     // methods
     void uiInit();
     void connectItems();
+    void connectCipher();
+    void connectProcess();
     void generateKey(Encoding encodingIndex);
     void shortcuts();
     void toolTips();
@@ -105,8 +111,6 @@ private:
     QMessageBox::ButtonRole dialogFileExists(const std::string& message);
     bool dialogInsertFilename(const std::string& message);
     bool dialogConfirm(const std::string& message);
-    void dialogSuccessMessage(const std::string& message);
-    void dialogErrorMessage(std::string message);
     void dialogNoKeyMessage(const std::string& action);
 
     void keyLoadedSelectable(const Qt::TextInteractionFlags flags) const;
@@ -115,11 +119,9 @@ private:
     void setKeyLoadedText(const QString &keyStr) const;
     void setKeyLoadedSelectable(const bool selectable) const;
 
-    void connectCipher();
 
 protected:
     void closeEvent(QCloseEvent* event) override;
-
 
 private slots:
     void on_m_encTabFileImport_clicked();
@@ -148,12 +150,15 @@ private slots:
     void recoverText(const std::string &recoverText);
     void cipherText(const std::string &cipherText);
     void cipherError(const std::string &error);
+    void dialogSuccessMessage(const std::string& message);
+    void dialogErrorMessage(const std::string& message);
+    void killProcess();
 
 signals:
-    void encryptText(const std::string& plain, Keygen* keygen, const Encoding encoding);
-    void decryptText(const std::string& cipher, Keygen* keygen, const Encoding encoding);
-    void encryptFile(const std::string& path, Keygen* keygen, const Encoding encoding);
-    void decryptFile(const std::string& path, Keygen* keygen, const Encoding encoding);
+    void encryptFile(std::vector<std::string> paths, Keygen* keygen, const Encoding encoding);
+    void decryptFile(std::vector<std::string> paths, Keygen* keygen, const Encoding encoding);
+    void cipherProceed(const int progress);
+    void process(const int progress = 0);
 };
 
 #endif // MAINWINDOW_H

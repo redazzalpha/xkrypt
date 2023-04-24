@@ -81,55 +81,71 @@ string AesCBC::decryptText(const string& cipher, Keygen* keygen, const Encoding 
     }
     return recover;
 }
-void AesCBC::encryptFile(const string& path, Keygen* keygen, const Encoding encoding)
+void AesCBC::encryptFile(vector<string> paths, Keygen* keygen, const Encoding encoding)
 {
+    string output;
     try {
         const SecByteBlock& key = keygen->getKey();
         const SecByteBlock& iv = keygen->getIv();
         CBC_Mode<AES>::Encryption encryptor;
         encryptor.SetKeyWithIV(key, key.size(), iv);
 
-        DirFname dirfname = extractFname(path, m_delim);
-        FileSink* fs = new FileSink((dirfname.m_dir + dirfname.m_delim + encryptText(dirfname.m_fname, keygen, Encoding::HEX)).c_str());
-        StreamTransformationFilter* stf = new StreamTransformationFilter(encryptor);
+        int progress = 0;
+        for(const string& path : paths) {
+            DirFname dirfname = extractFname(path, m_delim);
+            output = (dirfname.m_dir + dirfname.m_delim + encryptText(dirfname.m_fname, keygen, Encoding::HEX));
+            FileSink* fs = new FileSink(output.c_str());
+            StreamTransformationFilter* stf = new StreamTransformationFilter(encryptor);
 
-        switch(encoding) {
-        case Encoding::BASE64 : stf->Attach(new Base64Encoder(fs)); break;
-        case Encoding::HEX : stf->Attach(new HexEncoder(fs)); break;
-        case Encoding::NONE : stf->Attach(fs); break;
-        default: stf->Attach(new Base64Encoder(fs));;
+            switch(encoding) {
+            case Encoding::BASE64 : stf->Attach(new Base64Encoder(fs)); break;
+            case Encoding::HEX : stf->Attach(new HexEncoder(fs)); break;
+            case Encoding::NONE : stf->Attach(fs); break;
+            default: stf->Attach(new Base64Encoder(fs));;
+            }
+            FileSource(path.c_str(), true, stf);
+            removeFile(path);
+            emit proceed(++progress);
         }
-        FileSource(path.c_str(), true, stf);
-        removeFile(path);
         emit finished();
+        emit success(successEncMsg(progress));
     }
     catch(exception& e) {
         emit error(e.what());
+        emit finished();
     }
 }
-void AesCBC::decryptFile(const string& path, Keygen* keygen, const Encoding encoding)
+void AesCBC::decryptFile(vector<string> paths, Keygen* keygen, const Encoding encoding)
 {
+    string output;
     try {
         const SecByteBlock& key = keygen->getKey();
         const SecByteBlock& iv = keygen->getIv();
         CBC_Mode<AES>::Decryption decryptor;
         decryptor.SetKeyWithIV(key, key.size(), iv);
+        int progress = 0;
+        for(const string& path : paths) {
+            DirFname dirfname = extractFname(path, m_delim);
+            output = (dirfname.m_dir + dirfname.m_delim + decryptText(dirfname.m_fname, keygen, Encoding::HEX));
+            FileSink* fs = new FileSink(output.c_str());
+            StreamTransformationFilter* stf  = new StreamTransformationFilter(decryptor, fs);
 
-        DirFname dirfname = extractFname(path, m_delim);
-        FileSink* fs = new FileSink((dirfname.m_dir + dirfname.m_delim + decryptText(dirfname.m_fname, keygen, Encoding::HEX)).c_str());
-        StreamTransformationFilter* stf  = new StreamTransformationFilter(decryptor, fs);
-
-        switch(encoding) {
-        case Encoding::BASE64 : FileSource(path.c_str(), true, new Base64Decoder(stf)); break;
-        case Encoding::HEX : FileSource(path.c_str(), true, new HexDecoder(stf)); break;
-        case Encoding::NONE : FileSource(path.c_str(), true, stf); break;
-        default: FileSource(path.c_str(), true, new Base64Decoder(stf));
+            switch(encoding) {
+            case Encoding::BASE64 : FileSource(path.c_str(), true, new Base64Decoder(stf)); break;
+            case Encoding::HEX : FileSource(path.c_str(), true, new HexDecoder(stf)); break;
+            case Encoding::NONE : FileSource(path.c_str(), true, stf); break;
+            default: FileSource(path.c_str(), true, new Base64Decoder(stf));
+            }
+            removeFile(path);
+            emit proceed(++progress);
         }
-        removeFile(path);
         emit finished();
+        emit success(successDecMsg(progress));
     }
     catch(exception& e) {
+//        removeFile(output);
         emit error(e.what());
+        emit finished();
     }
 }
 
