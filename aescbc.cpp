@@ -26,7 +26,6 @@ std::string AesCBC::getModeName() const
     return AesCBC::ModeName;
 }
 
-
 // slots
 string AesCBC::encryptText(const string& plain, Keygen* keygen, const Encoding encoding) noexcept(false)
 {
@@ -47,6 +46,7 @@ string AesCBC::encryptText(const string& plain, Keygen* keygen, const Encoding e
         }
         StringSource(plain, true, stf);
         emit cipherText(cipher);
+        emit proceed(1);
         emit finished();
         return cipher;
     }
@@ -73,6 +73,7 @@ string AesCBC::decryptText(const string& cipher, Keygen* keygen, const Encoding 
         default: StringSource(cipher, true, new Base64Decoder(stf));
         }
         emit recoverText(recover);
+        emit proceed(1);
         emit finished();
         return recover;
     }
@@ -111,7 +112,6 @@ void AesCBC::encryptFile(vector<string> paths, Keygen* keygen, const Encoding en
         emit success(successEncMsg(progress));
     }
     catch(exception& e) {
-        removeFile(output);
         emit error(e.what());
         emit finished();
     }
@@ -144,7 +144,7 @@ void AesCBC::decryptFile(vector<string> paths, Keygen* keygen, const Encoding en
         emit success(successDecMsg(progress));
     }
     catch(exception& e) {
-        removeFile(output);
+//        removeFile(output);
         emit error(e.what());
         emit finished();
     }

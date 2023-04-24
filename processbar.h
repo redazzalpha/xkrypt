@@ -1,5 +1,5 @@
-#ifndef PROCESS_H
-#define PROCESS_H
+#ifndef PROCESSBAR_H
+#define PROCESSBAR_H
 
 
 #include <QObject>
@@ -36,6 +36,7 @@ public slots:
 
 signals:
     void finished();
+    void killed();
 };
 
-#endif // PROCESS_H
+#endif // PROCESSBAR_H

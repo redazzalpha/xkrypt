@@ -1,4 +1,4 @@
-#include "process.h"
+#include "processbar.h"
 #include "defines.h"
 #include <QProgressDialog>
 #include <thread>
@@ -25,22 +25,19 @@ void ProcessBar::init(const int max)
     m_progress = new QProgressDialog(QString::fromStdString(m_label), QString::fromStdString(m_cancelButton), m_min, m_max, m_parent);
     m_progress->setMinimumDuration(0);
     m_progress->setMinimumWidth(PROCESS_BAR_WIDTH);
+    m_progress->setWindowFlags(Qt::CustomizeWindowHint | Qt::Window | Qt::WindowMinimizeButtonHint | Qt::WindowStaysOnTopHint);
     m_progress->setWindowModality(Qt::WindowModal);
     m_progress->setMaximum(0);
     m_progress->setAutoClose(false);
     m_max = max;
 
-    QObject::connect(m_progress, &QProgressDialog::canceled, this, &ProcessBar::kill);
-    QObject::connect(m_progress, &QProgressDialog::accepted, this, &ProcessBar::kill);
-
-    std::cout << "-- process bar initialized here  " << std::endl;
+    QObject::connect(m_progress, &QProgressDialog::canceled, this, &ProcessBar::killed);
+    QObject::connect(m_progress, &QProgressDialog::accepted, this, &ProcessBar::killed);
 }
 
 // slots
 void ProcessBar::processing(const int progress)
 {
-    std::cout << "-- process bar start process here ! " << std::endl;
-
     if(progress > 0 && progress < m_max) {
         m_progress->setMaximum(m_max);
         m_progress->setValue(progress);
@@ -49,14 +46,10 @@ void ProcessBar::processing(const int progress)
 }
 void ProcessBar::kill()
 {
-    std::cout << "-- process bar kill here !" << std::endl;
-
     if(m_progress) {
-        m_progress->close();
         delete m_progress;
         m_progress = nullptr;
     }
     emit finished();
 }
-
 

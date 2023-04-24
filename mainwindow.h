@@ -15,7 +15,7 @@
 #include "actionquit.h"
 #include "aesccm.h"
 #include "fileimporter.h"
-#include "process.h"
+#include "processbar.h"
 #include <QList>
 #include <QString>
 #include <QMessageBox>
@@ -90,11 +90,11 @@ private:
     // methods
     void uiInit();
     void connectItems();
+    void connectCipher();
+    void connectProcess();
     void generateKey(Encoding encodingIndex);
     void shortcuts();
     void toolTips();
-    void processEncText();
-    void processDecText();
     void importAsymmectric();
     void importSymmectric();
     KeyLength keylengthFrom(const int index);
@@ -113,9 +113,6 @@ private:
     void setFilesLoadedStyle(const QString &style) const;
     void setKeyLoadedText(const QString &keyStr) const;
     void setKeyLoadedSelectable(const bool selectable) const;
-
-    void connectCipher();
-    void connectProcess();
 
 protected:
     void closeEvent(QCloseEvent* event) override;
@@ -154,6 +151,8 @@ private slots:
 signals:
     void encryptFile(std::vector<std::string> paths, Keygen* keygen, const Encoding encoding);
     void decryptFile(std::vector<std::string> paths, Keygen* keygen, const Encoding encoding);
+    void encryptText(const std::string& plain, Keygen* keygen, const Encoding encoding);
+    void decryptText(const std::string& cipher, Keygen* keygen, const Encoding encoding);
     void cipherProceed(const int progress);
     void process(const int progress = 0);
 };
