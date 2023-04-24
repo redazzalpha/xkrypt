@@ -90,6 +90,8 @@ private:
     // methods
     void uiInit();
     void connectItems();
+    void connectCipher();
+    void connectProcess();
     void generateKey(Encoding encodingIndex);
     void shortcuts();
     void toolTips();
@@ -114,8 +116,6 @@ private:
     void setKeyLoadedText(const QString &keyStr) const;
     void setKeyLoadedSelectable(const bool selectable) const;
 
-    void connectCipher();
-    void connectProcess();
 
 protected:
     void closeEvent(QCloseEvent* event) override;

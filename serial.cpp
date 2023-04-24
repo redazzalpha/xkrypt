@@ -60,7 +60,7 @@ void Serial::keyToFile(const string& path, Keygen& keygen, const Encoding encodi
         (CryptoPP::byte)encoding,
     };
     CryptoPP::byte* keyIv = new CryptoPP::byte[keyIvSize];
-    StringSource refsSource(&xkrypt_refs[0], xkrypt_refs.size(),false);
+    StringSource refsSource(&xkrypt_refs[0], xkrypt_refs.size(), false);
     StringSource keyIvSource(keyIv, keyIvSize, false);
     FileSink fs(path.c_str(), true);
 

@@ -36,6 +36,7 @@ public slots:
 
 signals:
     void finished();
+    void killed();
 };
 
 #endif // PROCESS_H

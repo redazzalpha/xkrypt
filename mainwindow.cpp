@@ -108,6 +108,27 @@ void MainWindow::connectItems()
         QObject::connect(action, &AbstractActionBase::setStackPage, ui->m_mainStack, &QStackedWidget::setCurrentIndex);
     }
 }
+void MainWindow::connectCipher()
+{
+    m_cipher->moveToThread(&m_threadCipher);
+    QObject::connect(this, &MainWindow::encryptFile, m_cipher, &AbstractCipherBase::encryptFile);
+    QObject::connect(this, &MainWindow::decryptFile, m_cipher, &AbstractCipherBase::decryptFile);
+    QObject::connect(m_cipher, &AbstractCipherBase::proceed, this, &MainWindow::cipherProceed);
+    QObject::connect(m_cipher, &AbstractCipherBase::finished, &m_threadCipher, &QThread::quit);
+    QObject::connect(m_cipher, &AbstractCipherBase::error, this, &MainWindow::dialogErrorMessage);
+    QObject::connect(m_cipher, &AbstractCipherBase::error, &m_threadCipher, &QThread::quit);
+    QObject::connect(m_cipher, &AbstractCipherBase::error, &m_threadProcess, &QThread::quit);
+    QObject::connect(m_cipher, &AbstractCipherBase::success, this, &MainWindow::dialogSuccessMessage);
+    QObject::connect(&m_process, &ProcessBar::killed, m_cipher, &AbstractCipherBase::finished);
+}
+void MainWindow::connectProcess()
+{
+    m_process.moveToThread(&m_threadProcess);
+    QObject::connect(this, &MainWindow::process, &m_process, &ProcessBar::processing);
+    QObject::connect(this, &MainWindow::cipherProceed, &m_process, &ProcessBar::processing);
+    QObject::connect(&m_process, &ProcessBar::finished, &m_threadProcess, &QThread::quit);
+    QObject::connect(&m_threadProcess, &QThread::finished, this, &MainWindow::killProcess);
+}
 void MainWindow::generateKey(Encoding encoding)
 {
     const int keylengthIndex = ui->m_keyMLength->currentIndex();
@@ -396,28 +417,6 @@ void MainWindow::setKeyLoadedSelectable(const bool selectable) const
     else keyLoadedSelectable(Qt::NoTextInteraction);
 }
 
-void MainWindow::connectCipher()
-{
-    m_cipher->moveToThread(&m_threadCipher);
-    QObject::connect(this, &MainWindow::encryptFile, m_cipher, &AbstractCipherBase::encryptFile);
-    QObject::connect(this, &MainWindow::decryptFile, m_cipher, &AbstractCipherBase::decryptFile);
-    QObject::connect(m_cipher, &AbstractCipherBase::proceed, this, &MainWindow::cipherProceed);
-    QObject::connect(m_cipher, &AbstractCipherBase::finished, &m_threadCipher, &QThread::quit);
-    QObject::connect(m_cipher, &AbstractCipherBase::error, this, &MainWindow::dialogErrorMessage);
-    QObject::connect(m_cipher, &AbstractCipherBase::error, &m_threadCipher, &QThread::quit);
-    QObject::connect(m_cipher, &AbstractCipherBase::error, &m_threadProcess, &QThread::quit);
-    QObject::connect(m_cipher, &AbstractCipherBase::success, this, &MainWindow::dialogSuccessMessage);
-}
-
-void MainWindow::connectProcess()
-{
-    m_process.moveToThread(&m_threadProcess);
-    QObject::connect(this, &MainWindow::process, &m_process, &ProcessBar::processing);
-    QObject::connect(this, &MainWindow::cipherProceed, &m_process, &ProcessBar::processing);
-    QObject::connect(&m_process, &ProcessBar::finished, &m_threadProcess, &QThread::quit);
-    QObject::connect(&m_threadProcess, &QThread::finished, this, &MainWindow::killProcess);
-}
-
 // protected methods
 void MainWindow::closeEvent(QCloseEvent*)
 {
@@ -470,9 +469,9 @@ void MainWindow::on_m_encTabFileEncrypt_clicked()
     Encoding encoding = static_cast<Encoding>(ui->m_encTabFileEncodings->currentIndex());
     m_cipherNew(alg, mode);
 
-    m_threadProcess.start(QThread::TimeCriticalPriority);
-    m_threadCipher.start();
     m_process.init(size);
+    m_threadProcess.start();
+    m_threadCipher.start();
     emit process();
     emit encryptFile(paths, m_keygen, encoding);
 }
@@ -488,9 +487,9 @@ void MainWindow::on_m_decTabFileDecrypt_clicked()
     Encoding encoding = static_cast<Encoding>(ui->m_decTabFileEncodings->currentIndex());
     m_cipherNew(alg, mode);
 
-    m_threadProcess.start(QThread::TimeCriticalPriority);
-    m_threadCipher.start();
     m_process.init(size);
+    m_threadProcess.start();
+    m_threadCipher.start();
     emit process();
     emit decryptFile(paths, m_keygen, encoding);
 }
