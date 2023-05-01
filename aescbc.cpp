@@ -86,7 +86,6 @@ void AesCBC::encryptFile(vector<string> paths, Keygen* keygen, const Encoding en
 {
     string output;
     string filenameEnc;
-    string filenameDec;
     try {
         const SecByteBlock& key = keygen->getKey();
         const SecByteBlock& iv = keygen->getIv();
