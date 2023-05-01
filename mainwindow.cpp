@@ -111,27 +111,29 @@ void MainWindow::connectItems()
 void MainWindow::connectCipher()
 {
     m_cipher->moveToThread(&m_threadCipher);
-    QObject::connect(this, &MainWindow::encryptFile, m_cipher, &AbstractCipherBase::encryptFile);
-    QObject::connect(this, &MainWindow::decryptFile, m_cipher, &AbstractCipherBase::decryptFile);
-    QObject::connect(this, &MainWindow::encryptText, m_cipher, &AbstractCipherBase::encryptText);
-    QObject::connect(this, &MainWindow::decryptText, m_cipher, &AbstractCipherBase::decryptText);
+    QObject::connect(this, &MainWindow::startEncFile, m_cipher, &AbstractCipherBase::encryptFile);
+    QObject::connect(this, &MainWindow::startDecFile, m_cipher, &AbstractCipherBase::decryptFile);
+    QObject::connect(this, &MainWindow::startEncText, m_cipher, &AbstractCipherBase::encryptText);
+    QObject::connect(this, &MainWindow::startDecText, m_cipher, &AbstractCipherBase::decryptText);
 
-    QObject::connect(m_cipher, &AbstractCipherBase::proceed, this, &MainWindow::cipherProceed);
+    QObject::connect(m_cipher, &AbstractCipherBase::proceed, this, &MainWindow::processing);
+//    QObject::connect(m_cipher, &AbstractCipherBase::proceed, &m_process, &ProcessBar::processing);
     QObject::connect(m_cipher, &AbstractCipherBase::finished, &m_threadCipher, &QThread::quit);
     QObject::connect(m_cipher, &AbstractCipherBase::error, this, &MainWindow::dialogErrorMessage);
     QObject::connect(m_cipher, &AbstractCipherBase::error, &m_threadCipher, &QThread::quit);
     QObject::connect(m_cipher, &AbstractCipherBase::error, &m_threadProcess, &QThread::quit);
     QObject::connect(m_cipher, &AbstractCipherBase::success, this, &MainWindow::dialogSuccessMessage);
-    QObject::connect(&m_process, &ProcessBar::killed, m_cipher, &AbstractCipherBase::finished);
 
     QObject::connect(m_cipher, &AbstractCipherBase::recoverText, this, &MainWindow::recoverText);
     QObject::connect(m_cipher, &AbstractCipherBase::cipherText, this, &MainWindow::cipherText);
+
+    QObject::connect(&m_process, &ProcessBar::killed, m_cipher, &AbstractCipherBase::finished);
+    QObject::connect(&m_process, &ProcessBar::killed, this, &MainWindow::cipherKill);
 }
 void MainWindow::connectProcess()
 {
     m_process.moveToThread(&m_threadProcess);
-    QObject::connect(this, &MainWindow::process, &m_process, &ProcessBar::processing);
-    QObject::connect(this, &MainWindow::cipherProceed, &m_process, &ProcessBar::processing);
+    QObject::connect(this, &MainWindow::startProcess, &m_process, &ProcessBar::processing);
     QObject::connect(&m_process, &ProcessBar::finished, &m_threadProcess, &QThread::quit);
     QObject::connect(&m_threadProcess, &QThread::finished, this, &MainWindow::killProcess);
 }
@@ -451,8 +453,8 @@ void MainWindow::on_m_encTabFileEncrypt_clicked()
     m_process.init(size);
     m_threadProcess.start();
     m_threadCipher.start();
-    emit process();
-    emit encryptFile(paths, m_keygen, encoding);
+    emit startProcess();
+    emit startEncFile(paths, m_keygen, encoding);
 }
 void MainWindow::on_m_decTabFileDecrypt_clicked()
 {
@@ -469,8 +471,8 @@ void MainWindow::on_m_decTabFileDecrypt_clicked()
     m_process.init(size);
     m_threadProcess.start();
     m_threadCipher.start();
-    emit process();
-    emit decryptFile(paths, m_keygen, encoding);
+    emit startProcess();
+    emit startDecFile(paths, m_keygen, encoding);
 }
 void MainWindow::on_m_encTabFileClear_clicked()
 {
@@ -494,12 +496,11 @@ void MainWindow::on_m_encTabTextEncrypt_clicked()
     Encoding encoding = static_cast<Encoding>(ui->m_encTabTextEncodings->currentIndex());
     m_cipherNew(selectedAlg, selectedMode);
 
-    m_process.init(1);
+    m_process.init();
     m_threadProcess.start();
     m_threadCipher.start();
-    emit process();
-    emit encryptText(plainText, m_keygen, encoding);
-
+    emit startProcess();
+    emit startEncText(plainText, m_keygen, encoding);
 }
 void MainWindow::on_m_decTabTextDecrypt_clicked()
 {
@@ -512,11 +513,11 @@ void MainWindow::on_m_decTabTextDecrypt_clicked()
     Encoding encoding = static_cast<Encoding>(ui->m_decTabTextEncodings->currentIndex());
     m_cipherNew(selectedAlg, selectedMode);
 
-    m_process.init(1);
+    m_process.init();
     m_threadProcess.start();
     m_threadCipher.start();
-    emit process();
-    emit decryptText(cipherText, m_keygen, encoding);
+    emit startProcess();
+    emit startDecText(cipherText, m_keygen, encoding);
 }
 void MainWindow::on_m_encTabTextReset_clicked()
 {
@@ -644,9 +645,18 @@ void MainWindow::dialogErrorMessage(const string &message)
     msg.exec();
 }
 
+void MainWindow::cipherKill()
+{
+    m_cipher->kill();
+}
 void MainWindow::killProcess()
 {
     m_process.kill();
+}
+
+void MainWindow::processing(const int progress)
+{
+    m_process.processing(progress);
 }
 
 

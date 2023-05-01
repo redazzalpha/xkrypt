@@ -7,6 +7,7 @@ struct DirFname {
     std::string m_dir;
     std::string m_fname;
     std::string m_delim;
+    std::string m_path;
 
     // constructors
     DirFname();

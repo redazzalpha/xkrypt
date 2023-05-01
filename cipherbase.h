@@ -16,6 +16,7 @@ class AbstractCipherBase : public QObject {
 
 protected:
     const std::string m_delim = "/";
+    bool m_run = true;
 
 public:
     // constructors
@@ -30,6 +31,7 @@ public:
     
 
 protected :
+    bool& run();
     void removeFile(const std::string& filePath) const;
     DirFname extractFname(const std::string& path, const std::string& delim) const;
     std::string successEncMsg(const int succeed);
@@ -40,10 +42,10 @@ public slots:
     virtual std::string decryptText(const std::string& cipher, Keygen* keygen, const Encoding encoding) = 0;
     virtual void encryptFile(std::vector<std::string>  paths, Keygen* keygen, const Encoding encoding) = 0;
     virtual void decryptFile(std::vector<std::string>  paths, Keygen* keygen, const Encoding encoding) = 0;
-
+    void kill();
 signals:
     void finished();
-    void proceed(const int progress);
+    void proceed(const int progress = 0);
     void error(const std::string& error);
     void success(const std::string& error);
     void cipherText(const std::string& cipherText);

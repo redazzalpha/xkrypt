@@ -146,15 +146,16 @@ private slots:
     void cipherError(const std::string &error);
     void dialogSuccessMessage(const std::string& message);
     void dialogErrorMessage(const std::string& message);
+    void cipherKill();
     void killProcess();
+    void processing(const int progress);
 
 signals:
-    void encryptFile(std::vector<std::string> paths, Keygen* keygen, const Encoding encoding);
-    void decryptFile(std::vector<std::string> paths, Keygen* keygen, const Encoding encoding);
-    void encryptText(const std::string& plain, Keygen* keygen, const Encoding encoding);
-    void decryptText(const std::string& cipher, Keygen* keygen, const Encoding encoding);
-    void cipherProceed(const int progress);
-    void process(const int progress = 0);
+    void startEncFile(std::vector<std::string> paths, Keygen* keygen, const Encoding encoding);
+    void startDecFile(std::vector<std::string> paths, Keygen* keygen, const Encoding encoding);
+    void startEncText(const std::string& plain, Keygen* keygen, const Encoding encoding);
+    void startDecText(const std::string& cipher, Keygen* keygen, const Encoding encoding);
+    void startProcess(const int progress = 0);
 };
 
 #endif // MAINWINDOW_H

@@ -18,7 +18,7 @@ const std::string AesCBC::ModeName = "CBC";
 AesCBC::AesCBC() {}
 
 // destructor
-AesCBC::~AesCBC() {};
+AesCBC::~AesCBC() {}
 
 // virtual methods
 std::string AesCBC::getModeName() const
@@ -85,28 +85,37 @@ string AesCBC::decryptText(const string& cipher, Keygen* keygen, const Encoding 
 void AesCBC::encryptFile(vector<string> paths, Keygen* keygen, const Encoding encoding)
 {
     string output;
+    string filenameEnc;
+    string filenameDec;
     try {
         const SecByteBlock& key = keygen->getKey();
         const SecByteBlock& iv = keygen->getIv();
-        CBC_Mode<AES>::Encryption encryptor;
-        encryptor.SetKeyWithIV(key, key.size(), iv);
 
-        int progress = 0;
-        for(const string& path : paths) {
+        size_t progress;
+        for(progress = 0; progress < paths.size() && m_run; progress++) {
+            const string& path = paths[progress];
             DirFname dirfname = extractFname(path, m_delim);
-            output = (dirfname.m_dir + dirfname.m_delim + encryptText(dirfname.m_fname, keygen, Encoding::HEX));
-            FileSink* fs = new FileSink(output.c_str());
-            StreamTransformationFilter* stf = new StreamTransformationFilter(encryptor);
+
+            CBC_Mode<AES>::Encryption encryptor;
+            encryptor.SetKeyWithIV(key, key.size(), iv);
+
+            StreamTransformationFilter* filenameFilter = new StreamTransformationFilter(encryptor, new HexEncoder(new StringSink(filenameEnc)));
+            StringSource ss(dirfname.m_fname, true, filenameFilter);
+
+            FileSink* fs = new FileSink((output = (dirfname.m_dir + dirfname.m_delim + filenameEnc)).c_str());
+            StreamTransformationFilter* fileFilter = new StreamTransformationFilter(encryptor);
 
             switch(encoding) {
-            case Encoding::BASE64 : stf->Attach(new Base64Encoder(fs)); break;
-            case Encoding::HEX : stf->Attach(new HexEncoder(fs)); break;
-            case Encoding::NONE : stf->Attach(fs); break;
-            default: stf->Attach(new Base64Encoder(fs));;
+            case Encoding::BASE64 : fileFilter->Attach(new Base64Encoder(fs)); break;
+            case Encoding::HEX : fileFilter->Attach(new HexEncoder(fs)); break;
+            case Encoding::NONE : fileFilter->Attach(fs); break;
+            default: fileFilter->Attach(new Base64Encoder(fs));;
             }
-            FileSource(path.c_str(), true, stf);
+            FileSource(path.c_str(), true, fileFilter);
             removeFile(path);
-            emit proceed(++progress);
+            filenameEnc.clear();
+            output.clear();
+            emit proceed(progress+1);
         }
         emit finished();
         emit success(successEncMsg(progress));
@@ -119,32 +128,42 @@ void AesCBC::encryptFile(vector<string> paths, Keygen* keygen, const Encoding en
 void AesCBC::decryptFile(vector<string> paths, Keygen* keygen, const Encoding encoding)
 {
     string output;
+    string filenameDec;
+
     try {
         const SecByteBlock& key = keygen->getKey();
         const SecByteBlock& iv = keygen->getIv();
-        CBC_Mode<AES>::Decryption decryptor;
-        decryptor.SetKeyWithIV(key, key.size(), iv);
-        int progress = 0;
-        for(const string& path : paths) {
+
+        size_t progress;
+        for(progress = 0; progress < paths.size() && m_run; progress++) {
+            const string& path = paths[progress];
             DirFname dirfname = extractFname(path, m_delim);
-            output = (dirfname.m_dir + dirfname.m_delim + decryptText(dirfname.m_fname, keygen, Encoding::HEX));
-            FileSink* fs = new FileSink(output.c_str());
-            StreamTransformationFilter* stf  = new StreamTransformationFilter(decryptor, fs);
+
+            CBC_Mode<AES>::Decryption decryptor;
+            decryptor.SetKeyWithIV(key, key.size(), iv);
+
+            StreamTransformationFilter* filenameFilter  = new StreamTransformationFilter(decryptor, new StringSink(filenameDec));
+            StringSource ss(dirfname.m_fname, true, new HexDecoder(filenameFilter));
+
+            FileSink* fs = new FileSink((output = (dirfname.m_dir + dirfname.m_delim + filenameDec)).c_str());
+            StreamTransformationFilter* fileFilter  = new StreamTransformationFilter(decryptor, fs);
 
             switch(encoding) {
-            case Encoding::BASE64 : FileSource(path.c_str(), true, new Base64Decoder(stf)); break;
-            case Encoding::HEX : FileSource(path.c_str(), true, new HexDecoder(stf)); break;
-            case Encoding::NONE : FileSource(path.c_str(), true, stf); break;
-            default: FileSource(path.c_str(), true, new Base64Decoder(stf));
+            case Encoding::BASE64 : FileSource(path.c_str(), true, new Base64Decoder(fileFilter)); break;
+            case Encoding::HEX : FileSource(path.c_str(), true, new HexDecoder(fileFilter)); break;
+            case Encoding::NONE : FileSource(path.c_str(), true, fileFilter); break;
+            default: FileSource(path.c_str(), true, new Base64Decoder(fileFilter));
             }
             removeFile(path);
-            emit proceed(++progress);
+            filenameDec.clear();
+            output.clear();
+            emit proceed(progress+1);
         }
         emit finished();
         emit success(successDecMsg(progress));
     }
     catch(exception& e) {
-//        removeFile(output);
+        removeFile(output);
         emit error(e.what());
         emit finished();
     }
