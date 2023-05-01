@@ -28,7 +28,7 @@ SOURCES += \
     keygen.cpp \
     main.cpp \
     mainwindow.cpp \
-    process.cpp \
+    processbar.cpp \
     rsaoeap.cpp \
     rsassa.cpp \
     serial.cpp \
@@ -55,7 +55,7 @@ HEADERS += \
     fileimporter.h \
     keygen.h \
     mainwindow.h \
-    process.h \
+    processbar.h \
     rsaoeap.h \
     rsassa.h \
     serial.h \

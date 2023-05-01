@@ -1,4 +1,4 @@
-#include "process.h"
+#include "processbar.h"
 #include "defines.h"
 #include <QProgressDialog>
 #include <thread>
