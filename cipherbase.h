@@ -1,6 +1,7 @@
 #ifndef CIPHERBASE_H
 #define CIPHERBASE_H
 
+#include "defines.h"
 #include "keygen.h"
 #include "structures.h"
 #include <QObject>
@@ -15,13 +16,11 @@ class AbstractCipherBase : public QObject {
     Q_OBJECT
 
 protected:
-    const std::string m_delim = "/";
     bool m_run = true;
-    bool m_encFname = true;
-    bool m_decFname = true;
-    const std::string m_encSuffix = ".xef";
-    const std::string m_decSuffix = ".xdf";
-    const std::string m_tempSuffix = ".xtf";
+    EmitType m_encFname = EmitType::EMIT;
+    EmitType m_decFname = EmitType::EMIT;
+    const std::string m_delim = DELIMITOR;
+    const std::string m_tempSuffix = ".xktmp";
 
 public:
     // constructors
@@ -34,15 +33,15 @@ public:
     virtual std::string getAlgName() const = 0;
     virtual std::string getModeName() const = 0;
     
-    void encFname(bool value);
-    void decFname(bool value);
+    void encFname(const EmitType emitType);
+    void decFname(const EmitType emitType);
     std::string successEncMsg(const int succeed = 1);
     std::string successDecMsg(const int succeed = 1);
+    DirFname extractFname(const std::string& path, const std::string& delim = "/") const;
 
 protected :
     bool& run();
     void removeFile(const std::string& filePath) const;
-    DirFname extractFname(const std::string& path, const std::string& delim) const;
 
 public slots:
     virtual std::string encryptText(const std::string& plain, Keygen* keygen, const Encoding encoding) = 0;
@@ -50,6 +49,7 @@ public slots:
     virtual void encryptFile(std::vector<std::string>  paths, Keygen* keygen, const Encoding encoding) = 0;
     virtual void decryptFile(std::vector<std::string>  paths, Keygen* keygen, const Encoding encoding) = 0;
     void kill();
+
 signals:
     void finished();
     void proceed(const int progress = 0);
@@ -57,6 +57,8 @@ signals:
     void success(const std::string& success);
     void cipherText(const std::string& cipherText);
     void recoverText(const std::string& recoverText);
+    void cipherFile(const std::string& success);
+    void recoverFile(const std::string& success);
 };
 
 #endif // CIPHERBASE_H

@@ -45,10 +45,11 @@ string AesCBC::encryptText(const string& plain, Keygen* keygen, const Encoding e
         case Encoding::NONE : stf->Attach(ss); break;
         default: stf->Attach(new Base64Encoder(ss));;
         }
+
         StringSource(plain, true, stf);
-        emit cipherText(cipher);
+        if(m_encFname == EmitType::EMIT) emit cipherText(cipher);
+        m_encFname = EmitType::EMIT;
         emit proceed(1);
-        emit finished();
         return cipher;
     }
     catch(exception& e) {
@@ -73,9 +74,10 @@ string AesCBC::decryptText(const string& cipher, Keygen* keygen, const Encoding 
         case Encoding::NONE : StringSource(cipher, true, stf); break;
         default: StringSource(cipher, true, new Base64Decoder(stf));
         }
-        emit recoverText(recover);
+
+        if(m_decFname == EmitType::EMIT) emit recoverText(recover);
+        m_decFname = EmitType::EMIT;
         emit proceed(1);
-        emit finished();
         return recover;
     }
     catch(exception& e) {
@@ -97,13 +99,15 @@ void AesCBC::encryptFile(vector<string> paths, Keygen* keygen, const Encoding en
             DirFname dirfname = extractFname(path, m_delim);
 
             CBC_Mode<AES>::Encryption encryptor;
-            encryptor.SetKeyWithIV(key, key.size(), iv);
 
-            if(m_encFname) {
+            if(m_encFname == EmitType::NO_EMIT) {
+                encryptor.SetKeyWithIV(key, key.size(), iv);
                 StreamTransformationFilter* filenameFilter = new StreamTransformationFilter(encryptor, new HexEncoder(new StringSink(filenameEnc)));
                 StringSource(dirfname.m_fname, true, filenameFilter);
             }
             else  filenameEnc = dirfname.m_fname;
+
+            encryptor.SetKeyWithIV(key, key.size(), iv);
 
             filenameEnc = filenameEnc == dirfname.m_fname? filenameEnc + m_tempSuffix:filenameEnc;
             FileSink* fs = new FileSink((output = (dirfname.m_dir + dirfname.m_delim + filenameEnc)).c_str());
@@ -118,7 +122,7 @@ void AesCBC::encryptFile(vector<string> paths, Keygen* keygen, const Encoding en
 
             FileSource(path.c_str(), true, fileFilter);
             removeFile(path);
-            if(!m_encFname)
+            if(m_encFname == EmitType::EMIT)
             QFile(QString::fromStdString(output)).rename(
                 QString::fromStdString(
                     output.substr(0, output.find_last_of(m_tempSuffix)-m_tempSuffix.size()+1)
@@ -128,9 +132,8 @@ void AesCBC::encryptFile(vector<string> paths, Keygen* keygen, const Encoding en
             output.clear();
             emit proceed(progress+1);
         }
-        m_encFname = true;
-        emit finished();
-        emit success(successEncMsg(progress));
+        m_decFname = EmitType::EMIT;
+        emit cipherFile(successEncMsg(progress));
     }
     catch(exception& e) {
         emit error(e.what());
@@ -141,7 +144,6 @@ void AesCBC::decryptFile(vector<string> paths, Keygen* keygen, const Encoding en
 {
     string output;
     string filenameDec;
-
     try {
         const SecByteBlock& key = keygen->getKey();
         const SecByteBlock& iv = keygen->getIv();
@@ -152,13 +154,15 @@ void AesCBC::decryptFile(vector<string> paths, Keygen* keygen, const Encoding en
             DirFname dirfname = extractFname(path, m_delim);
 
             CBC_Mode<AES>::Decryption decryptor;
-            decryptor.SetKeyWithIV(key, key.size(), iv);
 
-            if(m_decFname) {
+            if(m_decFname == EmitType::NO_EMIT) {
+                decryptor.SetKeyWithIV(key, key.size(), iv);
                 StreamTransformationFilter* filenameFilter  = new StreamTransformationFilter(decryptor, new StringSink(filenameDec));
                 StringSource(dirfname.m_fname, true, new HexDecoder(filenameFilter));
             }
             else filenameDec = dirfname.m_fname;
+
+            decryptor.SetKeyWithIV(key, key.size(), iv);
 
             filenameDec = filenameDec == dirfname.m_fname? filenameDec + m_tempSuffix:filenameDec;
             FileSink* fs = new FileSink((output = (dirfname.m_dir + dirfname.m_delim + filenameDec)).c_str());
@@ -172,7 +176,7 @@ void AesCBC::decryptFile(vector<string> paths, Keygen* keygen, const Encoding en
             }
 
             removeFile(path);
-            if(!m_decFname)
+            if(m_decFname == EmitType::EMIT)
             QFile(QString::fromStdString(output)).rename(
                 QString::fromStdString(
                     output.substr(0, output.find_last_of(m_tempSuffix)-m_tempSuffix.size()+1)
@@ -182,14 +186,12 @@ void AesCBC::decryptFile(vector<string> paths, Keygen* keygen, const Encoding en
             output.clear();
             emit proceed(progress+1);
         }
-        m_encFname = true;
-        emit finished();
-        emit success(successDecMsg(progress));
+        m_encFname = EmitType::EMIT;
+        emit recoverFile(successDecMsg(progress));
     }
     catch(exception& e) {
         removeFile(output);
         emit error(e.what());
-        emit finished();
     }
 }
 

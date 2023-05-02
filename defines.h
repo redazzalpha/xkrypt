@@ -1,6 +1,15 @@
 #ifndef DEFINES_H
 #define DEFINES_H
 
+#define UNIX_DELIM "/"
+#define WINDOW_DELIM "\\"
+
+#ifdef windows
+#define DELIMITOR  WINDOW_DELIM
+#elif unix
+#define DELIMITOR  UNIX_DELIM
+#endif
+
 #define XKRYPT_REF_SIZE 3
 #define XKRYPT_REF_VERSION 0x01
 #define XKRYPT_REF_MODEL 0x24

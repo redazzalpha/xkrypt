@@ -28,5 +28,11 @@ enum Encoding {
     HEX,
     NONE,
 };
+enum class EmitType {
+    EMIT,
+    NO_EMIT,
+    CHECKED = NO_EMIT,
+    UNCHECKED = EMIT,
+};
 
 #endif // ENUMS_H

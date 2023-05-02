@@ -4,6 +4,7 @@
 #include "aesgcm.h"
 #include "aescbc.h"
 #include "aeseax.h"
+#include "defines.h"
 #include "serial.h"
 #include "keygen.h"
 #include "rsassa.h"
@@ -38,8 +39,10 @@ private:
     FileImporter m_fimporterEnc;
     FileImporter m_fimporterDec;
     FileImporter m_fimporterKey;
-    std::string m_fname;
     std::string m_path;
+    std::string m_dir;
+    std::string m_fname;
+    const std::string m_delim = DELIMITOR;
     Keygen* m_keygen = new Keygen;
 
     QList<AbstractActionBase*> m_actions = QList<AbstractActionBase*> {
@@ -105,7 +108,7 @@ private:
     void processDecFile(std::vector<std::string>& paths);
     void m_cipherNew(const std::string& alg, const std::string& mode);
     
-    bool isFileExist(const std::string& filename) const;
+    bool isFileExist(const std::string& path) const;
     QMessageBox::ButtonRole dialogFileExists(const std::string& message);
     bool dialogInsertFilename(const std::string& message);
     bool dialogConfirm(const std::string& message);
@@ -146,12 +149,16 @@ private slots:
 
     void recoverText(const std::string &recoverText);
     void cipherText(const std::string &cipherText);
+    void recoverFile(const std::string& success);
+    void cipherFile(const std::string& success);
     void cipherError(const std::string &error);
     void cipherKill();
     void processing(const int progress);
     void processKill();
     void dialogSuccess(const std::string& message);
     void dialogError(const std::string& message);
+
+    void toogleEncFname(bool checked);
 
 signals:
     void startEncFile(std::vector<std::string> paths, Keygen* keygen, const Encoding encoding);

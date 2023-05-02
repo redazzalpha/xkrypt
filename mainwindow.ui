@@ -984,22 +984,6 @@
          <item>
           <layout class="QHBoxLayout" name="hlayout_22">
            <item>
-            <spacer name="spacer_17">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeType">
-              <enum>QSizePolicy::Expanding</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>60</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item>
             <widget class="QLabel" name="label_27">
              <property name="minimumSize">
               <size>
@@ -1022,7 +1006,7 @@
             <widget class="QLabel" name="label_28">
              <property name="minimumSize">
               <size>
-               <width>95</width>
+               <width>105</width>
                <height>0</height>
               </size>
              </property>
@@ -1035,12 +1019,28 @@
             <widget class="QLabel" name="label_10">
              <property name="minimumSize">
               <size>
-               <width>85</width>
+               <width>110</width>
                <height>0</height>
               </size>
              </property>
              <property name="text">
               <string>Encoding</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="m_encTabTextSaveOnF">
+             <property name="minimumSize">
+              <size>
+               <width>130</width>
+               <height>0</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>&amp;Save on file</string>
+             </property>
+             <property name="shortcut">
+              <string>Ctrl+S</string>
              </property>
             </widget>
            </item>
@@ -1051,7 +1051,7 @@
              </property>
              <property name="sizeHint" stdset="0">
               <size>
-               <width>275</width>
+               <width>130</width>
                <height>20</height>
               </size>
              </property>
@@ -1061,19 +1061,6 @@
          </item>
          <item>
           <layout class="QHBoxLayout" name="hlayout_10">
-           <item>
-            <spacer name="spacer_9">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
            <item>
             <widget class="QComboBox" name="m_encTabTextAlgs">
              <property name="minimumSize">
@@ -1110,12 +1097,18 @@
             <widget class="QComboBox" name="m_encTabTextEncodings"/>
            </item>
            <item>
-            <widget class="QCheckBox" name="m_encTabTextSaveOnF">
+            <widget class="QCheckBox" name="m_encTabTextEncFname">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
              <property name="text">
-              <string>&amp;Save on file</string>
+              <string>Encrypt &amp;filename</string>
              </property>
              <property name="shortcut">
-              <string>Ctrl+S</string>
+              <string>Ctrl+F</string>
+             </property>
+             <property name="checked">
+              <bool>false</bool>
              </property>
             </widget>
            </item>
@@ -1413,7 +1406,7 @@
             <widget class="QLabel" name="label_6">
              <property name="minimumSize">
               <size>
-               <width>95</width>
+               <width>100</width>
                <height>0</height>
               </size>
              </property>
@@ -1596,22 +1589,6 @@
          <item>
           <layout class="QHBoxLayout" name="hlayout_23">
            <item>
-            <spacer name="spacer_27">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeType">
-              <enum>QSizePolicy::Expanding</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>85</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item>
             <widget class="QLabel" name="label_30">
              <property name="minimumSize">
               <size>
@@ -1634,7 +1611,7 @@
             <widget class="QLabel" name="label_31">
              <property name="minimumSize">
               <size>
-               <width>95</width>
+               <width>120</width>
                <height>0</height>
               </size>
              </property>
@@ -1674,19 +1651,6 @@
          <item>
           <layout class="QHBoxLayout" name="hlayout_21">
            <item>
-            <spacer name="spacer_11">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item>
             <widget class="QComboBox" name="m_decTabTextAlgs">
              <property name="minimumSize">
               <size>
@@ -1723,6 +1687,12 @@
            </item>
            <item>
             <widget class="QCheckBox" name="m_decTabTextSaveOnF">
+             <property name="minimumSize">
+              <size>
+               <width>60</width>
+               <height>0</height>
+              </size>
+             </property>
              <property name="text">
               <string>&amp;Save on file</string>
              </property>
