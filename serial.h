@@ -17,6 +17,8 @@ public:
     void keyToFile(const std::string& path, Keygen& keygen, const Encoding encoding) const;
     std::string keyToString(Keygen& keygen, const Encoding encoding) const;
     std::string encodingToString(const Encoding encoding) const;
+
+    std::string writeSuccess(const std::string& path, Keygen& keygen, const Encoding encoding);
 };
 
 #endif // SERIAL_H

@@ -858,6 +858,19 @@
             <widget class="QComboBox" name="m_encTabFileEncodings"/>
            </item>
            <item>
+            <widget class="QCheckBox" name="m_encTabFileEncFname">
+             <property name="text">
+              <string>Encrypt &amp;filename</string>
+             </property>
+             <property name="shortcut">
+              <string>Ctrl+F</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
             <widget class="QPushButton" name="m_encTabFileEncrypt">
              <property name="minimumSize">
               <size>
@@ -1455,6 +1468,19 @@
            </item>
            <item>
             <widget class="QComboBox" name="m_decTabFileEncodings"/>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="m_decTabFileDecFname">
+             <property name="text">
+              <string>Decrypt &amp;filename</string>
+             </property>
+             <property name="shortcut">
+              <string>Ctrl+F</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+            </widget>
            </item>
            <item>
             <widget class="QPushButton" name="m_decTabFileDecrypt">

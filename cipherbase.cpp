@@ -9,6 +9,16 @@ AbstractCipherBase::AbstractCipherBase(){}
 // destructor
 AbstractCipherBase::~AbstractCipherBase(){}
 
+void AbstractCipherBase::encFname(bool value)
+{
+    m_encFname = value;
+}
+
+void AbstractCipherBase::decFname(bool value)
+{
+    m_decFname = value;
+}
+
 bool &AbstractCipherBase::run()
 {
     return m_run;
@@ -28,7 +38,7 @@ DirFname AbstractCipherBase::extractFname(const std::string& path, const string&
 string AbstractCipherBase::successEncMsg(const int succeed)
 {
     return  "Encryption successfull!<br />" +
-        std::to_string(succeed) + " file(s) encrypted<br />"
+        std::to_string(succeed) + " file(s) written<br />"
         "Using " +
         getAlgName() + " - " + getModeName() +
         " mode<br />";
@@ -36,7 +46,7 @@ string AbstractCipherBase::successEncMsg(const int succeed)
 string AbstractCipherBase::successDecMsg(const int succeed)
 {
     return  "Decryption successfull!<br />" +
-        std::to_string(succeed) + " file(s) decrypted<br />" +
+        std::to_string(succeed) + " file(s) written<br />" +
         "Using " +
         getAlgName() + " - " + getModeName() +
            " mode<br />";

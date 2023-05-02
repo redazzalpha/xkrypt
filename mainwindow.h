@@ -124,10 +124,10 @@ protected:
 private slots:
     void on_m_encTabFileImport_clicked();
     void on_m_decTabFileImport_clicked();
-
     void on_m_encTabFileEncrypt_clicked();
     void on_m_decTabFileDecrypt_clicked();
     void on_m_encTabFileClear_clicked();
+    void on_m_decTabFileClear_clicked();
 
     void on_m_encTabTextEncrypt_clicked();
     void on_m_decTabTextDecrypt_clicked();
@@ -143,16 +143,15 @@ private slots:
     void colorKeyLoaded();
     void colorFilesLoaded();
     void flushKey();
-    void on_m_decTabFileClear_clicked();
 
     void recoverText(const std::string &recoverText);
     void cipherText(const std::string &cipherText);
     void cipherError(const std::string &error);
-    void dialogSuccessMessage(const std::string& message);
-    void dialogErrorMessage(const std::string& message);
     void cipherKill();
-    void killProcess();
     void processing(const int progress);
+    void processKill();
+    void dialogSuccess(const std::string& message);
+    void dialogError(const std::string& message);
 
 signals:
     void startEncFile(std::vector<std::string> paths, Keygen* keygen, const Encoding encoding);

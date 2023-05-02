@@ -118,10 +118,10 @@ void MainWindow::connectCipher()
 
     QObject::connect(m_cipher, &AbstractCipherBase::proceed, this, &MainWindow::processing);
     QObject::connect(m_cipher, &AbstractCipherBase::finished, &m_threadCipher, &QThread::quit);
-    QObject::connect(m_cipher, &AbstractCipherBase::error, this, &MainWindow::dialogErrorMessage);
+    QObject::connect(m_cipher, &AbstractCipherBase::error, this, &MainWindow::dialogError);
     QObject::connect(m_cipher, &AbstractCipherBase::error, &m_threadCipher, &QThread::quit);
     QObject::connect(m_cipher, &AbstractCipherBase::error, &m_threadProcess, &QThread::quit);
-    QObject::connect(m_cipher, &AbstractCipherBase::success, this, &MainWindow::dialogSuccessMessage);
+    QObject::connect(m_cipher, &AbstractCipherBase::success, this, &MainWindow::dialogSuccess);
 
     QObject::connect(m_cipher, &AbstractCipherBase::recoverText, this, &MainWindow::recoverText);
     QObject::connect(m_cipher, &AbstractCipherBase::cipherText, this, &MainWindow::cipherText);
@@ -134,7 +134,7 @@ void MainWindow::connectProcess()
     m_process.moveToThread(&m_threadProcess);
     QObject::connect(this, &MainWindow::startProcess, &m_process, &ProcessBar::processing);
     QObject::connect(&m_process, &ProcessBar::finished, &m_threadProcess, &QThread::quit);
-    QObject::connect(&m_threadProcess, &QThread::finished, this, &MainWindow::killProcess);
+    QObject::connect(&m_threadProcess, &QThread::finished, this, &MainWindow::processKill);
 }
 void MainWindow::generateKey(Encoding encoding)
 {
@@ -171,11 +171,11 @@ void MainWindow::importSymmectric()
             string message = "key " + std::to_string(m_keygen->getKey().size()) + " bytes - encoded ";
             message += m_serial.encodingToString(encoding);
             message += "<br />has been successfully imported";
-            dialogSuccessMessage(message);
+            dialogSuccess(message);
         }
     }
     catch(exception& e) {
-        dialogErrorMessage(e.what());
+        dialogError(e.what());
     }
 }
 void MainWindow::importAsymmectric()
@@ -440,6 +440,7 @@ void MainWindow::on_m_encTabFileEncrypt_clicked()
     string mode = ui->m_encTabFileModes->currentText().toStdString();
     Encoding encoding = static_cast<Encoding>(ui->m_encTabFileEncodings->currentIndex());
     m_cipherNew(alg, mode);
+    m_cipher->encFname(ui->m_encTabFileEncFname->isChecked());
 
     m_process.init(size);
     m_threadProcess.start();
@@ -458,6 +459,7 @@ void MainWindow::on_m_decTabFileDecrypt_clicked()
     string mode = ui->m_decTabFileModes->currentText().toStdString();
     Encoding encoding = static_cast<Encoding>(ui->m_decTabFileEncodings->currentIndex());
     m_cipherNew(alg, mode);
+    m_cipher->decFname(ui->m_decTabFileDecFname->isChecked());
 
     m_process.init(size);
     m_threadProcess.start();
@@ -527,12 +529,8 @@ void MainWindow::on_m_keyMGenerate_clicked()
         string path = dialogSave();
         if(!path.empty()) {
             m_serial.keyToFile(m_path, *m_keygen, encoding);
-
-            string message = "key " + std::to_string(m_keygen->getKey().size()) + " bytes - encoded ";
-            message += m_serial.encodingToString(encoding);
-            message += "<br />has been successfully written on file<br />" + m_path;
-            dialogSuccessMessage(message);
             ui->m_keyMSaveOnF->setChecked(false);
+            dialogSuccess(m_serial.writeSuccess(m_path, *m_keygen, encoding));
         }
     }
 }
@@ -604,7 +602,6 @@ void MainWindow::flushKey()
 
 void MainWindow::recoverText(const std::string &recoverText)
 {
-    ui->m_decTabTextField->setPlainText(QString::fromStdString(recoverText));
     if(ui->m_decTabTextSaveOnF->isChecked()) {
         string path = dialogSave();
         if(!path.empty()) {
@@ -612,14 +609,15 @@ void MainWindow::recoverText(const std::string &recoverText)
             if(file.good()) {
                 file << recoverText;
                 ui->m_decTabTextSaveOnF->setChecked(false);
+                dialogSuccess(m_cipher->successDecMsg() + "at " + path);
             }
             file.close();
         }
     }
+    ui->m_decTabTextField->setPlainText(QString::fromStdString(recoverText));
 }
 void MainWindow::cipherText(const std::string &cipherText)
 {
-    ui->m_encTabTextField->setPlainText(QString::fromStdString(cipherText));
     if(ui->m_encTabTextSaveOnF->isChecked()) {
         string path = dialogSave();
         if(!path.empty()) {
@@ -627,10 +625,12 @@ void MainWindow::cipherText(const std::string &cipherText)
             if(file.good()) {
                 file << cipherText;
                 ui->m_encTabTextSaveOnF->setChecked(false);
+                dialogSuccess(m_cipher->successEncMsg() + "at " + path);
             }
             file.close();
         }
     }
+    ui->m_encTabTextField->setPlainText(QString::fromStdString(cipherText));
 }
 void MainWindow::cipherError(const std::string& error)
 {
@@ -638,7 +638,7 @@ void MainWindow::cipherError(const std::string& error)
     for(size_t i = 0; i < error.size(); i++) msg[i] = error[i];
     throw CipherException(msg);
 }
-void MainWindow::dialogSuccessMessage(const string& message)
+void MainWindow::dialogSuccess(const string& message)
 {
     if(m_warning) {
         string text = MESSAGE_SUCCESS_START+ message + MESSAGE_SUCCESS_END;
@@ -654,7 +654,7 @@ void MainWindow::dialogSuccessMessage(const string& message)
         msg.exec();
     }
 }
-void MainWindow::dialogErrorMessage(const string &message)
+void MainWindow::dialogError(const string &message)
 {
     string text = MESSAGE_ERROR_START+ message + MESSAGE_ERROR_END;
     QMessageBox msg(this);
@@ -673,7 +673,7 @@ void MainWindow::cipherKill()
 {
     m_cipher->kill();
 }
-void MainWindow::killProcess()
+void MainWindow::processKill()
 {
     m_process.kill();
 }

@@ -85,6 +85,8 @@ void Serial::keyToFile(const string& path, Keygen& keygen, const Encoding encodi
 
     refsSource.PumpAll();
     keyIvSource.PumpAll();
+
+
 }
 string Serial::keyToString(Keygen& keygen, const Encoding encoding) const
 {
@@ -117,5 +119,13 @@ string Serial::encodingToString(const Encoding encoding) const
     case Encoding::NONE: return "None";
     default: return "Unknown";
     }
+}
+
+string Serial::writeSuccess(const string& path, Keygen& keygen, const Encoding encoding)
+{
+    string message = "key " + std::to_string(keygen.getKey().size()) + " bytes - encoded ";
+    message += encodingToString(encoding);
+    message += "<br />has been successfully written on file<br />" + path;
+    return message;
 }
 
