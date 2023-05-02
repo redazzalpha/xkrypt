@@ -249,10 +249,14 @@ QMessageBox::ButtonRole MainWindow::dialogFileExists(const string& message)
     if(m_warning) {
         string text = MESSAGE_FILE_EXISTS_START + message + MESSAGE_FILE_EXISTS_END;
         QMessageBox msg(this);
-        QPushButton* changeDirectory =  msg.addButton("Change directory", QMessageBox::AcceptRole);
-        QPushButton* override =  msg.addButton("Override file", QMessageBox::ApplyRole);
-        QPushButton* create =  msg.addButton("Create file", QMessageBox::ActionRole);
+        QPushButton* changeDirectory =  msg.addButton("Change &directory", QMessageBox::AcceptRole);
+        QPushButton* override =  msg.addButton("&Override file", QMessageBox::ApplyRole);
+        QPushButton* create =  msg.addButton("&Create file", QMessageBox::ActionRole);
         QPushButton* cancel =  msg.addButton("Cancel", QMessageBox::RejectRole);
+
+        changeDirectory->setShortcut(QKeySequence("Ctrl+d"));
+        override->setShortcut(QKeySequence("Ctrl+o"));
+        create->setShortcut(QKeySequence("Ctrl+c"));
 
         cancel->setVisible(false);
         msg.setWindowTitle("xKrypt - Warning");
@@ -299,8 +303,11 @@ bool MainWindow::dialogConfirm(const string& message, const string& description)
     if(m_warning) {
         string text = MESSAGE_CONFIRM_START + message + MESSAGE_CONFIRM_END;
         QMessageBox msg(this);
-        QPushButton* ok =  msg.addButton("Ok", QMessageBox::AcceptRole);
-        QPushButton* cancel =  msg.addButton("Cancel", QMessageBox::RejectRole);
+        QPushButton* ok =  msg.addButton("&Ok", QMessageBox::AcceptRole);
+        QPushButton* cancel =  msg.addButton("&Cancel", QMessageBox::RejectRole);
+
+        ok->setShortcut(QKeySequence("Ctrl+o"));
+        cancel->setShortcut(QKeySequence("Ctrl+c"));
 
         msg.setWindowTitle("xKrypt - Warning");
         msg.setWindowIcon(QIcon(QPixmap(ICON_WARNING)));
@@ -366,6 +373,42 @@ string MainWindow::dialogSave()
         else break;
     }
     return path;
+}
+void MainWindow::dialogSuccess(const string& message, const string& description)
+{
+    if(m_warning) {
+        string text = MESSAGE_SUCCESS_START+ message + MESSAGE_SUCCESS_END;
+        QMessageBox msg(this);
+        QPushButton* ok =  msg.addButton("&Ok", QMessageBox::AcceptRole);
+
+        ok->setShortcut(QKeySequence("Ctrl+o"));
+
+        msg.setWindowTitle("xKrypt - Success");
+        msg.setWindowIcon(QIcon(QPixmap(ICON_ERROR)));
+        msg.setText(QString::fromStdString(text));
+        msg.setDetailedText(QString::fromStdString(description));
+        msg.setDefaultButton(ok);
+        msg.setEscapeButton(ok);
+        msg.setModal(true);
+        msg.exec();
+    }
+}
+void MainWindow::dialogError(const string &message, const string& description)
+{
+    string text = MESSAGE_ERROR_START+ message + MESSAGE_ERROR_END;
+    QMessageBox msg(this);
+    QPushButton* ok =  msg.addButton("O&k", QMessageBox::AcceptRole);
+
+    ok->setShortcut(QKeySequence("Ctrl+o"));
+
+    msg.setWindowTitle("xKrypt - Error");
+    msg.setWindowIcon(QIcon(QPixmap(ICON_ERROR)));
+    msg.setText(QString::fromStdString(text));
+    msg.setDetailedText(QString::fromStdString(description));
+    msg.setDefaultButton(ok);
+    msg.setEscapeButton(ok);
+    msg.setModal(true);
+    msg.exec();
 }
 
 void MainWindow::keyLoadedSelectable(const Qt::TextInteractionFlags flags) const
@@ -696,38 +739,6 @@ void MainWindow::processing(const int progress)
 void MainWindow::processKill()
 {
     m_process.kill();
-}
-void MainWindow::dialogSuccess(const string& message, const string& description)
-{
-    if(m_warning) {
-        string text = MESSAGE_SUCCESS_START+ message + MESSAGE_SUCCESS_END;
-        QMessageBox msg(this);
-        QPushButton* ok =  msg.addButton("Ok", QMessageBox::AcceptRole);
-
-        msg.setWindowTitle("xKrypt - Success");
-        msg.setWindowIcon(QIcon(QPixmap(ICON_ERROR)));
-        msg.setText(QString::fromStdString(text));
-        msg.setDetailedText(QString::fromStdString(description));
-        msg.setDefaultButton(ok);
-        msg.setEscapeButton(ok);
-        msg.setModal(true);
-        msg.exec();
-    }
-}
-void MainWindow::dialogError(const string &message, const string& description)
-{
-    string text = MESSAGE_ERROR_START+ message + MESSAGE_ERROR_END;
-    QMessageBox msg(this);
-    QPushButton* ok =  msg.addButton("Ok", QMessageBox::AcceptRole);
-
-    msg.setWindowTitle("xKrypt - Error");
-    msg.setWindowIcon(QIcon(QPixmap(ICON_ERROR)));
-    msg.setText(QString::fromStdString(text));
-    msg.setDetailedText(QString::fromStdString(description));
-    msg.setDefaultButton(ok);
-    msg.setEscapeButton(ok);
-    msg.setModal(true);
-    msg.exec();
 }
 
 void MainWindow::toogleEncFname(bool checked)

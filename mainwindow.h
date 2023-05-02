@@ -114,6 +114,9 @@ private:
     bool dialogConfirm(const std::string& message, const std::string& description = "");
     void dialogNoKeyMessage(const std::string& action, const std::string& description = "");
     std::string dialogSave();
+    void dialogSuccess(const std::string& message, const std::string &description = "");
+    void dialogError(const std::string& message, const std::string& description = "");
+
 
     void keyLoadedSelectable(const Qt::TextInteractionFlags flags) const;
     void setKeyLoadedStyle(const QString &style) const;
@@ -155,8 +158,6 @@ private slots:
     void cipherKill();
     void processing(const int progress);
     void processKill();
-    void dialogSuccess(const std::string& message, const std::string &description = "");
-    void dialogError(const std::string& message, const std::string& description = "");
 
     void toogleEncFname(bool checked);
 
