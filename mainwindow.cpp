@@ -91,7 +91,7 @@ void MainWindow::connectItems()
 
     // connect checkboxes
     QObject::connect(ui->m_keyMHide, &QCheckBox::clicked, this, &MainWindow::hideKey);
-    QObject::connect(ui->m_encTabTextSaveOnF, &QCheckBox::clicked, this, &MainWindow::toogleEncFname);
+    QObject::connect(ui->m_encTabTextSaveOnF, &QCheckBox::stateChanged, this, &MainWindow::toogleEncFname);
 
     // connect buttons
     QObject::connect(ui->m_keyMFlush, &QPushButton::clicked, this, &MainWindow::flushKey);
@@ -100,7 +100,6 @@ void MainWindow::connectItems()
     QObject::connect(ui->m_keyMLoaded, &QPlainTextEdit::textChanged, this, &MainWindow::colorKeyLoaded);
     QObject::connect(ui->m_encTabFileSelected, &QPlainTextEdit::textChanged, this, &MainWindow::colorFilesLoaded);
     QObject::connect(ui->m_decTabFileSelected, &QPlainTextEdit::textChanged, this, &MainWindow::colorFilesLoaded);
-
 
     // create and connect actions
     foreach (AbstractActionBase* action, m_actions) {
@@ -294,7 +293,7 @@ bool MainWindow::dialogInsertFilename(const string& message) {
 
     return isFnameInserted;
 }
-bool MainWindow::dialogConfirm(const string& message)
+bool MainWindow::dialogConfirm(const string& message, const string& description)
 {
     bool isConfirmed = true;
     if(m_warning) {
@@ -306,6 +305,7 @@ bool MainWindow::dialogConfirm(const string& message)
         msg.setWindowTitle("xKrypt - Warning");
         msg.setWindowIcon(QIcon(QPixmap(ICON_WARNING)));
         msg.setText(QString::fromStdString(text));
+        msg.setDetailedText(QString::fromStdString(description));
         msg.setDefaultButton(cancel);
         msg.setEscapeButton(cancel);
         msg.setModal(true);
@@ -316,7 +316,7 @@ bool MainWindow::dialogConfirm(const string& message)
 
     return isConfirmed;
 }
-void MainWindow::dialogNoKeyMessage(const string& action)
+void MainWindow::dialogNoKeyMessage(const string& action, const string &description)
 {
     string text = MESSAGE_NOKEY_START+ action + MESSAGE_NOKEY_END;
     QMessageBox msg(this);
@@ -325,6 +325,7 @@ void MainWindow::dialogNoKeyMessage(const string& action)
     msg.setWindowTitle("xKrypt - Error");
     msg.setWindowIcon(QIcon(QPixmap(ICON_ERROR)));
     msg.setText(QString::fromStdString(text));
+    msg.setDetailedText(QString::fromStdString(description));
     msg.setDefaultButton(ok);
     msg.setEscapeButton(ok);
     msg.setModal(true);
@@ -627,31 +628,46 @@ void MainWindow::flushKey()
 
 void MainWindow::recoverText(const std::string &recoverText)
 {
-    if(ui->m_decTabTextSaveOnF->isChecked() && !dialogSave().empty()) {
-        std::ofstream file(m_path, std::ios::out | std::ios::trunc);
-        file << recoverText;
-        file.close();
-        dialogSuccess(m_cipher->successDecMsg() + "at " + m_path);
+    try {
+        if(ui->m_decTabTextSaveOnF->isChecked() && !dialogSave().empty()) {
+            std::ofstream file(m_path, std::ios::out | std::ios::trunc);
+            file << recoverText;
+            file.close();
+            dialogSuccess(m_cipher->successDecMsg() + "at " + m_path);
+        }
+        ui->m_decTabTextSaveOnF->setChecked(false);
+        ui->m_decTabTextField->setPlainText(QString::fromStdString(recoverText));
     }
-    ui->m_decTabTextSaveOnF->setChecked(false);
-    ui->m_decTabTextField->setPlainText(QString::fromStdString(recoverText));
+    catch(std::exception& e) {
+        dialogError(e.what());
+    }
 }
 void MainWindow::cipherText(const std::string &cipherText)
 {
-    if(ui->m_encTabTextSaveOnF->isChecked() && !dialogSave().empty()) {
-        if(ui->m_encTabTextEncFname->isChecked()) {
-            m_cipher->encFname(EmitType::NO_EMIT);
-            m_path = m_dir + m_delim + m_cipher->encryptText(m_fname, m_keygen, Encoding::HEX);
+    string description;
+    try {
+        if(ui->m_encTabTextSaveOnF->isChecked() && !dialogSave().empty()) {
+            if(ui->m_encTabTextEncFname->isChecked()) {
+                m_cipher->encFname(EmitType::NO_EMIT);
+                m_path = m_dir + m_delim + m_cipher->encryptText(m_fname, m_keygen, Encoding::HEX);
+            }
+            if(isFileExist(m_path)){
+                description = "-- This error has been occured cause the file you're trying to create using \"Encrypt filename\" mode already exists.\n\n"\
+                    "-- In this mode override files is not allowed.\n\n"\
+                    "-- Please retry modifying the filename or change directory.";
+                throw FileSelectedException("-- error: wrong path file<br />Encrypted filename already exists");
+            }
+            std::ofstream file(m_path, std::ios::out | std::ios::trunc);
+            file << cipherText;
+            file.close();
+            dialogSuccess(m_cipher->successEncMsg() + "at " + m_path);
         }
-        if(isFileExist(m_path))
-            throw FileSelectedException("-- error: wrong path file<br />File already exists or unreachable");
-        std::ofstream file(m_path, std::ios::out | std::ios::trunc);
-        file << cipherText;
-        file.close();
-        dialogSuccess(m_cipher->successEncMsg() + "at " + m_path);
+        ui->m_encTabTextSaveOnF->setChecked(false);
+        ui->m_encTabTextField->setPlainText(QString::fromStdString(cipherText));
     }
-    ui->m_encTabTextSaveOnF->setChecked(false);
-    ui->m_encTabTextField->setPlainText(QString::fromStdString(cipherText));
+    catch(std::exception& e) {
+        dialogError(e.what(), description);
+    }
 }
 void MainWindow::recoverFile(const string& success)
 {
@@ -662,7 +678,6 @@ void MainWindow::cipherFile(const string& success)
 {
     ui->m_encTabFileEncFname->setChecked(true);
     dialogSuccess(success);
-
 }
 void MainWindow::cipherError(const std::string& error)
 {
@@ -682,7 +697,7 @@ void MainWindow::processKill()
 {
     m_process.kill();
 }
-void MainWindow::dialogSuccess(const string& message)
+void MainWindow::dialogSuccess(const string& message, const string& description)
 {
     if(m_warning) {
         string text = MESSAGE_SUCCESS_START+ message + MESSAGE_SUCCESS_END;
@@ -692,13 +707,14 @@ void MainWindow::dialogSuccess(const string& message)
         msg.setWindowTitle("xKrypt - Success");
         msg.setWindowIcon(QIcon(QPixmap(ICON_ERROR)));
         msg.setText(QString::fromStdString(text));
+        msg.setDetailedText(QString::fromStdString(description));
         msg.setDefaultButton(ok);
         msg.setEscapeButton(ok);
         msg.setModal(true);
         msg.exec();
     }
 }
-void MainWindow::dialogError(const string &message)
+void MainWindow::dialogError(const string &message, const string& description)
 {
     string text = MESSAGE_ERROR_START+ message + MESSAGE_ERROR_END;
     QMessageBox msg(this);
@@ -707,6 +723,7 @@ void MainWindow::dialogError(const string &message)
     msg.setWindowTitle("xKrypt - Error");
     msg.setWindowIcon(QIcon(QPixmap(ICON_ERROR)));
     msg.setText(QString::fromStdString(text));
+    msg.setDetailedText(QString::fromStdString(description));
     msg.setDefaultButton(ok);
     msg.setEscapeButton(ok);
     msg.setModal(true);

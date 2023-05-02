@@ -53,7 +53,7 @@ public slots:
 signals:
     void finished();
     void proceed(const int progress = 0);
-    void error(const std::string& error);
+    void error(const std::string& error, const std::string& description = "");
     void success(const std::string& success);
     void cipherText(const std::string& cipherText);
     void recoverText(const std::string& recoverText);

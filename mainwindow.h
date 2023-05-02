@@ -111,8 +111,8 @@ private:
     bool isFileExist(const std::string& path) const;
     QMessageBox::ButtonRole dialogFileExists(const std::string& message);
     bool dialogInsertFilename(const std::string& message);
-    bool dialogConfirm(const std::string& message);
-    void dialogNoKeyMessage(const std::string& action);
+    bool dialogConfirm(const std::string& message, const std::string& description = "");
+    void dialogNoKeyMessage(const std::string& action, const std::string& description = "");
     std::string dialogSave();
 
     void keyLoadedSelectable(const Qt::TextInteractionFlags flags) const;
@@ -155,8 +155,8 @@ private slots:
     void cipherKill();
     void processing(const int progress);
     void processKill();
-    void dialogSuccess(const std::string& message);
-    void dialogError(const std::string& message);
+    void dialogSuccess(const std::string& message, const std::string &description = "");
+    void dialogError(const std::string& message, const std::string& description = "");
 
     void toogleEncFname(bool checked);
 
