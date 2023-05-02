@@ -162,7 +162,7 @@ void AesCBC::decryptFile(vector<string> paths, Keygen* keygen, const Encoding en
         emit success(successDecMsg(progress));
     }
     catch(exception& e) {
-//        removeFile(output);
+        removeFile(output);
         emit error(e.what());
         emit finished();
     }

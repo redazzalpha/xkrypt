@@ -117,7 +117,6 @@ void MainWindow::connectCipher()
     QObject::connect(this, &MainWindow::startDecText, m_cipher, &AbstractCipherBase::decryptText);
 
     QObject::connect(m_cipher, &AbstractCipherBase::proceed, this, &MainWindow::processing);
-//    QObject::connect(m_cipher, &AbstractCipherBase::proceed, &m_process, &ProcessBar::processing);
     QObject::connect(m_cipher, &AbstractCipherBase::finished, &m_threadCipher, &QThread::quit);
     QObject::connect(m_cipher, &AbstractCipherBase::error, this, &MainWindow::dialogErrorMessage);
     QObject::connect(m_cipher, &AbstractCipherBase::error, &m_threadCipher, &QThread::quit);
@@ -232,45 +231,6 @@ void MainWindow::m_cipherNew(const string& alg, const string& mode)
     connectCipher();
 }
 
-void MainWindow::saveOnFile(const Encoding encoding)
-{
-    bool m_override = false;
-    bool m_create = false;
-    bool m_changeDirectory = false;
-
-    while(true) {
-        if(!m_override && !m_create) m_dir = QFileDialog::getExistingDirectory(nullptr, "Select saving directory", "").toStdString();
-        if(!m_dir.empty()) {
-            bool canWrite = true;
-            if(!m_override && !m_create && !m_changeDirectory) canWrite = dialogInsertFilename("Please insert filename");
-            if(canWrite) {
-                string dir = m_dir +  "/" + m_fname;
-                if(!isFileExist(dir) || m_override) {
-                    m_dir =  QString::fromStdString(dir).toStdString();
-                    m_serial.keyToFile(m_dir, *m_keygen, encoding);
-                    saveSuccess(encoding);
-                    break;
-                }
-                else {
-                    QMessageBox::ButtonRole role = dialogFileExists("File already exists! What you want to do?");
-                    if(role == QMessageBox::AcceptRole)  { m_changeDirectory = true; continue; }
-                    if(role == QMessageBox::ApplyRole) { m_override = true; continue; }
-                    if(role == QMessageBox::ActionRole) { m_create = true; continue; }
-                    if(role == QMessageBox::RejectRole) break;
-                }
-            }
-            else break;
-        }
-        else break;
-    }
-}
-void MainWindow::saveSuccess(Encoding encoding) {
-    string message = "key " + std::to_string(m_keygen->getKey().size()) + " bytes - encoded ";
-    message += m_serial.encodingToString(encoding);
-    message += "<br />has been successfully written on file<br />" + m_dir;
-    dialogSuccessMessage(message);
-    ui->m_keyMSaveOnF->setChecked(false);
-}
 bool MainWindow::isFileExist(const string& filename) const
 {
     return std::fstream(filename, ios::in | ios::binary).good();
@@ -359,6 +319,39 @@ void MainWindow::dialogNoKeyMessage(const string& action)
     msg.setEscapeButton(ok);
     msg.setModal(true);
     msg.exec();
+}
+string MainWindow::dialogSave()
+{
+    bool m_override = false;
+    bool m_create = false;
+    bool m_changeDirectory = false;
+    m_path.clear();
+    string dir, path;
+
+    while(true) {
+        if(!m_override && !m_create) dir = QFileDialog::getExistingDirectory(nullptr, "Select saving directory", "").toStdString();
+        if(!dir.empty()) {
+            bool canWrite = true;
+            if(!m_override && !m_create && !m_changeDirectory) canWrite = dialogInsertFilename("Please insert filename");
+            if(canWrite) {
+                path = dir +  "/" + m_fname;
+                if(!isFileExist(path) || m_override) {
+                    m_path =  path;
+                    break;
+                }
+                else {
+                    QMessageBox::ButtonRole role = dialogFileExists("File already exists! What you want to do?");
+                    if(role == QMessageBox::AcceptRole)  { path.clear(); m_changeDirectory = true; continue; }
+                    if(role == QMessageBox::ApplyRole) { m_override = true; continue; }
+                    if(role == QMessageBox::ActionRole) { m_create = true; continue; }
+                    if(role == QMessageBox::RejectRole) break;
+                }
+            }
+            else break;
+        }
+        else break;
+    }
+    return path;
 }
 
 void MainWindow::keyLoadedSelectable(const Qt::TextInteractionFlags flags) const
@@ -530,7 +523,18 @@ void MainWindow::on_m_keyMGenerate_clicked()
 {
     Encoding encoding = static_cast<Encoding>(ui->m_keyMEncodingsG->currentIndex());
     generateKey(encoding);
-    if(ui->m_keyMSaveOnF->isChecked()) saveOnFile(encoding);
+    if(ui->m_keyMSaveOnF->isChecked()) {
+        string path = dialogSave();
+        if(!path.empty()) {
+            m_serial.keyToFile(m_path, *m_keygen, encoding);
+
+            string message = "key " + std::to_string(m_keygen->getKey().size()) + " bytes - encoded ";
+            message += m_serial.encodingToString(encoding);
+            message += "<br />has been successfully written on file<br />" + m_path;
+            dialogSuccessMessage(message);
+            ui->m_keyMSaveOnF->setChecked(false);
+        }
+    }
 }
 void MainWindow::on_m_keyMImport_clicked()
 {
@@ -601,10 +605,32 @@ void MainWindow::flushKey()
 void MainWindow::recoverText(const std::string &recoverText)
 {
     ui->m_decTabTextField->setPlainText(QString::fromStdString(recoverText));
+    if(ui->m_decTabTextSaveOnF->isChecked()) {
+        string path = dialogSave();
+        if(!path.empty()) {
+            std::ofstream file(path, std::ios::out | std::ios::trunc);
+            if(file.good()) {
+                file << recoverText;
+                ui->m_decTabTextSaveOnF->setChecked(false);
+            }
+            file.close();
+        }
+    }
 }
 void MainWindow::cipherText(const std::string &cipherText)
 {
     ui->m_encTabTextField->setPlainText(QString::fromStdString(cipherText));
+    if(ui->m_encTabTextSaveOnF->isChecked()) {
+        string path = dialogSave();
+        if(!path.empty()) {
+            std::ofstream file(path, std::ios::out | std::ios::trunc);
+            if(file.good()) {
+                file << cipherText;
+                ui->m_encTabTextSaveOnF->setChecked(false);
+            }
+            file.close();
+        }
+    }
 }
 void MainWindow::cipherError(const std::string& error)
 {

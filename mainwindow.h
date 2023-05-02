@@ -39,7 +39,7 @@ private:
     FileImporter m_fimporterDec;
     FileImporter m_fimporterKey;
     std::string m_fname;
-    std::string m_dir;
+    std::string m_path;
     Keygen* m_keygen = new Keygen;
 
     QList<AbstractActionBase*> m_actions = QList<AbstractActionBase*> {
@@ -104,14 +104,13 @@ private:
     void processEncFile(std::vector<std::string>& paths);
     void processDecFile(std::vector<std::string>& paths);
     void m_cipherNew(const std::string& alg, const std::string& mode);
-
-    void saveOnFile(const Encoding encoding);
-    void saveSuccess(Encoding encoding);
+    
     bool isFileExist(const std::string& filename) const;
     QMessageBox::ButtonRole dialogFileExists(const std::string& message);
     bool dialogInsertFilename(const std::string& message);
     bool dialogConfirm(const std::string& message);
     void dialogNoKeyMessage(const std::string& action);
+    std::string dialogSave();
 
     void keyLoadedSelectable(const Qt::TextInteractionFlags flags) const;
     void setKeyLoadedStyle(const QString &style) const;
