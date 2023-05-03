@@ -3,6 +3,7 @@
 #include "files.h"
 #include "hex.h"
 #include "gcm.h"
+#include "defines.h"
 
 using namespace CryptoPP;
 using namespace std;
@@ -84,8 +85,8 @@ void AesGCM::encryptFile(vector<string> paths, Keygen* keygen, const Encoding en
         encryptor.SetKeyWithIV(key, key.size(), iv);
 
         for(const string& path : paths) {
-            DirFname dirfname = extractFname(path, m_delim);
-            FileSink* fs = new FileSink((dirfname.m_dir + dirfname.m_delim + encryptText(dirfname.m_fname, keygen, Encoding::HEX)).c_str());
+            DirFname dirfname = extractFname(path);
+            FileSink* fs = new FileSink((dirfname.m_dir + DELIMITOR + encryptText(dirfname.m_fname, keygen, Encoding::HEX)).c_str());
             AuthenticatedEncryptionFilter* aef = new AuthenticatedEncryptionFilter(encryptor);
 
             switch(encoding) {
@@ -112,8 +113,8 @@ void AesGCM::decryptFile(vector<string> paths, Keygen* keygen, const Encoding en
         decryptor.SetKeyWithIV(key, key.size(), iv);
 
         for(const string& path : paths) {
-            DirFname dirfname = extractFname(path, m_delim);
-            FileSink* fs = new FileSink((dirfname.m_dir + dirfname.m_delim + decryptText(dirfname.m_fname, keygen, Encoding::HEX)).c_str());
+            DirFname dirfname = extractFname(path);
+            FileSink* fs = new FileSink((dirfname.m_dir + DELIMITOR + decryptText(dirfname.m_fname, keygen, Encoding::HEX)).c_str());
             AuthenticatedDecryptionFilter* aef = new AuthenticatedDecryptionFilter(decryptor, fs);
 
             switch(encoding) {

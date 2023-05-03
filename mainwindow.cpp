@@ -207,36 +207,38 @@ KeyLength MainWindow::keylengthFrom(const int index)
 }
 void MainWindow::m_cipherNew(const string& alg, const string& mode)
 {
-    delete m_cipher;
-    m_cipher = nullptr;
+    if(!isRunningThread()) {
+        delete m_cipher;
+        m_cipher = nullptr;
 
-    // aes algs
-    if(alg == AbstractCipherAes::AlgName) {
+        // aes algs
+        if(alg == AbstractCipherAes::AlgName) {
 
-        if(mode == AesCBC::ModeName) m_cipher = new AesCBC;
-        else if(mode == AesEAX::ModeName) m_cipher = new AesEAX;
-        else if(mode == AesGCM::ModeName) m_cipher = new AesGCM;
-        else if(mode == AesCCM::ModeName) m_cipher = new AesCCM;
-        else if(mode == AesGCM::ModeName) m_cipher = new AesGCM;
-        else if(mode == AesGCM::ModeName) m_cipher = new AesGCM;
-        else if(mode == AesGCM::ModeName) m_cipher = new AesGCM;
-        else if(mode == AesGCM::ModeName) m_cipher = new AesGCM;
+            if(mode == AesCBC::ModeName) m_cipher = new AesCBC;
+            else if(mode == AesEAX::ModeName) m_cipher = new AesEAX;
+            else if(mode == AesGCM::ModeName) m_cipher = new AesGCM;
+            else if(mode == AesCCM::ModeName) m_cipher = new AesCCM;
+            else if(mode == AesGCM::ModeName) m_cipher = new AesGCM;
+            else if(mode == AesGCM::ModeName) m_cipher = new AesGCM;
+            else if(mode == AesGCM::ModeName) m_cipher = new AesGCM;
+            else if(mode == AesGCM::ModeName) m_cipher = new AesGCM;
+            // default. shouldn't go here but used to remove clang warnings
+            else m_cipher = new AesCBC;
+        }
+
+        // rsa algs
+        else if(alg == AbstractCipherRsa::AlgName) {
+            if(mode == RsaOEAP::ModeName) m_cipher = new RsaOEAP;
+            else if(mode == RsaSSA::ModeName) m_cipher = new RsaSSA;
+            // default. shouldn't go here but used to remove clang warnings
+            else m_cipher = new RsaOEAP;
+        }
+
         // default. shouldn't go here but used to remove clang warnings
         else m_cipher = new AesCBC;
+
+        connectCipher();
     }
-
-    // rsa algs
-    else if(alg == AbstractCipherRsa::AlgName) {
-        if(mode == RsaOEAP::ModeName) m_cipher = new RsaOEAP;
-        else if(mode == RsaSSA::ModeName) m_cipher = new RsaSSA;
-        // default. shouldn't go here but used to remove clang warnings
-        else m_cipher = new RsaOEAP;
-    }
-
-    // default. shouldn't go here but used to remove clang warnings
-    else m_cipher = new AesCBC;
-
-    connectCipher();
 }
 
 bool MainWindow::isFileExist(const string& path) const
@@ -448,6 +450,13 @@ void MainWindow::setKeyLoadedSelectable(const bool selectable) const
     else keyLoadedSelectable(Qt::NoTextInteraction);
 }
 
+bool MainWindow::isRunningThread()
+{
+    return
+        m_threadCipher.isRunning() ||
+        m_threadCipher.isRunning();
+}
+
 // protected methods
 void MainWindow::closeEvent(QCloseEvent*)
 {
@@ -491,42 +500,52 @@ void MainWindow::on_m_decTabFileImport_clicked()
 
 void MainWindow::on_m_encTabFileEncrypt_clicked()
 {
-    vector<string> paths = m_fimporterEnc.getFilePaths();
-    size_t size = paths.size();
-    if(size < 1) throw FileSelectedException();
+    try {
+        if(!isRunningThread()) {
+            std::cout << "run thread here " << std::endl;
+            vector<string> paths = m_fimporterEnc.getFilePaths();
+            size_t size = paths.size();
+            if(size < 1) throw FileSelectedException("-- error no file selected");
 
-    string alg = ui->m_encTabFileAlgs->currentText().toStdString();
-    string mode = ui->m_encTabFileModes->currentText().toStdString();
-    Encoding encoding = static_cast<Encoding>(ui->m_encTabFileEncodings->currentIndex());
-    EmitType emitType = static_cast<EmitType>(ui->m_encTabFileEncFname->isChecked());
-    m_cipherNew(alg, mode);
-    m_cipher->encFname(emitType);
+            string alg = ui->m_encTabFileAlgs->currentText().toStdString();
+            string mode = ui->m_encTabFileModes->currentText().toStdString();
+            Encoding encoding = static_cast<Encoding>(ui->m_encTabFileEncodings->currentIndex());
+            EmitType emitType = static_cast<EmitType>(ui->m_encTabFileEncFname->isChecked());
+            m_cipherNew(alg, mode);
+            m_cipher->encFname(emitType);
 
-    m_process.init(size);
-    m_threadProcess.start();
-    m_threadCipher.start();
-    emit startProcess();
-    emit startEncFile(paths, m_keygen, encoding);
+            m_process.init(size);
+            m_threadProcess.start();
+            m_threadCipher.start();
+            emit startProcess();
+            emit startEncFile(paths, m_keygen, encoding);
+        }
+    }
+    catch (std::exception& e) {
+        dialogError(e.what());
+    }
 }
 void MainWindow::on_m_decTabFileDecrypt_clicked()
 {
-    size_t size = 0;
-    vector<string> paths = m_fimporterDec.getFilePaths();
-    size =  paths.size();
-    if(size < 1) throw FileSelectedException();
+    if(!isRunningThread()) {
+        size_t size = 0;
+        vector<string> paths = m_fimporterDec.getFilePaths();
+        size =  paths.size();
+        if(size < 1) throw FileSelectedException();
 
-    string alg = ui->m_decTabFileAlgs->currentText().toStdString();
-    string mode = ui->m_decTabFileModes->currentText().toStdString();
-    Encoding encoding = static_cast<Encoding>(ui->m_decTabFileEncodings->currentIndex());
-    EmitType emitType = static_cast<EmitType>(ui->m_decTabFileDecFname->isChecked());
-    m_cipherNew(alg, mode);
-    m_cipher->decFname(emitType);
+        string alg = ui->m_decTabFileAlgs->currentText().toStdString();
+        string mode = ui->m_decTabFileModes->currentText().toStdString();
+        Encoding encoding = static_cast<Encoding>(ui->m_decTabFileEncodings->currentIndex());
+        EmitType emitType = static_cast<EmitType>(ui->m_decTabFileDecFname->isChecked());
+        m_cipherNew(alg, mode);
+        m_cipher->decFname(emitType);
 
-    m_process.init(size);
-    m_threadProcess.start();
-    m_threadCipher.start();
-    emit startProcess();
-    emit startDecFile(paths, m_keygen, encoding);
+        m_process.init(size);
+        m_threadProcess.start();
+        m_threadCipher.start();
+        emit startProcess();
+        emit startDecFile(paths, m_keygen, encoding);
+    }
 }
 void MainWindow::on_m_encTabFileClear_clicked()
 {
@@ -747,7 +766,6 @@ void MainWindow::toogleEncFname(bool checked)
     ui->m_encTabTextEncFname->setChecked(checked);
     ui->m_encTabTextEncFname->setEnabled(checked);
 }
-
 void MainWindow::actionSelected()
 {
     AbstractActionBase* sender = static_cast<AbstractActionBase*>(QObject::sender());
@@ -767,6 +785,15 @@ void MainWindow::actionSelected()
     sender->setIcon(iconPath);
 
     m_currentAction = static_cast<AbstractActionBase*>(sender);
+}
+
+void MainWindow::disable()
+{
+    setDisabled(true);
+}
+void MainWindow::enable()
+{
+    setDisabled(false);
 }
 
 

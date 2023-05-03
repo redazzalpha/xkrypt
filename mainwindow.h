@@ -125,6 +125,8 @@ private:
     void setKeyLoadedText(const QString &keyStr) const;
     void setKeyLoadedSelectable(const bool selectable) const;
 
+    bool isRunningThread();
+
 protected:
     void closeEvent(QCloseEvent* event) override;
 
@@ -162,6 +164,8 @@ private slots:
 
     void toogleEncFname(bool checked);
     void actionSelected();
+    void disable();
+    void enable();
 
 signals:
     void startEncFile(std::vector<std::string> paths, Keygen* keygen, const Encoding encoding);

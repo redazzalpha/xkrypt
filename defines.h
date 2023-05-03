@@ -69,4 +69,6 @@
 #define IMG_FILE ":/assets/file.png"
 #define IMG_WINDOW_APP ":/assets/icon.png"
 
+#define FILE_TEMP_SUFFIX ".xktmp"
+
 #endif // DEFINES_H

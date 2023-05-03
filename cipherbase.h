@@ -1,7 +1,6 @@
 #ifndef CIPHERBASE_H
 #define CIPHERBASE_H
 
-#include "defines.h"
 #include "keygen.h"
 #include "structures.h"
 #include <QObject>
@@ -19,8 +18,6 @@ protected:
     bool m_run = true;
     EmitType m_encFname = EmitType::EMIT;
     EmitType m_decFname = EmitType::EMIT;
-    const std::string m_delim = DELIMITOR;
-    const std::string m_tempSuffix = ".xktmp";
 
 public:
     // constructors
@@ -37,7 +34,7 @@ public:
     void decFname(const EmitType emitType);
     std::string successEncMsg(const int succeed = 1);
     std::string successDecMsg(const int succeed = 1);
-    DirFname extractFname(const std::string& path, const std::string& delim = "/") const;
+    DirFname extractFname(const std::string& path) const;
 
 protected :
     bool& run();
