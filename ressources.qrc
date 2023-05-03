@@ -3,24 +3,27 @@
         <file>assets/icon.png</file>
         <file>assets/warning.png</file>
         <file>assets/icon.ico</file>
-        <file>assets/decrypt.ico</file>
-        <file>assets/decrypt.png</file>
-        <file>assets/key.ico</file>
-        <file>assets/key.png</file>
         <file>assets/error.ico</file>
         <file>assets/error.png</file>
         <file>assets/error1.ico</file>
         <file>assets/error1.png</file>
-        <file>assets/quit.ico</file>
-        <file>assets/quit.png</file>
         <file>assets/succes1.ico</file>
         <file>assets/success.ico</file>
         <file>assets/success.png</file>
         <file>assets/success1.png</file>
         <file>assets/warning.ico</file>
-        <file>assets/encrypt.ico</file>
-        <file>assets/encrypt.png</file>
         <file>assets/file.ico</file>
         <file>assets/file.png</file>
+        <file>assets/decrypt.ico</file>
+        <file>assets/decrypt.png</file>
+        <file>assets/encrypt.ico</file>
+        <file>assets/encrypt.png</file>
+        <file>assets/key.ico</file>
+        <file>assets/key.png</file>
+        <file>assets/quit.ico</file>
+        <file>assets/quit.png</file>
+        <file>assets/decrypt_selected.png</file>
+        <file>assets/encrypt_selected.png</file>
+        <file>assets/key_selected.png</file>
     </qresource>
 </RCC>

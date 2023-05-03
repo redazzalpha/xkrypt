@@ -3,7 +3,7 @@
 #include "enums.h"
 
 // constructors
-ActionKeyMgr::ActionKeyMgr(): AbstractActionPage("key manager", IMG_KEY_MANAGER) {}
+ActionKeyMgr::ActionKeyMgr(): AbstractActionPage("key manager", IMG_KEY_MANAGER_SELECTED) {}
 
 // destructor
 ActionKeyMgr::~ActionKeyMgr(){}

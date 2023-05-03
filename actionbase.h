@@ -15,13 +15,18 @@ class AbstractActionBase: public QAction {
 protected:
     QPixmap m_pixmap;
     QIcon m_icon;
+    std::string m_iconPath;
 
 public:
     // constructor
     AbstractActionBase(const std::string& toolTipText, const std::string& iconPath);
+    std::string iconPath();
 
     // destructor
     virtual ~AbstractActionBase();
+
+    // methods
+    void setIcon(const std::string& iconPath);
 
 public slots:
     virtual void onActionClick() = 0;

@@ -31,6 +31,7 @@ class MainWindow : public QMainWindow {
 
 private:
     Ui::MainWindow *ui;
+    AbstractActionBase* m_currentAction;
     QThread m_threadProcess;
     QThread m_threadCipher;
     ProcessBar m_process = ProcessBar(this);
@@ -160,6 +161,7 @@ private slots:
     void processKill();
 
     void toogleEncFname(bool checked);
+    void actionSelected();
 
 signals:
     void startEncFile(std::vector<std::string> paths, Keygen* keygen, const Encoding encoding);

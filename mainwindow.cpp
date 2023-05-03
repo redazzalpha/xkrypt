@@ -14,7 +14,6 @@
 #include <fstream>
 #include <regex>
 #include <QProgressDialog>
-#include <thread>
 
 
 using namespace std;
@@ -32,6 +31,7 @@ MainWindow::MainWindow(QWidget *parent)
     toolTips();
     setFixedSize(WINDOW_WIDTH, WINDOW_HEIGHT);
     setIconSize(QSize(WINDOW_ICON_WIDTH, WINDOW_ICON_HEIGHT));
+    m_currentAction = m_actions[0];
 }
 
 // destructor
@@ -107,6 +107,8 @@ void MainWindow::connectItems()
         QObject::connect(action, &QAction::triggered, action, &AbstractActionBase::onActionClick);
         QObject::connect(action, &AbstractActionBase::quit, this, &QMainWindow::close);
         QObject::connect(action, &AbstractActionBase::setStackPage, ui->m_mainStack, &QStackedWidget::setCurrentIndex);
+        QObject::connect(action, &QAction::triggered, this, &MainWindow::actionSelected);
+
     }
 }
 void MainWindow::connectCipher()
@@ -744,6 +746,27 @@ void MainWindow::toogleEncFname(bool checked)
 {
     ui->m_encTabTextEncFname->setChecked(checked);
     ui->m_encTabTextEncFname->setEnabled(checked);
+}
+
+void MainWindow::actionSelected()
+{
+    AbstractActionBase* sender = static_cast<AbstractActionBase*>(QObject::sender());
+    AbstractActionBase* current = m_currentAction;
+
+    string senderPath = sender->iconPath();
+    string currentPath = current->iconPath();
+    string iconPath;
+    int len;
+
+    len = currentPath.size() - strlen(IMG_SELECTED_SUFFIX);
+    iconPath = currentPath.substr(0, len) + IMG_UNSELECTED_SUFFIX;
+    current->setIcon(iconPath);
+
+    len = senderPath.size() - strlen(IMG_UNSELECTED_SUFFIX);
+    iconPath = senderPath.substr(0, len) + IMG_SELECTED_SUFFIX;
+    sender->setIcon(iconPath);
+
+    m_currentAction = static_cast<AbstractActionBase*>(sender);
 }
 
 
