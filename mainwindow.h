@@ -113,7 +113,7 @@ private:
     bool dialogInsertFilename(const std::string& message);
     bool dialogConfirm(const std::string& message, const std::string& description = "");
     void dialogNoKeyMessage(const std::string& action, const std::string& description = "");
-    std::string dialogSave();
+    std::string dialogSave(QWidget* parent = nullptr, const std::string& caption = "Select saving directory", const std::string& openDir = "");
     void dialogSuccess(const std::string& message, const std::string &description = "");
     void dialogError(const std::string& message, const std::string& description = "");
 

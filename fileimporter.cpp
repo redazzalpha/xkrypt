@@ -78,9 +78,9 @@ size_t FileImporter::getFSize() const
     return fsize;
 }
 
-fstream* FileImporter::importFile()
+fstream* FileImporter::importFile(QWidget* parent, const string& caption, const string& dir, const string& filter)
 {
-    setPath(QFileDialog::getOpenFileName(nullptr,"Import file", "", "All Files (*)").toStdString());
+    setPath(QFileDialog::getOpenFileName(parent, QString::fromStdString(caption), QString::fromStdString(dir), QString::fromStdString(filter)).toStdString());
     return newFile(m_path, std::ios::in | std::ios::out | std::ios::binary);
 }
 fstream* FileImporter::importFile(const string& dir, const string& fname)
@@ -102,9 +102,9 @@ fstream* FileImporter::importFile(const string& path)
     setPath(path);
     return newFile(std::ios::in | std::ios::out | std::ios::binary);
 }
-const vector<fstream>& FileImporter::importFiles()
+const vector<fstream>& FileImporter::importFiles(QWidget* parent, const string& caption, const string& dir, const string& filter)
 {
-    QFileDialog dialog;
+    QFileDialog dialog(parent, QString::QString::fromStdString(caption), QString::fromStdString(dir), QString::fromStdString(filter));
     dialog.setFileMode(QFileDialog::ExistingFiles);
     if (dialog.exec()) {
         QStringList paths;

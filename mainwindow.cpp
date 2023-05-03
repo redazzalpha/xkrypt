@@ -169,7 +169,7 @@ void MainWindow::importSymmectric()
     try {
         m_fimporterKey.clear();
         Encoding encoding = static_cast<Encoding>(ui->m_keyMEncodingsI->currentIndex());
-        bool imported = m_serial.importKeygen(m_keygen, (ifstream*)m_fimporterKey.importFile());
+        bool imported = m_serial.importKeygen(m_keygen, (ifstream*)m_fimporterKey.importFile(this, "Import symmetric key"));
         if(m_keygen->isReady() && imported) {
             string keyStr = m_serial.keyToString(*m_keygen, encoding);
             setKeyLoadedText(QString::fromStdString(keyStr));
@@ -338,7 +338,7 @@ void MainWindow::dialogNoKeyMessage(const string& action, const string &descript
     msg.setModal(true);
     msg.exec();
 }
-string MainWindow::dialogSave()
+string MainWindow::dialogSave(QWidget* parent, const string& caption, const string& openDir)
 {
     bool m_override = false;
     bool m_create = false;
@@ -349,7 +349,7 @@ string MainWindow::dialogSave()
     string dir, path;
 
     while(true) {
-        if(!m_override && !m_create) dir = QFileDialog::getExistingDirectory(nullptr, "Select saving directory", "").toStdString();
+        if(!m_override && !m_create) dir = QFileDialog::getExistingDirectory(parent, QString::fromStdString(caption), QString::fromStdString(openDir)).toStdString();
         if(!dir.empty()) {
             bool canWrite = true;
             if(!m_override && !m_create && !m_changeDirectory) canWrite = dialogInsertFilename("Please insert filename");
@@ -372,7 +372,7 @@ string MainWindow::dialogSave()
         }
         else break;
     }
-    return path;
+    return m_path;
 }
 void MainWindow::dialogSuccess(const string& message, const string& description)
 {
@@ -463,7 +463,7 @@ AbstractCipherBase *MainWindow::cipher() const
 void MainWindow::on_m_encTabFileImport_clicked()
 {
     m_fimporterEnc.clear();
-    m_fimporterEnc.importFiles();
+    m_fimporterEnc.importFiles(this, "Select file(s) to encrypt");
 
     stringstream ss;
     auto paths = m_fimporterEnc.getFilePaths();
@@ -476,7 +476,7 @@ void MainWindow::on_m_encTabFileImport_clicked()
 void MainWindow::on_m_decTabFileImport_clicked()
 {
     m_fimporterDec.clear();
-    m_fimporterDec.importFiles();
+    m_fimporterDec.importFiles(this, "Select file(s) to decrypt");
 
     stringstream ss;
     auto paths = m_fimporterDec.getFilePaths();
@@ -595,8 +595,7 @@ void MainWindow::on_m_keyMGenerate_clicked()
     Encoding encoding = static_cast<Encoding>(ui->m_keyMEncodingsG->currentIndex());
     generateKey(encoding);
     if(ui->m_keyMSaveOnF->isChecked()) {
-        string path = dialogSave();
-        if(!path.empty()) {
+        if(!dialogSave(this).empty()) {
             m_serial.keyToFile(m_path, *m_keygen, encoding);
             ui->m_keyMSaveOnF->setChecked(false);
             dialogSuccess(m_serial.writeSuccess(m_path, *m_keygen, encoding));
@@ -672,7 +671,7 @@ void MainWindow::flushKey()
 void MainWindow::recoverText(const std::string &recoverText)
 {
     try {
-        if(ui->m_decTabTextSaveOnF->isChecked() && !dialogSave().empty()) {
+        if(ui->m_decTabTextSaveOnF->isChecked() && !dialogSave(this).empty()) {
             std::ofstream file(m_path, std::ios::out | std::ios::trunc);
             file << recoverText;
             file.close();
@@ -689,7 +688,7 @@ void MainWindow::cipherText(const std::string &cipherText)
 {
     string description;
     try {
-        if(ui->m_encTabTextSaveOnF->isChecked() && !dialogSave().empty()) {
+        if(ui->m_encTabTextSaveOnF->isChecked() && !dialogSave(this).empty()) {
             if(ui->m_encTabTextEncFname->isChecked()) {
                 m_cipher->encFname(EmitType::NO_EMIT);
                 m_path = m_dir + m_delim + m_cipher->encryptText(m_fname, m_keygen, Encoding::HEX);

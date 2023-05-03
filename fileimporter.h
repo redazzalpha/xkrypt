@@ -4,6 +4,7 @@
 #include <iostream>
 #include <fstream>
 #include <QStringList>
+#include <QWidget>
 
 class FileImporter {
 private:
@@ -37,10 +38,20 @@ public:
     const std::vector<std::string>& getFilePaths();
     size_t getFSize() const;
 
-    std::fstream* importFile();
+    std::fstream* importFile(
+        QWidget* parent = nullptr,
+        const std::string& caption = "Import file",
+        const std::string& dir = "",
+        const std::string& filter = "All Files (*)"
+    );
     std::fstream* importFile(const std::string& dir, const std::string& fname);
     std::fstream* importFile(const std::string& path);
-    const std::vector<std::fstream>& importFiles();
+    const std::vector<std::fstream>& importFiles(
+        QWidget* parent = nullptr,
+        const std::string& caption = "Import file",
+        const std::string& dir = "",
+        const std::string& filter = "All Files (*)"
+    );
 
     std::fstream* openRead(const std::string& path);
     std::fstream* openWriteTrunc(const std::string& path);
