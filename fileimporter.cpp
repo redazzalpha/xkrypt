@@ -104,17 +104,16 @@ fstream* FileImporter::importFile(const string& path)
 }
 const vector<fstream>& FileImporter::importFiles(QWidget* parent, const string& caption, const string& dir, const string& filter)
 {
+    QStringList paths;
     QFileDialog dialog(parent, QString::QString::fromStdString(caption), QString::fromStdString(dir), QString::fromStdString(filter));
     dialog.setFileMode(QFileDialog::ExistingFiles);
     if (dialog.exec()) {
-        QStringList paths;
+        clear();
         paths = dialog.selectedFiles();
-        m_files.clear();
-        m_filePaths.clear();
-        foreach(QString path, paths) {
-            m_files.push_back(fstream (path.toStdString(), ios::in | ios::out | ios::binary));
-            m_filePaths.push_back(path.toStdString());
-        }
+    }
+    foreach(QString path, paths) {
+        m_files.push_back(fstream (path.toStdString(), ios::in | ios::out | ios::binary));
+        m_filePaths.push_back(path.toStdString());
     }
     return m_files;
 }

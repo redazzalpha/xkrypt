@@ -4,7 +4,6 @@
 #include "aesgcm.h"
 #include "aescbc.h"
 #include "aeseax.h"
-#include "defines.h"
 #include "serial.h"
 #include "keygen.h"
 #include "rsassa.h"
@@ -16,11 +15,11 @@
 #include "actionquit.h"
 #include "aesccm.h"
 #include "fileimporter.h"
-#include "processbar.h"
 #include <QList>
 #include <QString>
 #include <QMessageBox>
 #include <QThread>
+#include <processbar.h>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -32,9 +31,8 @@ class MainWindow : public QMainWindow {
 private:
     Ui::MainWindow *ui;
     AbstractActionBase* m_currentAction;
-    QThread m_threadProcess;
     QThread m_threadCipher;
-    ProcessBar m_process = ProcessBar(this);
+    ProcessBar m_processBar;
     AbstractCipherBase* m_cipher = new AesCBC;
     Serial m_serial;
     FileImporter m_fimporterEnc;
@@ -43,7 +41,6 @@ private:
     std::string m_path;
     std::string m_dir;
     std::string m_fname;
-    const std::string m_delim = DELIMITOR;
     Keygen* m_keygen = new Keygen;
 
     QList<AbstractActionBase*> m_actions = QList<AbstractActionBase*> {
@@ -95,7 +92,7 @@ private:
     void uiInit();
     void connectItems();
     void connectCipher();
-    void connectProcess();
+    void connectProcess1();
     void generateKey(Encoding encodingIndex);
     void shortcuts();
     void toolTips();
@@ -117,7 +114,6 @@ private:
     std::string dialogSave(QWidget* parent = nullptr, const std::string& caption = "Select saving directory", const std::string& openDir = "");
     void dialogSuccess(const std::string& message, const std::string &description = "");
     void dialogError(const std::string& message, const std::string& description = "");
-
 
     void keyLoadedSelectable(const Qt::TextInteractionFlags flags) const;
     void setKeyLoadedStyle(const QString &style) const;
@@ -159,8 +155,6 @@ private slots:
     void cipherFile(const std::string& success);
     void cipherError(const std::string &error);
     void cipherKill();
-    void processing(const int progress);
-    void processKill();
 
     void toogleEncFname(bool checked);
     void actionSelected();

@@ -1,42 +1,41 @@
 #ifndef PROCESSBAR_H
 #define PROCESSBAR_H
 
+#include <QDialog>
+#include <QLabel>
+#include <QProgressBar>
+#include <QPushButton>
+#include <QVBoxLayout>
 
-#include <QObject>
-#include <QProgressDialog>
-
-class ProcessBar : public QObject {
+class ProcessBar : public QDialog {
     Q_OBJECT
+
 private:
     QWidget* m_parent;
-    QProgressDialog* m_progress = nullptr;
+    QProgressBar m_progress;
     std::string m_label;
     std::string m_cancelButton;
     int m_min;
     int m_max;
 
-public :
-    //constructor
+public:
+    // constructors
     ProcessBar(
         QWidget* parent = nullptr,
-        const std::string& label = "Processing please wait...",
+        const std::string& labelText = "Processing please wait...",
         const std::string& cancelButton = "Cancel operation",
         const int min = 0, const int max = 0
     );
 
-    //destructor
-    ~ProcessBar();
-
     // methods
-    void init(const int max = 0 );
+    void setMax(const int max = 1);
+
+private:
+    void setup();
+    void initLayouts();
 
 public slots:
-    void processing(const int progress);
-    void kill();
-
-signals:
-    void finished();
-    void killed();
+    void proceed(const int progress);
 };
 
 #endif // PROCESSBAR_H

@@ -16,8 +16,8 @@ class AbstractCipherBase : public QObject {
 
 protected:
     bool m_run = true;
-    EmitType m_encFname = EmitType::EMIT;
-    EmitType m_decFname = EmitType::EMIT;
+    bool m_encFname = false;
+    bool m_decFname = false;
 
 public:
     // constructors
@@ -30,8 +30,8 @@ public:
     virtual std::string getAlgName() const = 0;
     virtual std::string getModeName() const = 0;
     
-    void encFname(const EmitType emitType);
-    void decFname(const EmitType emitType);
+    void encFname(const bool encFname);
+    void decFname(const bool decFname);
     std::string successEncMsg(const int succeed = 1);
     std::string successDecMsg(const int succeed = 1);
     DirFname extractFname(const std::string& path) const;
@@ -49,7 +49,7 @@ public slots:
 
 signals:
     void finished();
-    void proceed(const int progress = 0);
+    void proceed(const int progress = 1);
     void error(const std::string& error, const std::string& description = "");
     void success(const std::string& success);
     void cipherText(const std::string& cipherText);

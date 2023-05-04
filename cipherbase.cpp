@@ -10,14 +10,14 @@ AbstractCipherBase::AbstractCipherBase(){}
 // destructor
 AbstractCipherBase::~AbstractCipherBase(){}
 
-void AbstractCipherBase::encFname(const EmitType emitType)
+void AbstractCipherBase::encFname(const bool encFname)
 {
-    m_encFname = emitType;
+    m_encFname = encFname;
 }
 
-void AbstractCipherBase::decFname(const EmitType emitType)
+void AbstractCipherBase::decFname(const bool decFname)
 {
-    m_decFname = emitType;
+    m_decFname = decFname;
 }
 
 bool &AbstractCipherBase::run()
