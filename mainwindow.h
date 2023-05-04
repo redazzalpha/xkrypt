@@ -15,11 +15,15 @@
 #include "actionquit.h"
 #include "aesccm.h"
 #include "fileimporter.h"
+#include "aesecb.h"
+#include "aescfb.h"
+#include "aesofb.h"
 #include <QList>
 #include <QString>
 #include <QMessageBox>
 #include <QThread>
 #include <processbar.h>
+#include <aesctr.h>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -58,6 +62,10 @@ private:
         QString::fromStdString(AesEAX::ModeName),
         QString::fromStdString(AesGCM::ModeName),
         QString::fromStdString(AesCCM::ModeName),
+        QString::fromStdString(AesECB::ModeName),
+        QString::fromStdString(AesCFB::ModeName),
+        QString::fromStdString(AesOFB::ModeName),
+        QString::fromStdString(AesCTR::ModeName),
     };
     QList<QString>* m_rsaModes = new QList<QString>{
         QString::fromStdString(RsaOEAP::ModeName),

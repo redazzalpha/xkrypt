@@ -6,10 +6,7 @@
 #include "hex.h"
 #include "base64.h"
 #include "modes.h"
-
 #include <QFile>
-#include <regex>
-#include <thread>
 
 using namespace CryptoPP;
 using namespace std;

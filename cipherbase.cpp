@@ -53,6 +53,7 @@ string AbstractCipherBase::successDecMsg(const int succeed)
            " mode<br />";
 }
 
+// slots
 void AbstractCipherBase::kill()
 {
     m_run = false;

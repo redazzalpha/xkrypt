@@ -1,21 +1,22 @@
-#ifndef AESCBC_H
-#define AESCBC_H
+#ifndef AESECB_H
+#define AESECB_H
 
 #include "cipheraes.h"
 
-class AesCBC : public AbstractCipherAes {
+class AesECB : public  AbstractCipherAes {
 public:
     static const std::string ModeName;
 
     // constructors
-    AesCBC();
+    AesECB();
 
     // destructor
-    virtual ~AesCBC();
+    virtual ~AesECB();
 
     // methods
     virtual std::string getModeName() const override;
-    
+
+
 public slots:
     virtual std::string encryptText(const std::string& plain, Keygen* keygen, const Encoding encoding) override;
     virtual std::string decryptText(const std::string& cipher, Keygen* keygen, const Encoding encoding) override;
@@ -23,4 +24,4 @@ public slots:
     virtual void decryptFile(std::vector<std::string> paths, Keygen* keygen, const Encoding encoding) override;
 };
 
-#endif // AESCBC_H
+#endif // AESECB_H

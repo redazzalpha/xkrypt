@@ -18,8 +18,12 @@ SOURCES += \
     actionquit.cpp \
     aescbc.cpp \
     aesccm.cpp \
+    aescfb.cpp \
+    aesctr.cpp \
     aeseax.cpp \
+    aesecb.cpp \
     aesgcm.cpp \
+    aesofb.cpp \
     cipheraes.cpp \
     cipherbase.cpp \
     cipherrsa.cpp \
@@ -44,8 +48,12 @@ HEADERS += \
     actionquit.h \
     aescbc.h \
     aesccm.h \
+    aescfb.h \
+    aesctr.h \
     aeseax.h \
+    aesecb.h \
     aesgcm.h \
+    aesofb.h \
     cipheraes.h \
     cipherbase.h \
     cipherrsa.h \

@@ -1,49 +1,49 @@
-#include "aesgcm.h"
+#include "aesecb.h"
 #include "base64.h"
+#include "defines.h"
 #include "files.h"
 #include "hex.h"
-#include "gcm.h"
-#include "defines.h"
+#include "modes.h"
 
 #include <QFile>
 
 using namespace CryptoPP;
 using namespace std;
 
-const std::string AesGCM::ModeName = "GCM";
+const std::string AesECB::ModeName = "ECB";
 
 // constructors
-AesGCM::AesGCM(){}
+AesECB::AesECB(){}
 
 // destructor
-AesGCM::~AesGCM(){};
+AesECB::~AesECB(){};
 
 // virtual methods
-std::string AesGCM::getModeName() const
+std::string AesECB::getModeName() const
 {
-    return AesGCM::AlgName;
+    return AesECB::AlgName;
 }
 
 // slots
-string AesGCM::encryptText(const string& plain, Keygen* keygen, const Encoding encoding) noexcept(false)
+string AesECB::encryptText(const string& plain, Keygen* keygen, const Encoding encoding) noexcept(false)
 {
     std::string cipher = "";
     try {
         const SecByteBlock& key = keygen->getKey();
         const SecByteBlock& iv = keygen->getIv();
         StringSink* ss = new StringSink(cipher);
-        GCM<AES>::Encryption encryptor;
-        AuthenticatedEncryptionFilter* aef = new AuthenticatedEncryptionFilter(encryptor);
+        ECB_Mode<AES>::Encryption encryptor;
+        StreamTransformationFilter* stf = new StreamTransformationFilter(encryptor);
         encryptor.SetKeyWithIV(key, key.size(), iv);
 
         switch(encoding) {
-        case Encoding::BASE64 : aef->Attach(new Base64Encoder(ss)); break;
-        case Encoding::HEX : aef->Attach(new HexEncoder(ss)); break;
-        case Encoding::NONE : aef->Attach(ss); break;
-        default: aef->Attach(new Base64Encoder(ss));;
+        case Encoding::BASE64 : stf->Attach(new Base64Encoder(ss)); break;
+        case Encoding::HEX : stf->Attach(new HexEncoder(ss)); break;
+        case Encoding::NONE : stf->Attach(ss); break;
+        default: stf->Attach(new Base64Encoder(ss));;
         }
 
-        StringSource(plain, true, aef);
+        StringSource(plain, true, stf);
         emit proceed();
         if(!m_encFname) emit cipherText(cipher);
         return cipher;
@@ -53,22 +53,22 @@ string AesGCM::encryptText(const string& plain, Keygen* keygen, const Encoding e
     }
     return cipher;
 }
-string AesGCM::decryptText(const string& cipher, Keygen* keygen, const Encoding encoding) noexcept(false)
+string AesECB::decryptText(const string& cipher, Keygen* keygen, const Encoding encoding) noexcept(false)
 {
     std::string recover;
     try {
         const SecByteBlock& key = keygen->getKey();
         const SecByteBlock& iv = keygen->getIv();
         StringSink* ss = new StringSink(recover);
-        GCM<AES>::Decryption decryptor;
-        AuthenticatedDecryptionFilter* aef = new AuthenticatedDecryptionFilter(decryptor, ss);
+        ECB_Mode<AES>::Decryption decryptor;
+        StreamTransformationFilter* stf = new StreamTransformationFilter(decryptor, ss);
         decryptor.SetKeyWithIV(key, key.size(), iv);
 
         switch(encoding) {
-        case Encoding::BASE64 : StringSource(cipher, true, new Base64Decoder(aef)); break;
-        case Encoding::HEX : StringSource(cipher, true, new HexDecoder(aef)); break;
-        case Encoding::NONE : StringSource(cipher, true, aef); break;
-        default: StringSource(cipher, true, new Base64Decoder(aef));
+        case Encoding::BASE64 : StringSource(cipher, true, new Base64Decoder(stf)); break;
+        case Encoding::HEX : StringSource(cipher, true, new HexDecoder(stf)); break;
+        case Encoding::NONE : StringSource(cipher, true, stf); break;
+        default: StringSource(cipher, true, new Base64Decoder(stf));
         }
 
         emit proceed();
@@ -80,7 +80,7 @@ string AesGCM::decryptText(const string& cipher, Keygen* keygen, const Encoding 
     }
     return recover;
 }
-void AesGCM::encryptFile(vector<string> paths, Keygen* keygen, const Encoding encoding)
+void AesECB::encryptFile(vector<string> paths, Keygen* keygen, const Encoding encoding)
 {
     string output;
     string filenameEnc;
@@ -93,11 +93,11 @@ void AesGCM::encryptFile(vector<string> paths, Keygen* keygen, const Encoding en
             const string& path = paths[progress];
             DirFname dirfname = extractFname(path);
 
-            GCM<AES>::Encryption encryptor;
+            ECB_Mode<AES>::Encryption encryptor;
 
             if(m_encFname) {
                 encryptor.SetKeyWithIV(key, key.size(), iv);
-                AuthenticatedEncryptionFilter* filenameFilter = new AuthenticatedEncryptionFilter(encryptor, new HexEncoder(new StringSink(filenameEnc)));
+                StreamTransformationFilter* filenameFilter = new StreamTransformationFilter(encryptor, new HexEncoder(new StringSink(filenameEnc)));
                 StringSource(dirfname.m_fname, true, filenameFilter);
             }
             else  filenameEnc = dirfname.m_fname;
@@ -106,7 +106,7 @@ void AesGCM::encryptFile(vector<string> paths, Keygen* keygen, const Encoding en
 
             filenameEnc = filenameEnc == dirfname.m_fname? filenameEnc + FILE_TEMP_SUFFIX:filenameEnc;
             FileSink* fs = new FileSink((output = (dirfname.m_dir + DELIMITOR + filenameEnc)).c_str());
-            AuthenticatedEncryptionFilter* fileFilter = new AuthenticatedEncryptionFilter(encryptor);
+            StreamTransformationFilter* fileFilter = new StreamTransformationFilter(encryptor);
 
             switch(encoding) {
             case Encoding::BASE64 : fileFilter->Attach(new Base64Encoder(fs)); break;
@@ -118,11 +118,11 @@ void AesGCM::encryptFile(vector<string> paths, Keygen* keygen, const Encoding en
             FileSource(path.c_str(), true, fileFilter);
             removeFile(path);
             if(!m_encFname)
-            QFile(QString::fromStdString(output)).rename(
-                QString::fromStdString(
-                    output.substr(0, output.size()-strlen(FILE_TEMP_SUFFIX))
-                )
-            );
+                QFile(QString::fromStdString(output)).rename(
+                    QString::fromStdString(
+                        output.substr(0, output.size()-strlen(FILE_TEMP_SUFFIX))
+                        )
+                    );
             filenameEnc.clear();
             output.clear();
             emit proceed(progress+1);
@@ -133,7 +133,7 @@ void AesGCM::encryptFile(vector<string> paths, Keygen* keygen, const Encoding en
         emit error(e.what());
     }
 }
-void AesGCM::decryptFile(vector<string> paths, Keygen* keygen, const Encoding encoding)
+void AesECB::decryptFile(vector<string> paths, Keygen* keygen, const Encoding encoding)
 {
     string output;
     string filenameDec;
@@ -146,11 +146,11 @@ void AesGCM::decryptFile(vector<string> paths, Keygen* keygen, const Encoding en
             const string& path = paths[progress];
             DirFname dirfname = extractFname(path);
 
-            GCM<AES>::Decryption decryptor;
+            ECB_Mode<AES>::Decryption decryptor;
 
             if(m_decFname) {
                 decryptor.SetKeyWithIV(key, key.size(), iv);
-                AuthenticatedDecryptionFilter* filenameFilter = new AuthenticatedDecryptionFilter(decryptor, new StringSink(filenameDec));
+                StreamTransformationFilter* filenameFilter  = new StreamTransformationFilter(decryptor, new StringSink(filenameDec));
                 StringSource(dirfname.m_fname, true, new HexDecoder(filenameFilter));
             }
             else filenameDec = dirfname.m_fname;
@@ -159,7 +159,7 @@ void AesGCM::decryptFile(vector<string> paths, Keygen* keygen, const Encoding en
 
             filenameDec = filenameDec == dirfname.m_fname? filenameDec + FILE_TEMP_SUFFIX:filenameDec;
             FileSink* fs = new FileSink((output = (dirfname.m_dir + DELIMITOR + filenameDec)).c_str());
-            AuthenticatedDecryptionFilter* fileFilter = new AuthenticatedDecryptionFilter(decryptor, fs);
+            StreamTransformationFilter* fileFilter  = new StreamTransformationFilter(decryptor, fs);
 
             switch(encoding) {
             case Encoding::BASE64 : FileSource(path.c_str(), true, new Base64Decoder(fileFilter)); break;
@@ -170,11 +170,11 @@ void AesGCM::decryptFile(vector<string> paths, Keygen* keygen, const Encoding en
 
             removeFile(path);
             if(!m_decFname)
-            QFile(QString::fromStdString(output)).rename(
-                QString::fromStdString(
-                    output.substr(0, output.size()-strlen(FILE_TEMP_SUFFIX))
-                )
-            );
+                QFile(QString::fromStdString(output)).rename(
+                    QString::fromStdString(
+                        output.substr(0, output.size()-strlen(FILE_TEMP_SUFFIX))
+                        )
+                    );
             filenameDec.clear();
             output.clear();
             emit proceed(progress+1);
@@ -186,3 +186,4 @@ void AesGCM::decryptFile(vector<string> paths, Keygen* keygen, const Encoding en
         emit error(e.what());
     }
 }
+

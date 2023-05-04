@@ -210,15 +210,14 @@ void MainWindow::m_cipherNew(const string& alg, const string& mode)
 
         // aes algs
         if(alg == AbstractCipherAes::AlgName) {
-
             if(mode == AesCBC::ModeName) m_cipher = new AesCBC;
             else if(mode == AesEAX::ModeName) m_cipher = new AesEAX;
             else if(mode == AesGCM::ModeName) m_cipher = new AesGCM;
             else if(mode == AesCCM::ModeName) m_cipher = new AesCCM;
-            else if(mode == AesGCM::ModeName) m_cipher = new AesGCM;
-            else if(mode == AesGCM::ModeName) m_cipher = new AesGCM;
-            else if(mode == AesGCM::ModeName) m_cipher = new AesGCM;
-            else if(mode == AesGCM::ModeName) m_cipher = new AesGCM;
+            else if(mode == AesECB::ModeName) m_cipher = new AesECB;
+            else if(mode == AesCFB::ModeName) m_cipher = new AesCFB;
+            else if(mode == AesOFB::ModeName) m_cipher = new AesOFB;
+            else if(mode == AesCTR::ModeName) m_cipher = new AesCTR;
             // default. shouldn't go here but used to remove clang warnings
             else m_cipher = new AesCBC;
         }

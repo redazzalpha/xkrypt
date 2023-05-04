@@ -5,6 +5,8 @@
 #include "hex.h"
 #include "ccm.h"
 
+#include <QFile>
+
 using namespace CryptoPP;
 using namespace std;
 
@@ -40,9 +42,10 @@ string AesCCM::encryptText(const string& plain, Keygen* keygen, const Encoding e
         case Encoding::NONE : aef->Attach(ss); break;
         default: aef->Attach(new Base64Encoder(ss));;
         }
+
         StringSource(plain, true, aef);
-        emit cipherText(cipher);
-        emit finished();
+        emit proceed();
+        if(!m_encFname) emit cipherText(cipher);
         return cipher;
     }
     catch(exception& e) {
@@ -67,8 +70,9 @@ string AesCCM::decryptText(const string& cipher, Keygen* keygen, const Encoding 
         case Encoding::NONE : StringSource(cipher, true, aef); break;
         default: StringSource(cipher, true, new Base64Decoder(aef));
         }
+
+        emit proceed();
         emit recoverText(recover);
-        emit finished();
         return recover;
     }
     catch(exception& e) {
@@ -78,27 +82,52 @@ string AesCCM::decryptText(const string& cipher, Keygen* keygen, const Encoding 
 }
 void AesCCM::encryptFile(vector<string> paths, Keygen* keygen, const Encoding encoding)
 {
+    string output;
+    string filenameEnc;
     try {
         const SecByteBlock& key = keygen->getKey();
         const SecByteBlock& iv = keygen->getIv();
-        CCM<AES>::Encryption encryptor;
-        encryptor.SetKeyWithIV(key, key.size(), iv);
 
-        for(const string& path : paths) {
+        size_t progress;
+        for(progress = 0; progress < paths.size() && m_run; progress++) {
+            const string& path = paths[progress];
             DirFname dirfname = extractFname(path);
-            FileSink* fs = new FileSink((dirfname.m_dir + DELIMITOR + encryptText(dirfname.m_fname, keygen, Encoding::HEX)).c_str());
-            AuthenticatedEncryptionFilter* aef = new AuthenticatedEncryptionFilter(encryptor);
+
+            CCM<AES>::Encryption encryptor;
+
+            if(m_encFname) {
+                encryptor.SetKeyWithIV(key, key.size(), iv);
+                AuthenticatedEncryptionFilter* filenameFilter = new AuthenticatedEncryptionFilter(encryptor, new HexEncoder(new StringSink(filenameEnc)));
+                StringSource(dirfname.m_fname, true, filenameFilter);
+            }
+            else  filenameEnc = dirfname.m_fname;
+
+            encryptor.SetKeyWithIV(key, key.size(), iv);
+
+            filenameEnc = filenameEnc == dirfname.m_fname? filenameEnc + FILE_TEMP_SUFFIX:filenameEnc;
+            FileSink* fs = new FileSink((output = (dirfname.m_dir + DELIMITOR + filenameEnc)).c_str());
+            AuthenticatedEncryptionFilter* fileFilter = new AuthenticatedEncryptionFilter(encryptor);
 
             switch(encoding) {
-            case Encoding::BASE64 : aef->Attach(new Base64Encoder(fs)); break;
-            case Encoding::HEX : aef->Attach(new HexEncoder(fs)); break;
-            case Encoding::NONE : aef->Attach(fs); break;
-            default: aef->Attach(new Base64Encoder(fs));;
+            case Encoding::BASE64 : fileFilter->Attach(new Base64Encoder(fs)); break;
+            case Encoding::HEX : fileFilter->Attach(new HexEncoder(fs)); break;
+            case Encoding::NONE : fileFilter->Attach(fs); break;
+            default: fileFilter->Attach(new Base64Encoder(fs));;
             }
-            FileSource(path.c_str(), true, aef);
+
+            FileSource(path.c_str(), true, fileFilter);
             removeFile(path);
+            if(!m_encFname)
+            QFile(QString::fromStdString(output)).rename(
+                QString::fromStdString(
+                    output.substr(0, output.size()-strlen(FILE_TEMP_SUFFIX))
+                )
+            );
+            filenameEnc.clear();
+            output.clear();
+            emit proceed(progress+1);
         }
-        emit finished();
+        emit cipherFile(successEncMsg(progress));
     }
     catch(exception& e) {
         emit error(e.what());
@@ -106,28 +135,54 @@ void AesCCM::encryptFile(vector<string> paths, Keygen* keygen, const Encoding en
 }
 void AesCCM::decryptFile(vector<string> paths, Keygen* keygen, const Encoding encoding)
 {
+    string output;
+    string filenameDec;
     try {
         const SecByteBlock& key = keygen->getKey();
         const SecByteBlock& iv = keygen->getIv();
-        CCM<AES>::Decryption decryptor;
-        decryptor.SetKeyWithIV(key, key.size(), iv);
 
-        for(const string& path : paths) {
+        size_t progress;
+        for(progress = 0; progress < paths.size() && m_run; progress++) {
+            const string& path = paths[progress];
             DirFname dirfname = extractFname(path);
-            FileSink* fs = new FileSink((dirfname.m_dir + DELIMITOR + decryptText(dirfname.m_fname, keygen, Encoding::HEX)).c_str());
-            AuthenticatedDecryptionFilter* aef = new AuthenticatedDecryptionFilter(decryptor, fs);
+
+            CCM<AES>::Decryption decryptor;
+
+            if(m_decFname) {
+                decryptor.SetKeyWithIV(key, key.size(), iv);
+                AuthenticatedDecryptionFilter* filenameFilter = new AuthenticatedDecryptionFilter(decryptor, new StringSink(filenameDec));
+                StringSource(dirfname.m_fname, true, new HexDecoder(filenameFilter));
+            }
+            else filenameDec = dirfname.m_fname;
+
+            decryptor.SetKeyWithIV(key, key.size(), iv);
+
+            filenameDec = filenameDec == dirfname.m_fname? filenameDec + FILE_TEMP_SUFFIX:filenameDec;
+            FileSink* fs = new FileSink((output = (dirfname.m_dir + DELIMITOR + filenameDec)).c_str());
+            AuthenticatedDecryptionFilter* fileFilter = new AuthenticatedDecryptionFilter(decryptor, fs);
 
             switch(encoding) {
-            case Encoding::BASE64 : FileSource(path.c_str(), true, new Base64Decoder(aef)); break;
-            case Encoding::HEX : FileSource(path.c_str(), true, new HexDecoder(aef)); break;
-            case Encoding::NONE : FileSource(path.c_str(), true, aef); break;
-            default: FileSource(path.c_str(), true, new Base64Decoder(aef));
+            case Encoding::BASE64 : FileSource(path.c_str(), true, new Base64Decoder(fileFilter)); break;
+            case Encoding::HEX : FileSource(path.c_str(), true, new HexDecoder(fileFilter)); break;
+            case Encoding::NONE : FileSource(path.c_str(), true, fileFilter); break;
+            default: FileSource(path.c_str(), true, new Base64Decoder(fileFilter));
             }
+
             removeFile(path);
+            if(!m_decFname)
+            QFile(QString::fromStdString(output)).rename(
+                QString::fromStdString(
+                    output.substr(0, output.size()-strlen(FILE_TEMP_SUFFIX))
+                )
+            );
+            filenameDec.clear();
+            output.clear();
+            emit proceed(progress+1);
         }
-        emit finished();
+        emit recoverFile(successDecMsg(progress));
     }
     catch(exception& e) {
+        removeFile(output);
         emit error(e.what());
     }
 }
