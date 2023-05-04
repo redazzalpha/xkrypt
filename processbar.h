@@ -13,8 +13,11 @@ class ProcessBar : public QDialog {
 private:
     QWidget* m_parent;
     QProgressBar m_progress;
-    std::string m_label;
+    std::string m_labelText;
     std::string m_cancelButton;
+    QLabel* m_label;
+    QLabel* m_sublabel;
+    QPushButton* m_button;
     int m_min;
     int m_max;
 
@@ -29,6 +32,7 @@ public:
 
     // methods
     void setMax(const int max = 1);
+    void setMin(const int min = 0);
 
 private:
     void setup();
@@ -36,6 +40,11 @@ private:
 
 public slots:
     void proceed(const int progress);
+    void cancel();
+    void show();
+
+signals:
+    void canceled();
 };
 
 #endif // PROCESSBAR_H

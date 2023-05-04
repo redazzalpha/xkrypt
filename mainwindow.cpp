@@ -137,6 +137,8 @@ void MainWindow::connectCipher()
     QObject::connect(m_cipher, &AbstractCipherBase::recoverFile, &m_processBar, &ProcessBar::hide);
     QObject::connect(m_cipher, &AbstractCipherBase::cipherFile, &m_processBar, &ProcessBar::hide);
     QObject::connect(m_cipher, &AbstractCipherBase::error, &m_processBar, &ProcessBar::hide);
+
+    QObject::connect(&m_processBar, &ProcessBar::canceled, this, &MainWindow::cipherKill);
 }
 
 void MainWindow::generateKey(Encoding encoding)
@@ -491,22 +493,20 @@ void MainWindow::on_m_decTabFileImport_clicked()
 void MainWindow::on_m_encTabFileEncrypt_clicked()
 {
     try {
-        if(!isRunningThread()) {
-            vector<string> paths = m_fimporterEnc.getFilePaths();
-            size_t size = paths.size();
-            if(size < 1) throw FileSelectedException("-- error no file selected");
+        vector<string> paths = m_fimporterEnc.getFilePaths();
+        size_t size = paths.size();
+        if(size < 1) throw FileSelectedException("-- error no file selected");
 
-            string alg = ui->m_encTabFileAlgs->currentText().toStdString();
-            string mode = ui->m_encTabFileModes->currentText().toStdString();
-            Encoding encoding = static_cast<Encoding>(ui->m_encTabFileEncodings->currentIndex());
-            bool encFname = ui->m_encTabFileEncFname->isChecked();
-            m_cipherNew(alg, mode);
-            m_cipher->encFname(encFname);
+        string alg = ui->m_encTabFileAlgs->currentText().toStdString();
+        string mode = ui->m_encTabFileModes->currentText().toStdString();
+        Encoding encoding = static_cast<Encoding>(ui->m_encTabFileEncodings->currentIndex());
+        bool encFname = ui->m_encTabFileEncFname->isChecked();
+        m_cipherNew(alg, mode);
+        m_cipher->encFname(encFname);
 
-            m_processBar.setMax(size);
-            m_threadCipher.start();
-            emit startEncFile(paths, m_keygen, encoding);
-        }
+        m_processBar.setMax(size);
+        m_threadCipher.start();
+        emit startEncFile(paths, m_keygen, encoding);
     }
     catch (std::exception& e) {
         dialogError(e.what());
@@ -514,23 +514,21 @@ void MainWindow::on_m_encTabFileEncrypt_clicked()
 }
 void MainWindow::on_m_decTabFileDecrypt_clicked()
 {
-    if(!isRunningThread()) {
-        size_t size = 0;
-        vector<string> paths = m_fimporterDec.getFilePaths();
-        size =  paths.size();
-        if(size < 1) throw FileSelectedException();
+    size_t size = 0;
+    vector<string> paths = m_fimporterDec.getFilePaths();
+    size =  paths.size();
+    if(size < 1) throw FileSelectedException();
 
-        string alg = ui->m_decTabFileAlgs->currentText().toStdString();
-        string mode = ui->m_decTabFileModes->currentText().toStdString();
-        Encoding encoding = static_cast<Encoding>(ui->m_decTabFileEncodings->currentIndex());
-        bool decFname = ui->m_decTabFileDecFname->isChecked();
-        m_cipherNew(alg, mode);
-        m_cipher->decFname(decFname);
+    string alg = ui->m_decTabFileAlgs->currentText().toStdString();
+    string mode = ui->m_decTabFileModes->currentText().toStdString();
+    Encoding encoding = static_cast<Encoding>(ui->m_decTabFileEncodings->currentIndex());
+    bool decFname = ui->m_decTabFileDecFname->isChecked();
+    m_cipherNew(alg, mode);
+    m_cipher->decFname(decFname);
 
-        m_processBar.setMax(size);
-        m_threadCipher.start();
-        emit startDecFile(paths, m_keygen, encoding);
-    }
+    m_processBar.setMax(size);
+    m_threadCipher.start();
+    emit startDecFile(paths, m_keygen, encoding);
 }
 void MainWindow::on_m_encTabFileClear_clicked()
 {
@@ -546,20 +544,18 @@ void MainWindow::on_m_decTabFileClear_clicked()
 void MainWindow::on_m_encTabTextEncrypt_clicked()
 {
     try {
-        if(!isRunningThread()) {
-            if(!m_keygen->isReady()) throw UnreadyKeyException();
-            string plainText = ui->m_encTabTextField->toPlainText().toStdString();
+        if(!m_keygen->isReady()) throw UnreadyKeyException();
+        string plainText = ui->m_encTabTextField->toPlainText().toStdString();
 
-            if(plainText.empty()) throw EmptyTextException();
-            string selectedAlg = ui->m_encTabTextAlgs->currentText().toStdString();
-            string selectedMode = ui->m_encTabTextModes->currentText().toStdString();
-            Encoding encoding = static_cast<Encoding>(ui->m_encTabTextEncodings->currentIndex());
-            m_cipherNew(selectedAlg, selectedMode);
+        if(plainText.empty()) throw EmptyTextException();
+        string selectedAlg = ui->m_encTabTextAlgs->currentText().toStdString();
+        string selectedMode = ui->m_encTabTextModes->currentText().toStdString();
+        Encoding encoding = static_cast<Encoding>(ui->m_encTabTextEncodings->currentIndex());
+        m_cipherNew(selectedAlg, selectedMode);
 
-            m_processBar.setMax();
-            m_threadCipher.start();
-            emit startEncText(plainText, m_keygen, encoding);
-        }
+        m_processBar.setMax();
+        m_threadCipher.start();
+        emit startEncText(plainText, m_keygen, encoding);
     }
     catch(exception& e) {
         dialogError(e.what());
@@ -568,20 +564,18 @@ void MainWindow::on_m_encTabTextEncrypt_clicked()
 void MainWindow::on_m_decTabTextDecrypt_clicked()
 {
     try {
-        if(!isRunningThread()) {
-            if(!m_keygen->isReady()) throw UnreadyKeyException();
-            string cipherText = ui->m_decTabTextField->toPlainText().toStdString();
+        if(!m_keygen->isReady()) throw UnreadyKeyException();
+        string cipherText = ui->m_decTabTextField->toPlainText().toStdString();
 
-            if(cipherText.empty()) throw EmptyTextException();
-            string selectedAlg = ui->m_decTabTextAlgs->currentText().toStdString();
-            string selectedMode = ui->m_decTabTextModes->currentText().toStdString();
-            Encoding encoding = static_cast<Encoding>(ui->m_decTabTextEncodings->currentIndex());
-            m_cipherNew(selectedAlg, selectedMode);
+        if(cipherText.empty()) throw EmptyTextException();
+        string selectedAlg = ui->m_decTabTextAlgs->currentText().toStdString();
+        string selectedMode = ui->m_decTabTextModes->currentText().toStdString();
+        Encoding encoding = static_cast<Encoding>(ui->m_decTabTextEncodings->currentIndex());
+        m_cipherNew(selectedAlg, selectedMode);
 
-            m_processBar.setMax();
-            m_threadCipher.start();
-            emit startDecText(cipherText, m_keygen, encoding);
-        }
+        m_processBar.setMax();
+        m_threadCipher.start();
+        emit startDecText(cipherText, m_keygen, encoding);
     }
     catch(exception& e) {
         dialogError(e.what());
