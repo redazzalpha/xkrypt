@@ -21,6 +21,8 @@
 #define WINDOW_ICON_HEIGHT 35
 #define PROCESS_BAR_WIDTH 600
 
+#define DEFAULT_PADDING_AEF 32
+
 #define NO_KEY_LOADED "no key loaded!"
 #define NO_FILE_LOADED "no file loaded!"
 

@@ -115,6 +115,7 @@ void AesGCM::decryptFile(const string& path, Keygen* keygen, const Encoding enco
         decryptor.SetKeyWithIV(key, key.size(), iv);
         AuthenticatedEncryptionFilter* filenameFilter  = new AuthenticatedEncryptionFilter(decryptor, new StringSink(filename));
         StringSource(dirfname.m_fname, true, new HexDecoder(filenameFilter));
+        filename = filename.substr(0, filename.size()-DEFAULT_PADDING_AEF);
     }
     else filename += dirfname.m_fname + FILE_TEMP_SUFFIX;
 
