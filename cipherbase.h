@@ -18,7 +18,6 @@ protected:
     bool m_encfname = true;
     bool m_decfname = true;
 
-
 public:
     // constructors
     AbstractCipherBase();

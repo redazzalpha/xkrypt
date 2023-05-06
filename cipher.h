@@ -21,6 +21,8 @@ public:
     // methods
     void setEncfname(bool newEncfname);
     void setDecfname(bool newDecfname);
+    bool encfname();
+    bool decfname();
 
     std::string algName() const;
     std::string modeName() const;
@@ -50,7 +52,7 @@ signals:
     void cipherFile(const std::string& success);
     void recoverFile(const std::string& success);
     void processing(const std::string& filename);
-    void autoDetect(const std::string& alg, const std::string& mode, const Encoding encoding);
+    void autoDetect(const std::string& alg, const std::string& mode, const Encoding encoding, const bool decfname);
 };
 
 #endif // CIPHER_H

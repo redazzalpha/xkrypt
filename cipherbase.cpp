@@ -55,7 +55,8 @@ void AbstractCipherBase::injectRefs(FileSink* fs, const Encoding encoding)
         XKRYPT_REF_MODEL,
         (CryptoPP::byte)encoding,
         (CryptoPP::byte)algId(),
-        (CryptoPP::byte)modeId()
+        (CryptoPP::byte)modeId(),
+        (CryptoPP::byte)m_encfname,
     };
     StringSource refsSource(&xkrypt_refs[0], xkrypt_refs.size(), true, new Base64Encoder(new Redirector(*fs)));
 }
@@ -71,7 +72,8 @@ string AbstractCipherBase::checkRefs(const std::string &path)
     string refs = pumpRefs(path);
     if(refs.size() != XKRYPT_REF_SIZE) throw InvalidRefsException();
     if((refs[0] < XKRYPT_REF_VERSION)) throw VersionException();
-    if( (refs[1] != XKRYPT_REF_MODEL)) throw ModelException();
+    if((refs[1] != XKRYPT_REF_MODEL)) throw ModelException();
+    if(!(refs[5] == XKRYPT_REF_DECFNAME || refs[5] == XKRYPT_REF_NOTDECFNAME)) throw DecFnameRefsException();
     return refs;
 }
 

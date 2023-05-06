@@ -1474,6 +1474,9 @@
            </item>
            <item>
             <widget class="QCheckBox" name="m_decTabFileDecFname">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
              <property name="text">
               <string>Decrypt &amp;filename</string>
              </property>

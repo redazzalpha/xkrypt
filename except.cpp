@@ -99,6 +99,15 @@ const char*  EncodingException::what() const noexcept
     return m_message;
 }
 
+DecFnameRefsException::DecFnameRefsException(const char* message)
+{
+    m_message = message;
+}
+const char*  DecFnameRefsException::what() const noexcept
+{
+    return m_message;
+}
+
 UnreadyKeyException::UnreadyKeyException(const char* message)
 {
     m_message = message;

@@ -39,6 +39,14 @@ void Cipher::setDecfname(bool newDecfname)
 {
     m_cipher->setDecfname(newDecfname);
 }
+bool Cipher::encfname()
+{
+    return m_cipher->encfname();
+}
+bool Cipher::decfname()
+{
+    return m_cipher->decfname();
+}
 
 string Cipher::algName() const
 {
@@ -218,10 +226,10 @@ void Cipher::decryptFile(vector<string> paths, Keygen* keygen)
             }
 
             cipherDetect(refs);
+            m_cipher->setDecfname(refs[5]);
             m_cipher->decryptFile(path, keygen, encoding);
 
-
-            emit autoDetect(m_cipher->algName(), m_cipher->modeName(), encoding);
+            emit autoDetect(m_cipher->algName(), m_cipher->modeName(), encoding, refs[5]);
             emit proceed(progress+1);
         }
         emit recoverFile(successDecMsg(progress));

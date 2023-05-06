@@ -427,6 +427,7 @@ string MainWindow::refsToString()
     refs[2] = (CryptoPP::byte)ui->m_encTabTextEncodings->currentIndex();
     refs[3] = (CryptoPP::byte)m_cipher.algId();
     refs[4] = (CryptoPP::byte)m_cipher.modeId();
+    refs[5] = (CryptoPP::byte)m_cipher.encfname();
 
     return refs;
 }
@@ -548,9 +549,6 @@ void MainWindow::on_m_decTabFileDecrypt_clicked()
 
         string alg = ui->m_decTabFileAlgs->currentText().toStdString();
         string mode = ui->m_decTabFileModes->currentText().toStdString();
-        bool decFname = ui->m_decTabFileDecFname->isChecked();
-
-        m_cipher.setDecfname(decFname);
         m_processBar.setMax(size);
         m_threadCipher.start();
         emit startDecFile(paths, m_keygen);
@@ -695,7 +693,6 @@ void MainWindow::cipherText(const std::string &cipherText)
 void MainWindow::recoverFile(const string& success)
 {
     Encoding encoding = static_cast<Encoding>(ui->m_decTabFileEncodings->currentIndex());
-    ui->m_decTabFileDecFname->setChecked(true);
     dialogSuccess(success + " Encoding: " + m_serial.encodingToString(encoding));
 }
 void MainWindow::cipherFile(const string& success)
@@ -750,7 +747,7 @@ void MainWindow::enable()
 {
     setDisabled(false);
 }
-void MainWindow::dectectFields(const string &alg, const string &mode, const Encoding encoding)
+void MainWindow::dectectFields(const string &alg, const string &mode, const Encoding encoding, const bool decfname)
 {
     QComboBox* combo = ui->m_decTabFileModes;
     combo->clear();
@@ -759,6 +756,7 @@ void MainWindow::dectectFields(const string &alg, const string &mode, const Enco
     ui->m_decTabFileAlgs->setCurrentText(QString::fromStdString(alg));
     ui->m_decTabFileModes->setCurrentText(QString::fromStdString(mode));
     ui->m_decTabFileEncodings->setCurrentIndex(encoding);
+    ui->m_decTabFileDecFname->setChecked(decfname);
 }
 
 

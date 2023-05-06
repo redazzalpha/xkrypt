@@ -91,6 +91,17 @@ public:
     // methods
     virtual const char* what() const noexcept;
 };
+class DecFnameRefsException : public std::exception {
+private:
+    const char* m_message;
+
+public:
+    // constructors
+    DecFnameRefsException(const char* message = "-- error: Invalid refs decfname<br />file is corrupt or unknown");
+
+    // methods
+    virtual const char* what() const noexcept;
+};
 class AlgException : public std::exception {
 private:
     const char* m_message;
