@@ -22,7 +22,7 @@ AesECB::~AesECB(){};
 // virtual methods
 std::string AesECB::modeName() const
 {
-    return AesECB::AlgName;
+    return AesECB::ModeName;
 }
 Mode AesECB::modeId() const
 {

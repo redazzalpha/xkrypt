@@ -75,3 +75,8 @@ string AbstractCipherBase::checkRefs(const std::string &path)
     return refs;
 }
 
+string AbstractCipherBase::transfromRefs()
+{
+
+}
+

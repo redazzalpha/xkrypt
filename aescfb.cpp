@@ -73,7 +73,7 @@ void AesCFB::encryptFile(const string& path, Keygen* keygen, const Encoding enco
     string filename, output;
     const SecByteBlock& key = keygen->getKey();
     const SecByteBlock& iv = keygen->getIv();
-    OFB_Mode<CryptoPP::AES>::Encryption encryptor;
+    CFB_Mode<CryptoPP::AES>::Encryption encryptor;
     DirFname dirfname = extractFname(path);
 
     if(m_encfname) {

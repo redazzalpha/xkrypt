@@ -439,7 +439,6 @@ void MainWindow::closeEvent(QCloseEvent*)
 }
 
 // slots
-
 void MainWindow::on_m_encTabTextEncrypt_clicked()
 {
     try {
