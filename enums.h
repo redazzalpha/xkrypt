@@ -28,5 +28,21 @@ enum Encoding {
     HEX,
     NONE,
 };
+enum Alg {
+    AES,
+    RSA,
+};
+enum Mode {
+    CBC,
+    CCM,
+    CFB,
+    CTR,
+    EAX,
+    ECB,
+    GCM,
+    OFB,
+    OEAP,
+    SSA,
+};
 
 #endif // ENUMS_H

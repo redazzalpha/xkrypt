@@ -42,6 +42,7 @@ public slots:
     void proceed(const int progress);
     void cancel();
     void show();
+    void processing(const std::string& filename);
 
 signals:
     void canceled();

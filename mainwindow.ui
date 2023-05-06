@@ -1441,6 +1441,9 @@
           <layout class="QHBoxLayout" name="hlayout_2">
            <item>
             <widget class="QComboBox" name="m_decTabFileAlgs">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
              <property name="minimumSize">
               <size>
                <width>150</width>
@@ -1451,6 +1454,9 @@
            </item>
            <item>
             <widget class="QComboBox" name="m_decTabFileModes">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
              <property name="minimumSize">
               <size>
                <width>100</width>
@@ -1460,7 +1466,11 @@
             </widget>
            </item>
            <item>
-            <widget class="QComboBox" name="m_decTabFileEncodings"/>
+            <widget class="QComboBox" name="m_decTabFileEncodings">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+            </widget>
            </item>
            <item>
             <widget class="QCheckBox" name="m_decTabFileDecFname">

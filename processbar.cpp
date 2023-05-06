@@ -77,7 +77,8 @@ void ProcessBar::proceed(const int progress)
         m_progress.setMaximum(m_max);
     m_progress.setValue(progress);
     string sublabel = "processing: ";
-    sublabel += std::to_string(progress+1) + "/" + std::to_string(m_max);
+    sublabel += std::to_string(progress) +
+        "/" + std::to_string(m_max);
     m_sublabel->setText(QString::fromStdString(sublabel));
 }
 void ProcessBar::cancel()
@@ -89,11 +90,17 @@ void ProcessBar::cancel()
 }
 void ProcessBar::show()
 {
-
     m_button->setEnabled(true);
     m_progress.setMaximum(m_min);
     string sublabel = "processing: ";
     sublabel += std::to_string(1) + "/" + std::to_string(m_max);
     m_sublabel->setText(QString::fromStdString(sublabel));
     QDialog::show();
+}
+
+void ProcessBar::processing(const std::string &filename)
+{
+    string label = m_sublabel->text().toStdString();
+    label += " " + filename;
+    m_sublabel->setText(QString::fromStdString(label));
 }

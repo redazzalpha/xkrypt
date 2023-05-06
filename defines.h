@@ -10,7 +10,8 @@
 #define DELIMITOR  UNIX_DELIM
 #endif
 
-#define XKRYPT_REF_SIZE 3
+#define XKRYPT_REF_SIZE 5
+#define XKRYPT_KEY_REF_SIZE 3
 #define XKRYPT_REF_VERSION 0x01
 #define XKRYPT_REF_MODEL 0x24
 
@@ -18,7 +19,7 @@
 #define WINDOW_HEIGHT 600
 #define WINDOW_ICON_WIDTH 35
 #define WINDOW_ICON_HEIGHT 35
-#define PROCESS_BAR_WIDTH 500
+#define PROCESS_BAR_WIDTH 600
 
 #define NO_KEY_LOADED "no key loaded!"
 #define NO_FILE_LOADED "no file loaded!"

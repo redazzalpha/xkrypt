@@ -20,14 +20,14 @@ public:
     virtual ~AbstractCipherAes();
 
     // methods
-    virtual std::string getAlgName() const final;
-    virtual std::string getModeName() const override = 0 ;
-    
-public slots:
+    virtual std::string algName() const final;
+    virtual std::string modeName() const override = 0 ;
+    virtual Alg algId() const final;
+    virtual Mode modeId() const override = 0;
     virtual std::string encryptText(const std::string& plain, Keygen* keygen, const Encoding encoding) override = 0;
     virtual std::string decryptText(const std::string& cipher, Keygen* keygen, const Encoding encoding) override = 0;
-    virtual void encryptFile(std::vector<std::string>  paths, Keygen* keygen, const Encoding encoding) override = 0;
-    virtual void decryptFile(std::vector<std::string>  paths, Keygen* keygen, const Encoding encoding) override = 0;
+    virtual void encryptFile(const std::string& path, Keygen* keygen, const Encoding encoding) override = 0;
+    virtual void decryptFile(const std::string& path, Keygen* keygen, const Encoding encoding) override = 0;
 };
 
 #endif // CIPHERAES_H

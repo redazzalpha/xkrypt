@@ -13,7 +13,11 @@ AbstractCipherAes::AbstractCipherAes() {}
 AbstractCipherAes::~AbstractCipherAes() {};
 
 // virtual methods
-std::string AbstractCipherAes::getAlgName() const
+std::string AbstractCipherAes::algName() const
 {
     return AbstractCipherAes::AlgName;
+}
+Alg AbstractCipherAes::algId() const
+{
+    return Alg::AES;
 }

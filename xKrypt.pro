@@ -24,6 +24,7 @@ SOURCES += \
     aesecb.cpp \
     aesgcm.cpp \
     aesofb.cpp \
+    cipher.cpp \
     cipheraes.cpp \
     cipherbase.cpp \
     cipherrsa.cpp \
@@ -54,6 +55,7 @@ HEADERS += \
     aesecb.h \
     aesgcm.h \
     aesofb.h \
+    cipher.h \
     cipheraes.h \
     cipherbase.h \
     cipherrsa.h \

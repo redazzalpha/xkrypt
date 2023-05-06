@@ -26,7 +26,7 @@ bool Serial::importKeygen(Keygen* keygen, ifstream* file) const noexcept(false)
         FileSource fs(*file, false);
 
         fs.Attach(new StringSink(refs));
-        fs.Pump(XKRYPT_REF_SIZE);
+        fs.Pump(XKRYPT_KEY_REF_SIZE);
 
         if((refs[0] < XKRYPT_REF_VERSION)) throw VersionException();
         if( (refs[1] != XKRYPT_REF_MODEL)) throw ModelException();

@@ -9,7 +9,11 @@ AbstractCipherRsa::AbstractCipherRsa(){}
 AbstractCipherRsa::~AbstractCipherRsa() {};
 
 // virtual methods
-std::string AbstractCipherRsa::getAlgName() const
+std::string AbstractCipherRsa::algName() const
 {
     return AbstractCipherRsa::AlgName;
+}
+Alg AbstractCipherRsa::algId() const
+{
+    return Alg::RSA;
 }

@@ -18,6 +18,7 @@
 #include "aesecb.h"
 #include "aescfb.h"
 #include "aesofb.h"
+#include "cipher.h"
 #include <QList>
 #include <QString>
 #include <QMessageBox>
@@ -34,11 +35,11 @@ class MainWindow : public QMainWindow {
 
 private:
     Ui::MainWindow *ui;
-    AbstractActionBase* m_currentAction;
+    Cipher m_cipher;
     QThread m_threadCipher;
     ProcessBar m_processBar;
-    AbstractCipherBase* m_cipher = new AesCBC;
     Serial m_serial;
+    AbstractActionBase* m_currentAction;
     FileImporter m_fimporterEnc;
     FileImporter m_fimporterDec;
     FileImporter m_fimporterKey;
@@ -59,13 +60,13 @@ private:
     };
     QList<QString>* m_aesModes = new QList<QString>{
         QString::fromStdString(AesCBC::ModeName),
-        QString::fromStdString(AesEAX::ModeName),
-        QString::fromStdString(AesGCM::ModeName),
         QString::fromStdString(AesCCM::ModeName),
-        QString::fromStdString(AesECB::ModeName),
         QString::fromStdString(AesCFB::ModeName),
-        QString::fromStdString(AesOFB::ModeName),
         QString::fromStdString(AesCTR::ModeName),
+        QString::fromStdString(AesEAX::ModeName),
+        QString::fromStdString(AesECB::ModeName),
+        QString::fromStdString(AesGCM::ModeName),
+        QString::fromStdString(AesOFB::ModeName),
     };
     QList<QString>* m_rsaModes = new QList<QString>{
         QString::fromStdString(RsaOEAP::ModeName),
@@ -93,7 +94,6 @@ public:
     // destructor
     ~MainWindow();
 
-    AbstractCipherBase *cipher() const;
 
 private:
     // methods
@@ -112,16 +112,15 @@ private:
     void processDecText();
     void processEncFile(std::vector<std::string>& paths);
     void processDecFile(std::vector<std::string>& paths);
-    void m_cipherNew(const std::string& alg, const std::string& mode);
     
     bool isFileExist(const std::string& path) const;
     QMessageBox::ButtonRole dialogFileExists(const std::string& message);
     bool dialogInsertFilename(const std::string& message);
     bool dialogConfirm(const std::string& message, const std::string& description = "");
     void dialogNoKeyMessage(const std::string& action, const std::string& description = "");
-    std::string dialogSave(QWidget* parent = nullptr, const std::string& caption = "Select saving directory", const std::string& openDir = "");
     void dialogSuccess(const std::string& message, const std::string &description = "");
     void dialogError(const std::string& message, const std::string& description = "");
+    std::string dialogSave(QWidget* parent = nullptr, const std::string& caption = "Select saving directory", const std::string& openDir = "");
 
     void keyLoadedSelectable(const Qt::TextInteractionFlags flags) const;
     void setKeyLoadedStyle(const QString &style) const;
@@ -130,22 +129,24 @@ private:
     void setKeyLoadedSelectable(const bool selectable) const;
 
     bool isRunningThread();
+    std::string refsToString();
 
-protected:
     void closeEvent(QCloseEvent* event) override;
 
 private slots:
-    void on_m_encTabFileImport_clicked();
-    void on_m_decTabFileImport_clicked();
-    void on_m_encTabFileEncrypt_clicked();
-    void on_m_decTabFileDecrypt_clicked();
-    void on_m_encTabFileClear_clicked();
-    void on_m_decTabFileClear_clicked();
 
     void on_m_encTabTextEncrypt_clicked();
     void on_m_decTabTextDecrypt_clicked();
     void on_m_encTabTextReset_clicked();
     void on_m_decTabTextReset_clicked();
+
+    void on_m_encTabFileImport_clicked();
+    void on_m_decTabFileImport_clicked();
+
+    void on_m_encTabFileEncrypt_clicked();
+    void on_m_decTabFileDecrypt_clicked();
+    void on_m_encTabFileClear_clicked();
+    void on_m_decTabFileClear_clicked();
 
     void on_m_keyMGenerate_clicked();
     void on_m_keyMImport_clicked();
@@ -168,10 +169,11 @@ private slots:
     void actionSelected();
     void disable();
     void enable();
+    void autoDectectFields(const std::string& alg, const std::string& mode, const Encoding encoding);
 
 signals:
     void startEncFile(std::vector<std::string> paths, Keygen* keygen, const Encoding encoding);
-    void startDecFile(std::vector<std::string> paths, Keygen* keygen, const Encoding encoding);
+    void startDecFile(std::vector<std::string> paths, Keygen* keygen);
     void startEncText(const std::string& plain, Keygen* keygen, const Encoding encoding);
     void startDecText(const std::string& cipher, Keygen* keygen, const Encoding encoding);
     void startProcess(const int progress = 0);

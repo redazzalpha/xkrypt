@@ -38,7 +38,6 @@ MainWindow::~MainWindow()
 {
     delete ui;
     delete m_keygen;
-    delete m_cipher;
     delete m_aesModes;
     delete m_rsaModes;
     delete m_algorithms;
@@ -111,32 +110,36 @@ void MainWindow::connectItems()
 }
 void MainWindow::connectCipher()
 {
-    m_cipher->moveToThread(&m_threadCipher);
-    QObject::connect(this, &MainWindow::startEncFile, m_cipher, &AbstractCipherBase::encryptFile);
-    QObject::connect(this, &MainWindow::startDecFile, m_cipher, &AbstractCipherBase::decryptFile);
-    QObject::connect(this, &MainWindow::startEncText, m_cipher, &AbstractCipherBase::encryptText);
-    QObject::connect(this, &MainWindow::startDecText, m_cipher, &AbstractCipherBase::decryptText);
+    m_cipher.moveToThread(&m_threadCipher);
+    QObject::connect(this, &MainWindow::startEncFile, &m_cipher, &Cipher::encryptFile);
+    QObject::connect(this, &MainWindow::startDecFile, &m_cipher, &Cipher::decryptFile);
+    QObject::connect(this, &MainWindow::startEncText, &m_cipher, &Cipher::encryptText);
+    QObject::connect(this, &MainWindow::startDecText, &m_cipher, &Cipher::decryptText);
 
-    QObject::connect(m_cipher, &AbstractCipherBase::recoverText, this, &MainWindow::recoverText);
-    QObject::connect(m_cipher, &AbstractCipherBase::cipherText, this, &MainWindow::cipherText);
-    QObject::connect(m_cipher, &AbstractCipherBase::recoverText, &m_threadCipher, &QThread::quit);
-    QObject::connect(m_cipher, &AbstractCipherBase::cipherText, &m_threadCipher, &QThread::quit);
+    QObject::connect(&m_cipher, &Cipher::recoverText, this, &MainWindow::recoverText);
+    QObject::connect(&m_cipher, &Cipher::cipherText, this, &MainWindow::cipherText);
+    QObject::connect(&m_cipher, &Cipher::recoverText, &m_threadCipher, &QThread::quit);
+    QObject::connect(&m_cipher, &Cipher::cipherText, &m_threadCipher, &QThread::quit);
 
-    QObject::connect(m_cipher, &AbstractCipherBase::recoverFile, this, &MainWindow::recoverFile);
-    QObject::connect(m_cipher, &AbstractCipherBase::cipherFile, this, &MainWindow::cipherFile);
-    QObject::connect(m_cipher, &AbstractCipherBase::recoverFile, &m_threadCipher, &QThread::quit);
-    QObject::connect(m_cipher, &AbstractCipherBase::cipherFile, &m_threadCipher, &QThread::quit);
+    QObject::connect(&m_cipher, &Cipher::recoverFile, this, &MainWindow::recoverFile);
+    QObject::connect(&m_cipher, &Cipher::cipherFile, this, &MainWindow::cipherFile);
+    QObject::connect(&m_cipher, &Cipher::recoverFile, &m_threadCipher, &QThread::quit);
+    QObject::connect(&m_cipher, &Cipher::cipherFile, &m_threadCipher, &QThread::quit);
 
-    QObject::connect(m_cipher, &AbstractCipherBase::error, this, &MainWindow::dialogError);
-    QObject::connect(m_cipher, &AbstractCipherBase::error, &m_threadCipher, &QThread::quit);
+    QObject::connect(&m_cipher, &Cipher::error, this, &MainWindow::dialogError);
+    QObject::connect(&m_cipher, &Cipher::error, &m_threadCipher, &QThread::quit);
 
     QObject::connect(&m_threadCipher, &QThread::started, &m_processBar, &ProcessBar::show);
-    QObject::connect(m_cipher, &AbstractCipherBase::proceed, &m_processBar, &ProcessBar::proceed);
-    QObject::connect(m_cipher, &AbstractCipherBase::recoverText, &m_processBar, &ProcessBar::hide);
-    QObject::connect(m_cipher, &AbstractCipherBase::cipherText, &m_processBar, &ProcessBar::hide);
-    QObject::connect(m_cipher, &AbstractCipherBase::recoverFile, &m_processBar, &ProcessBar::hide);
-    QObject::connect(m_cipher, &AbstractCipherBase::cipherFile, &m_processBar, &ProcessBar::hide);
-    QObject::connect(m_cipher, &AbstractCipherBase::error, &m_processBar, &ProcessBar::hide);
+    QObject::connect(&m_cipher, &Cipher::proceed, &m_processBar, &ProcessBar::proceed);
+    QObject::connect(&m_cipher, &Cipher::recoverText, &m_processBar, &ProcessBar::hide);
+    QObject::connect(&m_cipher, &Cipher::cipherText, &m_processBar, &ProcessBar::hide);
+    QObject::connect(&m_cipher, &Cipher::recoverFile, &m_processBar, &ProcessBar::hide);
+    QObject::connect(&m_cipher, &Cipher::cipherFile, &m_processBar, &ProcessBar::hide);
+    QObject::connect(&m_cipher, &Cipher::error, &m_processBar, &ProcessBar::hide);
+
+    QObject::connect(&m_cipher, &Cipher::processing, &m_processBar, &ProcessBar::processing);
+
+    QObject::connect(&m_cipher, &Cipher::autoDetect, this, &MainWindow::autoDectectFields);
 
     QObject::connect(&m_processBar, &ProcessBar::canceled, this, &MainWindow::cipherKill);
 }
@@ -201,40 +204,6 @@ KeyLength MainWindow::keylengthFrom(const int index)
     default: keylength = static_cast<KeyLength>(0);
     }
     return keylength;
-}
-void MainWindow::m_cipherNew(const string& alg, const string& mode)
-{
-    if(!isRunningThread()) {
-        delete m_cipher;
-        m_cipher = nullptr;
-
-        // aes algs
-        if(alg == AbstractCipherAes::AlgName) {
-            if(mode == AesCBC::ModeName) m_cipher = new AesCBC;
-            else if(mode == AesEAX::ModeName) m_cipher = new AesEAX;
-            else if(mode == AesGCM::ModeName) m_cipher = new AesGCM;
-            else if(mode == AesCCM::ModeName) m_cipher = new AesCCM;
-            else if(mode == AesECB::ModeName) m_cipher = new AesECB;
-            else if(mode == AesCFB::ModeName) m_cipher = new AesCFB;
-            else if(mode == AesOFB::ModeName) m_cipher = new AesOFB;
-            else if(mode == AesCTR::ModeName) m_cipher = new AesCTR;
-            // default. shouldn't go here but used to remove clang warnings
-            else m_cipher = new AesCBC;
-        }
-
-        // rsa algs
-        else if(alg == AbstractCipherRsa::AlgName) {
-            if(mode == RsaOEAP::ModeName) m_cipher = new RsaOEAP;
-            else if(mode == RsaSSA::ModeName) m_cipher = new RsaSSA;
-            // default. shouldn't go here but used to remove clang warnings
-            else m_cipher = new RsaOEAP;
-        }
-
-        // default. shouldn't go here but used to remove clang warnings
-        else m_cipher = new AesCBC;
-
-        connectCipher();
-    }
 }
 
 bool MainWindow::isFileExist(const string& path) const
@@ -338,42 +307,6 @@ void MainWindow::dialogNoKeyMessage(const string& action, const string &descript
     msg.setModal(true);
     msg.exec();
 }
-string MainWindow::dialogSave(QWidget* parent, const string& caption, const string& openDir)
-{
-    bool m_override = false;
-    bool m_create = false;
-    bool m_changeDirectory = false;
-    m_path.clear();
-    m_dir.clear();
-    m_fname.clear();
-    string dir, path;
-
-    while(true) {
-        if(!m_override && !m_create) dir = QFileDialog::getExistingDirectory(parent, QString::fromStdString(caption), QString::fromStdString(openDir)).toStdString();
-        if(!dir.empty()) {
-            bool canWrite = true;
-            if(!m_override && !m_create && !m_changeDirectory) canWrite = dialogInsertFilename("Please insert filename");
-            if(canWrite) {
-                path = dir +  "/" + m_fname;
-                if(!isFileExist(path) || m_override) {
-                    m_path =  path;
-                    m_dir = dir;
-                    break;
-                }
-                else {
-                    QMessageBox::ButtonRole role = dialogFileExists("File already exists! What you want to do?");
-                    if(role == QMessageBox::AcceptRole)  { path.clear(); m_changeDirectory = true; continue; }
-                    if(role == QMessageBox::ApplyRole) { m_override = true; continue; }
-                    if(role == QMessageBox::ActionRole) { m_create = true; continue; }
-                    if(role == QMessageBox::RejectRole) break;
-                }
-            }
-            else break;
-        }
-        else break;
-    }
-    return m_path;
-}
 void MainWindow::dialogSuccess(const string& message, const string& description)
 {
     if(m_warning) {
@@ -409,6 +342,42 @@ void MainWindow::dialogError(const string &message, const string& description)
     msg.setEscapeButton(ok);
     msg.setModal(true);
     msg.exec();
+}
+string MainWindow::dialogSave(QWidget* parent, const string& caption, const string& openDir)
+{
+    bool m_override = false;
+    bool m_create = false;
+    bool m_changeDirectory = false;
+    m_path.clear();
+    m_dir.clear();
+    m_fname.clear();
+    string dir, path;
+
+    while(true) {
+        if(!m_override && !m_create) dir = QFileDialog::getExistingDirectory(parent, QString::fromStdString(caption), QString::fromStdString(openDir)).toStdString();
+        if(!dir.empty()) {
+            bool canWrite = true;
+            if(!m_override && !m_create && !m_changeDirectory) canWrite = dialogInsertFilename("Please insert filename");
+            if(canWrite) {
+                path = dir +  "/" + m_fname;
+                if(!isFileExist(path) || m_override) {
+                    m_path =  path;
+                    m_dir = dir;
+                    break;
+                }
+                else {
+                    QMessageBox::ButtonRole role = dialogFileExists("File already exists! What you want to do?");
+                    if(role == QMessageBox::AcceptRole)  { path.clear(); m_changeDirectory = true; continue; }
+                    if(role == QMessageBox::ApplyRole) { m_override = true; continue; }
+                    if(role == QMessageBox::ActionRole) { m_create = true; continue; }
+                    if(role == QMessageBox::RejectRole) break;
+                }
+            }
+            else break;
+        }
+        else break;
+    }
+    return m_path;
 }
 
 void MainWindow::keyLoadedSelectable(const Qt::TextInteractionFlags flags) const
@@ -450,6 +419,18 @@ bool MainWindow::isRunningThread()
 {
     return m_threadCipher.isRunning();
 }
+string MainWindow::refsToString()
+{
+    string refs;
+    refs.resize(XKRYPT_REF_SIZE);
+    refs[0] = XKRYPT_REF_VERSION;
+    refs[1] = XKRYPT_REF_MODEL;
+    refs[2] = (CryptoPP::byte)ui->m_encTabTextEncodings->currentIndex();
+    refs[3] = (CryptoPP::byte)m_cipher.algId();
+    refs[4] = (CryptoPP::byte)m_cipher.modeId();
+
+    return refs;
+}
 
 // protected methods
 void MainWindow::closeEvent(QCloseEvent*)
@@ -457,13 +438,60 @@ void MainWindow::closeEvent(QCloseEvent*)
     QMainWindow::close();
 }
 
-// public methods
-AbstractCipherBase *MainWindow::cipher() const
+// slots
+
+void MainWindow::on_m_encTabTextEncrypt_clicked()
 {
-    return m_cipher;
+    try {
+        if(!m_keygen->isReady()) throw UnreadyKeyException();
+        string plainText = ui->m_encTabTextField->toPlainText().toStdString();
+
+        if(plainText.empty()) throw EmptyTextException();
+        string alg = ui->m_encTabTextAlgs->currentText().toStdString();
+        string mode = ui->m_encTabTextModes->currentText().toStdString();
+        Encoding encoding = static_cast<Encoding>(ui->m_encTabTextEncodings->currentIndex());
+        
+        m_cipher.cipherNew(alg, mode);
+        m_cipher.setEncfname(false);
+
+        m_processBar.setMax();
+        m_threadCipher.start();
+        emit startEncText(plainText, m_keygen, encoding);
+    }
+    catch(exception& e) {
+        dialogError(e.what());
+    }
+}
+void MainWindow::on_m_decTabTextDecrypt_clicked()
+{
+    try {
+        if(!m_keygen->isReady()) throw UnreadyKeyException();
+        string cipherText = ui->m_decTabTextField->toPlainText().toStdString();
+
+        if(cipherText.empty()) throw EmptyTextException();
+        string alg = ui->m_decTabTextAlgs->currentText().toStdString();
+        string mode = ui->m_decTabTextModes->currentText().toStdString();
+        Encoding encoding = static_cast<Encoding>(ui->m_decTabTextEncodings->currentIndex());
+        
+        m_cipher.cipherNew(alg, mode);
+
+        m_processBar.setMax();
+        m_threadCipher.start();
+        emit startDecText(cipherText, m_keygen, encoding);
+    }
+    catch(exception& e) {
+        dialogError(e.what());
+    }
+}
+void MainWindow::on_m_encTabTextReset_clicked()
+{
+    ui->m_encTabTextField->setPlainText("");
+}
+void MainWindow::on_m_decTabTextReset_clicked()
+{
+    ui->m_decTabTextField->setPlainText("");
 }
 
-// slots
 void MainWindow::on_m_encTabFileImport_clicked()
 {
     m_fimporterEnc.importFiles(this, "Select file(s) to encrypt");
@@ -500,8 +528,9 @@ void MainWindow::on_m_encTabFileEncrypt_clicked()
         string mode = ui->m_encTabFileModes->currentText().toStdString();
         Encoding encoding = static_cast<Encoding>(ui->m_encTabFileEncodings->currentIndex());
         bool encFname = ui->m_encTabFileEncFname->isChecked();
-        m_cipherNew(alg, mode);
-        m_cipher->encFname(encFname);
+        
+        m_cipher.cipherNew(alg, mode);
+        m_cipher.setEncfname(encFname);
 
         m_processBar.setMax(size);
         m_threadCipher.start();
@@ -513,21 +542,24 @@ void MainWindow::on_m_encTabFileEncrypt_clicked()
 }
 void MainWindow::on_m_decTabFileDecrypt_clicked()
 {
-    size_t size = 0;
-    vector<string> paths = m_fimporterDec.getFilePaths();
-    size =  paths.size();
-    if(size < 1) throw FileSelectedException();
+    try {
+        size_t size = 0;
+        vector<string> paths = m_fimporterDec.getFilePaths();
+        size =  paths.size();
+        if(size < 1) throw FileSelectedException();
 
-    string alg = ui->m_decTabFileAlgs->currentText().toStdString();
-    string mode = ui->m_decTabFileModes->currentText().toStdString();
-    Encoding encoding = static_cast<Encoding>(ui->m_decTabFileEncodings->currentIndex());
-    bool decFname = ui->m_decTabFileDecFname->isChecked();
-    m_cipherNew(alg, mode);
-    m_cipher->decFname(decFname);
+        string alg = ui->m_decTabFileAlgs->currentText().toStdString();
+        string mode = ui->m_decTabFileModes->currentText().toStdString();
+        bool decFname = ui->m_decTabFileDecFname->isChecked();
 
-    m_processBar.setMax(size);
-    m_threadCipher.start();
-    emit startDecFile(paths, m_keygen, encoding);
+        m_cipher.setDecfname(decFname);
+        m_processBar.setMax(size);
+        m_threadCipher.start();
+        emit startDecFile(paths, m_keygen);
+    }
+    catch (std::exception& e) {
+        dialogError(e.what());
+    }
 }
 void MainWindow::on_m_encTabFileClear_clicked()
 {
@@ -538,55 +570,6 @@ void MainWindow::on_m_decTabFileClear_clicked()
 {
     m_fimporterDec.clear();
     ui->m_decTabFileSelected->setPlainText(NO_FILE_LOADED);
-}
-
-void MainWindow::on_m_encTabTextEncrypt_clicked()
-{
-    try {
-        if(!m_keygen->isReady()) throw UnreadyKeyException();
-        string plainText = ui->m_encTabTextField->toPlainText().toStdString();
-
-        if(plainText.empty()) throw EmptyTextException();
-        string selectedAlg = ui->m_encTabTextAlgs->currentText().toStdString();
-        string selectedMode = ui->m_encTabTextModes->currentText().toStdString();
-        Encoding encoding = static_cast<Encoding>(ui->m_encTabTextEncodings->currentIndex());
-        m_cipherNew(selectedAlg, selectedMode);
-
-        m_processBar.setMax();
-        m_threadCipher.start();
-        emit startEncText(plainText, m_keygen, encoding);
-    }
-    catch(exception& e) {
-        dialogError(e.what());
-    }
-}
-void MainWindow::on_m_decTabTextDecrypt_clicked()
-{
-    try {
-        if(!m_keygen->isReady()) throw UnreadyKeyException();
-        string cipherText = ui->m_decTabTextField->toPlainText().toStdString();
-
-        if(cipherText.empty()) throw EmptyTextException();
-        string selectedAlg = ui->m_decTabTextAlgs->currentText().toStdString();
-        string selectedMode = ui->m_decTabTextModes->currentText().toStdString();
-        Encoding encoding = static_cast<Encoding>(ui->m_decTabTextEncodings->currentIndex());
-        m_cipherNew(selectedAlg, selectedMode);
-
-        m_processBar.setMax();
-        m_threadCipher.start();
-        emit startDecText(cipherText, m_keygen, encoding);
-    }
-    catch(exception& e) {
-        dialogError(e.what());
-    }
-}
-void MainWindow::on_m_encTabTextReset_clicked()
-{
-    ui->m_encTabTextField->setPlainText("");
-}
-void MainWindow::on_m_decTabTextReset_clicked()
-{
-    ui->m_decTabTextField->setPlainText("");
 }
 
 void MainWindow::on_m_keyMGenerate_clicked()
@@ -674,7 +657,7 @@ void MainWindow::recoverText(const std::string &recoverText)
             std::ofstream file(m_path, std::ios::out | std::ios::trunc);
             file << recoverText;
             file.close();
-            dialogSuccess(m_cipher->successDecMsg() + "at " + m_path);
+            dialogSuccess(m_cipher.successDecMsg() + "at " + m_path);
         }
         ui->m_decTabTextSaveOnF->setChecked(false);
         ui->m_decTabTextField->setPlainText(QString::fromStdString(recoverText));
@@ -689,8 +672,8 @@ void MainWindow::cipherText(const std::string &cipherText)
     try {
         if(ui->m_encTabTextSaveOnF->isChecked() && !dialogSave(this).empty()) {
             if(ui->m_encTabTextEncFname->isChecked()) {
-                m_cipher->encFname(true);
-                m_path = m_dir + DELIMITOR + m_cipher->encryptText(m_fname, m_keygen, Encoding::HEX);
+                m_cipher.setEncfname(true);
+                m_path = m_dir + DELIMITOR + m_cipher.encryptText(m_fname, m_keygen, Encoding::HEX);
             }
             if(isFileExist(m_path)){
                 description = "-- This error has been occured cause the file you're trying to create using \"Encrypt filename\" mode already exists.\n\n"\
@@ -699,9 +682,10 @@ void MainWindow::cipherText(const std::string &cipherText)
                 throw FileSelectedException("-- error: wrong path file<br />Encrypted filename already exists");
             }
             std::ofstream file(m_path, std::ios::out | std::ios::trunc);
+            file << m_cipher.encodeText(refsToString(), Encoding::BASE64);;
             file << cipherText;
             file.close();
-            dialogSuccess(m_cipher->successEncMsg() + "at " + m_path);
+            dialogSuccess(m_cipher.successEncMsg() + "at " + m_path);
         }
         ui->m_encTabTextSaveOnF->setChecked(false);
         ui->m_encTabTextField->setPlainText(QString::fromStdString(cipherText));
@@ -712,13 +696,15 @@ void MainWindow::cipherText(const std::string &cipherText)
 }
 void MainWindow::recoverFile(const string& success)
 {
+    Encoding encoding = static_cast<Encoding>(ui->m_decTabFileEncodings->currentIndex());
     ui->m_decTabFileDecFname->setChecked(true);
-    dialogSuccess(success);
+    dialogSuccess(success + " Encoding: " + m_serial.encodingToString(encoding));
 }
 void MainWindow::cipherFile(const string& success)
 {
+    Encoding encoding = static_cast<Encoding>(ui->m_encTabFileEncodings->currentIndex());
     ui->m_encTabFileEncFname->setChecked(true);
-    dialogSuccess(success);
+    dialogSuccess(success + " Encoding: " + m_serial.encodingToString(encoding));
 }
 void MainWindow::cipherError(const std::string& error)
 {
@@ -728,7 +714,7 @@ void MainWindow::cipherError(const std::string& error)
 }
 void MainWindow::cipherKill()
 {
-    m_cipher->kill();
+    m_cipher.kill();
 }
 
 void MainWindow::toogleEncFname(bool checked)
@@ -765,6 +751,16 @@ void MainWindow::disable()
 void MainWindow::enable()
 {
     setDisabled(false);
+}
+void MainWindow::autoDectectFields(const string &alg, const string &mode, const Encoding encoding)
+{
+    QComboBox* combo = ui->m_decTabFileModes;
+    combo->clear();
+    if(alg == AbstractCipherAes::AlgName) combo->addItems(*m_aesModes);
+    if(alg == AbstractCipherRsa::AlgName) combo->addItems(*m_rsaModes);
+    ui->m_decTabFileAlgs->setCurrentText(QString::fromStdString(alg));
+    ui->m_decTabFileModes->setCurrentText(QString::fromStdString(mode));
+    ui->m_decTabFileEncodings->setCurrentText(QString::fromStdString(m_serial.encodingToString(encoding)));
 }
 
 

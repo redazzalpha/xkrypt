@@ -1,16 +1,5 @@
 #include "except.h"
 
-/*--------------------------------------------------------*/
-
-EncodingException::EncodingException(const char* message)
-{
-    m_message = message;
-}
-const char*  EncodingException::what() const noexcept
-{
-    return m_message;
-}
-
 BadKeyException::BadKeyException(const char* message)
 {
     m_message = message;
@@ -47,7 +36,68 @@ const char*  ModelException::what() const noexcept
     return m_message;
 }
 
-/*--------------------------------------------------------*/
+InvalidRefsException::InvalidRefsException(const char* message)
+{
+    m_message = message;
+}
+const char*  InvalidRefsException::what() const noexcept
+{
+    return m_message;
+}
+
+AlgRefsException::AlgRefsException(const char* message)
+{
+    m_message = message;
+}
+const char*  AlgRefsException::what() const noexcept
+{
+    return m_message;
+}
+
+ModeRefsException::ModeRefsException(const char* message)
+{
+    m_message = message;
+}
+const char*  ModeRefsException::what() const noexcept
+{
+    return m_message;
+}
+
+EncodingRefsException::EncodingRefsException(const char* message)
+{
+    m_message = message;
+}
+const char*  EncodingRefsException::what() const noexcept
+{
+    return m_message;
+}
+
+AlgException::AlgException(const char* message)
+{
+    m_message = message;
+}
+const char*  AlgException::what() const noexcept
+{
+    return m_message;
+}
+
+ModeException::ModeException(const char* message)
+{
+    m_message = message;
+}
+const char*  ModeException::what() const noexcept
+{
+    return m_message;
+}
+
+EncodingException::EncodingException(const char* message)
+{
+    m_message = message;
+}
+const char*  EncodingException::what() const noexcept
+{
+    return m_message;
+}
 
 UnreadyKeyException::UnreadyKeyException(const char* message)
 {
@@ -57,6 +107,7 @@ const char*  UnreadyKeyException::what() const noexcept
 {
     return m_message;
 }
+
 EmptyTextException::EmptyTextException(const char* message)
 {
     m_message = message;
@@ -65,6 +116,7 @@ const char*  EmptyTextException::what() const noexcept
 {
     return m_message;
 }
+
 BadCipherException::BadCipherException(const char* message)
 {
     m_message = message;
@@ -73,6 +125,7 @@ const char*  BadCipherException::what() const noexcept
 {
     return m_message;
 }
+
 FileSelectedException::FileSelectedException(const char* message)
 {
     m_message = message;
@@ -81,6 +134,7 @@ const char*  FileSelectedException::what() const noexcept
 {
     return m_message;
 }
+
 CipherException::CipherException(const char* message)
 {
     m_message = message;
