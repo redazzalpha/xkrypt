@@ -105,7 +105,6 @@ void MainWindow::connectItems()
         QObject::connect(action, &AbstractActionBase::quit, this, &QMainWindow::close);
         QObject::connect(action, &AbstractActionBase::setStackPage, ui->m_mainStack, &QStackedWidget::setCurrentIndex);
         QObject::connect(action, &QAction::triggered, this, &MainWindow::actionSelected);
-
     }
 }
 void MainWindow::connectCipher()
@@ -139,7 +138,7 @@ void MainWindow::connectCipher()
 
     QObject::connect(&m_cipher, &Cipher::processing, &m_processBar, &ProcessBar::processing);
 
-    QObject::connect(&m_cipher, &Cipher::autoDetect, this, &MainWindow::autoDectectFields);
+    QObject::connect(&m_cipher, &Cipher::autoDetect, this, &MainWindow::dectectFields);
 
     QObject::connect(&m_processBar, &ProcessBar::canceled, this, &MainWindow::cipherKill);
 }
@@ -751,7 +750,7 @@ void MainWindow::enable()
 {
     setDisabled(false);
 }
-void MainWindow::autoDectectFields(const string &alg, const string &mode, const Encoding encoding)
+void MainWindow::dectectFields(const string &alg, const string &mode, const Encoding encoding)
 {
     QComboBox* combo = ui->m_decTabFileModes;
     combo->clear();
@@ -759,7 +758,7 @@ void MainWindow::autoDectectFields(const string &alg, const string &mode, const 
     if(alg == AbstractCipherRsa::AlgName) combo->addItems(*m_rsaModes);
     ui->m_decTabFileAlgs->setCurrentText(QString::fromStdString(alg));
     ui->m_decTabFileModes->setCurrentText(QString::fromStdString(mode));
-    ui->m_decTabFileEncodings->setCurrentText(QString::fromStdString(m_serial.encodingToString(encoding)));
+    ui->m_decTabFileEncodings->setCurrentIndex(encoding);
 }
 
 

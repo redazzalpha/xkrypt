@@ -46,8 +46,6 @@ public:
     void injectRefs(CryptoPP::FileSink *fs, const Encoding encoding);
     void afterRefs(CryptoPP::FileSource *fs);
     std::string checkRefs(const std::string& path);
-    std::string transfromRefs();
-
 };
 
 #endif // CIPHERBASE_H

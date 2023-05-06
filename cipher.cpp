@@ -104,7 +104,6 @@ void Cipher::cipherNew(const string& alg, const string& mode)
     // default. shouldn't go here but used to remove clang warnings
     else throw AlgException();
 }
-
 void Cipher::cipherDetect(const string& refs)
 {
     string alg;

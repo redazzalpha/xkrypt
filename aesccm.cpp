@@ -22,7 +22,7 @@ AesCCM::~AesCCM(){};
 // virtual methods
 std::string AesCCM::modeName() const
 {
-    return AesCCM::AlgName;
+    return AesCCM::ModeName;
 }
 Mode AesCCM::modeId() const
 {

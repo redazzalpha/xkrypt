@@ -169,7 +169,7 @@ private slots:
     void actionSelected();
     void disable();
     void enable();
-    void autoDectectFields(const std::string& alg, const std::string& mode, const Encoding encoding);
+    void dectectFields(const std::string& alg, const std::string& mode, const Encoding encoding);
 
 signals:
     void startEncFile(std::vector<std::string> paths, Keygen* keygen, const Encoding encoding);
