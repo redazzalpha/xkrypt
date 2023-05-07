@@ -60,12 +60,14 @@ void AbstractCipherBase::injectRefs(FileSink* fs, const Encoding encoding)
     };
     StringSource refsSource(&xkrypt_refs[0], xkrypt_refs.size(), true, new Base64Encoder(new Redirector(*fs)));
 }
-void AbstractCipherBase::afterRefs(FileSource* fs)
+int AbstractCipherBase::afterRefs(FileSource* fs)
 {
     string sink;
+    int i = 0;
     fs->Attach(new StringSink(sink));
-    do { fs->Pump(1); } while(sink[sink.size()-1] != '\n' && sink[sink.size()-1] != '\0' && sink[sink.size()-1] != '=');
+    do { fs->Pump(1); i++;} while(sink[sink.size()-1] != '\n' && sink[sink.size()-1] != '\0' && sink[sink.size()-1] != '=');
     fs->Detach();
+    return i;
 }
 string AbstractCipherBase::checkRefs(const std::string &path)
 {

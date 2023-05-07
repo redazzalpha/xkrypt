@@ -43,7 +43,7 @@ public:
     DirFname extractFname(const std::string &path) const;
     std::string pumpRefs(const std::string &path);
     void injectRefs(CryptoPP::FileSink *fs, const Encoding encoding);
-    void afterRefs(CryptoPP::FileSource *fs);
+    int afterRefs(CryptoPP::FileSource *fs);
     std::string checkRefs(const std::string& path);
 };
 
