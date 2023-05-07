@@ -31,7 +31,6 @@ Mode AesCCM::modeId() const
 }
 string AesCCM::encryptText(const string& plain, Keygen* keygen, const Encoding encoding) noexcept(false)
 {
-
     std::string cipher = "";
     const SecByteBlock& key = keygen->getKey();
     const SecByteBlock& iv = keygen->getIv();
@@ -39,11 +38,24 @@ string AesCCM::encryptText(const string& plain, Keygen* keygen, const Encoding e
     CryptoPP::CCM<CryptoPP::AES, XKRYPT_TAG_SIZE>::Encryption encryptor;
     AuthenticatedEncryptionFilter* textFilter = new AuthenticatedEncryptionFilter(encryptor);
     encryptor.SetKeyWithIV(key, key.size(), iv);
+    encryptor.SpecifyDataLengths(0, plain.size(), 0);
+    BufferedTransformation* encoder;
 
     switch(encoding) {
-    case Encoding::BASE64 : textFilter->Attach(new Base64Encoder(ss)); break;
-    case Encoding::HEX : textFilter->Attach(new HexEncoder(ss)); break;
-    case Encoding::NONE : textFilter->Attach(ss); break;
+    case Encoding::BASE64 :
+        encoder = new Base64Encoder;
+        encoder->Attach(ss);
+        textFilter->Attach(encoder);
+        break;
+    case Encoding::HEX :
+        encoder = new HexEncoder;
+        encoder->Attach(ss);
+        textFilter->Attach(encoder);
+        break;
+    case Encoding::NONE :
+        encoder = nullptr;
+        textFilter->Attach(ss);
+        break;
     default : throw EncodingException();
     }
 
@@ -58,13 +70,34 @@ string AesCCM::decryptText(const string& cipher, Keygen* keygen, const Encoding 
     StringSink* ss = new StringSink(recover);
     CryptoPP::CCM<CryptoPP::AES, XKRYPT_TAG_SIZE>::Decryption decryptor;
     AuthenticatedDecryptionFilter* textFilter = new AuthenticatedDecryptionFilter(decryptor, ss);
-    decryptor.SetKeyWithIV(key, key.size(), iv);
+    BufferedTransformation* decoder;
 
     switch(encoding) {
-    case Encoding::BASE64 : StringSource(cipher, true, new Base64Decoder(textFilter)); break;
-    case Encoding::HEX : StringSource(cipher, true, new HexDecoder(textFilter)); break;
-    case Encoding::NONE : StringSource(cipher, true, textFilter); break;
+    case Encoding::BASE64 :
+        decoder = new Base64Decoder;
+        break;
+    case Encoding::HEX :
+        decoder = new HexDecoder;
+        break;
+    case Encoding::NONE :
+        decoder = nullptr;
+        break;
     default : throw EncodingException();
+    }
+
+    if(decoder) {
+        decoder->PutMessageEnd((CryptoPP::byte*)cipher.c_str(), cipher.size());
+        decryptor.SetKeyWithIV(key, key.size(), iv);
+
+        decryptor.SpecifyDataLengths(0, decoder->MaxRetrievable(), 0);
+        decoder->Attach(textFilter);
+        StringSource(cipher, true, decoder);
+    }
+    else {
+        decryptor.SetKeyWithIV(key, key.size(), iv);
+        decryptor.SpecifyDataLengths(0, cipher.size()-XKRYPT_TAG_SIZE, 0);
+        StringSource(cipher, true, textFilter);
+
     }
 
     return recover;
