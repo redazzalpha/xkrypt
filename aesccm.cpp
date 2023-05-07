@@ -97,7 +97,6 @@ string AesCCM::decryptText(const string& cipher, Keygen* keygen, const Encoding 
         decryptor.SetKeyWithIV(key, key.size(), iv);
         decryptor.SpecifyDataLengths(0, cipher.size()-XKRYPT_TAG_SIZE, 0);
         StringSource(cipher, true, textFilter);
-
     }
 
     return recover;
@@ -164,25 +163,39 @@ void AesCCM::decryptFile(const string& path, Keygen* keygen, const Encoding enco
 
     BufferedTransformation* decoder;
     switch(encoding) {
-    case Encoding::BASE64 : decoder = new Base64Decoder; break;
-    case Encoding::HEX : decoder = new HexDecoder; break;
-    case Encoding::NONE : decoder = nullptr; break;
+    case Encoding::BASE64 :
+        decoder = new Base64Decoder;
+        break;
+    case Encoding::HEX :
+        decoder = new HexDecoder;
+        break;
+    case Encoding::NONE :
+        decoder = nullptr;
+        break;
     default : throw EncodingException();
     }
 
-    std::ifstream encodedFile(path.c_str(), std::ios::in | std::ios::binary);
-    std::vector<char> encodedBytes((std::istreambuf_iterator<char>(encodedFile)), std::istreambuf_iterator<char>());
+    std::ifstream f(path.c_str(), std::ios::in | std::ios::binary);
+    std::vector<char> bytes((std::istreambuf_iterator<char>(f)), std::istreambuf_iterator<char>());
     FileSource source(path.c_str(), false);
     int refsCount = afterRefs(&source);
 
-    decoder->PutMessageEnd((CryptoPP::byte*)&encodedBytes[refsCount], encodedBytes.size()-refsCount);
-
     FileSink* fs = new FileSink((output = dirfname.m_dir + DELIMITOR + filename).c_str());
     AuthenticatedDecryptionFilter* fileFilter = new AuthenticatedDecryptionFilter(decryptor, fs);
-    decryptor.SetKeyWithIV(key, key.size(), iv);
-    decryptor.SpecifyDataLengths(0, decoder->MaxRetrievable()-XKRYPT_TAG_SIZE, 0 );
-    decoder->Attach(fileFilter);
-    source.Attach(decoder);
+
+    if(decoder) {
+        decoder->PutMessageEnd((CryptoPP::byte*)&bytes[refsCount], bytes.size()-refsCount);
+        decryptor.SetKeyWithIV(key, key.size(), iv);
+        decryptor.SpecifyDataLengths(0, decoder->MaxRetrievable()-XKRYPT_TAG_SIZE, 0 );
+        decoder->Attach(fileFilter);
+        source.Attach(decoder);
+    }
+    else {
+        decryptor.SetKeyWithIV(key, key.size(), iv);
+        decryptor.SpecifyDataLengths(0, bytes.size()-XKRYPT_TAG_SIZE-refsCount, 0 );
+        source.Attach(fileFilter);
+    }
+
     source.PumpAll();
 
     remove(path.c_str());
