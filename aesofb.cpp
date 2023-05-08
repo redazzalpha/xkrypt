@@ -36,8 +36,8 @@ string AesOFB::encryptText(const string& plain, Keygen* keygen, const Encoding e
     const SecByteBlock& iv = keygen->getIv();
     StringSink* ss = new StringSink(cipher);
     OFB_Mode<CryptoPP::AES>::Encryption encryptor;
-    StreamTransformationFilter* textFilter = new StreamTransformationFilter(encryptor);
     encryptor.SetKeyWithIV(key, key.size(), iv);
+    StreamTransformationFilter* textFilter = new StreamTransformationFilter(encryptor);
 
     switch(encoding) {
     case Encoding::BASE64 : textFilter->Attach(new Base64Encoder(ss)); break;
@@ -56,8 +56,8 @@ string AesOFB::decryptText(const string& cipher, Keygen* keygen, const Encoding 
     const SecByteBlock& iv = keygen->getIv();
     StringSink* ss = new StringSink(recover);
     OFB_Mode<CryptoPP::AES>::Decryption decryptor;
-    StreamTransformationFilter* textFilter = new StreamTransformationFilter(decryptor, ss);
     decryptor.SetKeyWithIV(key, key.size(), iv);
+    StreamTransformationFilter* textFilter = new StreamTransformationFilter(decryptor, ss);
 
     switch(encoding) {
     case Encoding::BASE64 : StringSource(cipher, true, new Base64Decoder(textFilter)); break;
@@ -84,8 +84,8 @@ void AesOFB::encryptFile(const string& path, Keygen* keygen, const Encoding enco
     else filename += dirfname.m_fname + FILE_TEMP_SUFFIX;
 
     FileSink* fs = new FileSink((output = dirfname.m_dir + DELIMITOR + filename).c_str());
-    StreamTransformationFilter* fileFilter = new StreamTransformationFilter(encryptor);
     encryptor.SetKeyWithIV(key, key.size(), iv);
+    StreamTransformationFilter* fileFilter = new StreamTransformationFilter(encryptor);
 
     injectRefs(fs, encoding);
     switch(encoding) {
@@ -119,9 +119,9 @@ void AesOFB::decryptFile(const string& path, Keygen* keygen, const Encoding enco
     else filename += dirfname.m_fname + FILE_TEMP_SUFFIX;
 
     FileSink* fs = new FileSink((output = dirfname.m_dir + DELIMITOR + filename).c_str());
+    decryptor.SetKeyWithIV(key, key.size(), iv);
     StreamTransformationFilter* fileFilter  = new StreamTransformationFilter(decryptor, fs);
     FileSource source(path.c_str(), false);
-    decryptor.SetKeyWithIV(key, key.size(), iv);
 
     afterRefs(&source);
     switch(encoding) {
@@ -132,6 +132,7 @@ void AesOFB::decryptFile(const string& path, Keygen* keygen, const Encoding enco
     }
 
     source.PumpAll();
+
     remove(path.c_str());
     if(!m_decfname) {
         QString out = QString::fromStdString(output);

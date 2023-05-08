@@ -34,8 +34,8 @@ string AesECB::encryptText(const string& plain, Keygen* keygen, const Encoding e
     const SecByteBlock& key = keygen->getKey();
     StringSink* ss = new StringSink(cipher);
     ECB_Mode<CryptoPP::AES>::Encryption encryptor;
-    StreamTransformationFilter* textFilter = new StreamTransformationFilter(encryptor);
     encryptor.SetKey(key, key.size());
+    StreamTransformationFilter* textFilter = new StreamTransformationFilter(encryptor);
 
     switch(encoding) {
     case Encoding::BASE64 : textFilter->Attach(new Base64Encoder(ss)); break;
@@ -53,8 +53,8 @@ string AesECB::decryptText(const string& cipher, Keygen* keygen, const Encoding 
     const SecByteBlock& key = keygen->getKey();
     StringSink* ss = new StringSink(recover);
     ECB_Mode<CryptoPP::AES>::Decryption decryptor;
-    StreamTransformationFilter* textFilter = new StreamTransformationFilter(decryptor, ss);
     decryptor.SetKey(key, key.size());
+    StreamTransformationFilter* textFilter = new StreamTransformationFilter(decryptor, ss);
 
     switch(encoding) {
     case Encoding::BASE64 : StringSource(cipher, true, new Base64Decoder(textFilter)); break;
@@ -80,8 +80,8 @@ void AesECB::encryptFile(const string& path, Keygen* keygen, const Encoding enco
     else filename += dirfname.m_fname + FILE_TEMP_SUFFIX;
 
     FileSink* fs = new FileSink((output = dirfname.m_dir + DELIMITOR + filename).c_str());
-    StreamTransformationFilter* fileFilter = new StreamTransformationFilter(encryptor);
     encryptor.SetKey(key, key.size());
+    StreamTransformationFilter* fileFilter = new StreamTransformationFilter(encryptor);
 
     injectRefs(fs, encoding);
     switch(encoding) {
@@ -114,9 +114,9 @@ void AesECB::decryptFile(const string& path, Keygen* keygen, const Encoding enco
     else filename += dirfname.m_fname + FILE_TEMP_SUFFIX;
 
     FileSink* fs = new FileSink((output = dirfname.m_dir + DELIMITOR + filename).c_str());
+    decryptor.SetKey(key, key.size());
     StreamTransformationFilter* fileFilter  = new StreamTransformationFilter(decryptor, fs);
     FileSource source(path.c_str(), false);
-    decryptor.SetKey(key, key.size());
 
     afterRefs(&source);
     switch(encoding) {
@@ -127,6 +127,7 @@ void AesECB::decryptFile(const string& path, Keygen* keygen, const Encoding enco
     }
 
     source.PumpAll();
+
     remove(path.c_str());
     if(!m_decfname) {
         QString out = QString::fromStdString(output);

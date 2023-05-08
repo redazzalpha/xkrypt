@@ -33,8 +33,8 @@ string AesEAX::encryptText(const string& plain, Keygen* keygen, const Encoding e
     const SecByteBlock& iv = keygen->getIv();
     StringSink* ss = new StringSink(cipher);
     CryptoPP::EAX<CryptoPP::AES>::Encryption encryptor;
-    AuthenticatedEncryptionFilter* textFilter = new AuthenticatedEncryptionFilter(encryptor);
     encryptor.SetKeyWithIV(key, key.size(), iv);
+    AuthenticatedEncryptionFilter* textFilter = new AuthenticatedEncryptionFilter(encryptor);
 
     switch(encoding) {
     case Encoding::BASE64 : textFilter->Attach(new Base64Encoder(ss)); break;
@@ -53,8 +53,8 @@ string AesEAX::decryptText(const string& cipher, Keygen* keygen, const Encoding 
     const SecByteBlock& iv = keygen->getIv();
     StringSink* ss = new StringSink(recover);
     CryptoPP::EAX<CryptoPP::AES>::Decryption decryptor;
-    AuthenticatedDecryptionFilter* textFilter = new AuthenticatedDecryptionFilter(decryptor, ss);
     decryptor.SetKeyWithIV(key, key.size(), iv);
+    AuthenticatedDecryptionFilter* textFilter = new AuthenticatedDecryptionFilter(decryptor, ss);
 
     switch(encoding) {
     case Encoding::BASE64 : StringSource(cipher, true, new Base64Decoder(textFilter)); break;
@@ -81,8 +81,8 @@ void AesEAX::encryptFile(const string& path, Keygen* keygen, const Encoding enco
     else filename += dirfname.m_fname + FILE_TEMP_SUFFIX;
 
     FileSink* fs = new FileSink((output = dirfname.m_dir + DELIMITOR + filename).c_str());
-    AuthenticatedEncryptionFilter* fileFilter = new AuthenticatedEncryptionFilter(encryptor);
     encryptor.SetKeyWithIV(key, key.size(), iv);
+    AuthenticatedEncryptionFilter* fileFilter = new AuthenticatedEncryptionFilter(encryptor);
 
     injectRefs(fs, encoding);
     switch(encoding) {
@@ -117,9 +117,9 @@ void AesEAX::decryptFile(const string& path, Keygen* keygen, const Encoding enco
     else filename += dirfname.m_fname + FILE_TEMP_SUFFIX;
 
     FileSink* fs = new FileSink((output = dirfname.m_dir + DELIMITOR + filename).c_str());
+    decryptor.SetKeyWithIV(key, key.size(), iv);
     AuthenticatedDecryptionFilter* fileFilter = new AuthenticatedDecryptionFilter(decryptor, fs);
     FileSource source(path.c_str(), false);
-    decryptor.SetKeyWithIV(key, key.size(), iv);
 
     afterRefs(&source);
     switch(encoding) {
@@ -130,6 +130,7 @@ void AesEAX::decryptFile(const string& path, Keygen* keygen, const Encoding enco
     }
 
     source.PumpAll();
+
     remove(path.c_str());
     if(!m_decfname) {
         QString out = QString::fromStdString(output);
