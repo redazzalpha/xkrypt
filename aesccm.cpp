@@ -134,7 +134,7 @@ void AesCCM::encryptFile(const string& path, Keygen* keygen, const Encoding enco
     default : throw EncodingException();
     }
 
-    FileSource source(path.c_str(), true, new Redirector(*fileFilter));
+    FileSource source(path.c_str(), true, fileFilter);
 
     remove(path.c_str());
     if(!m_encfname) {

@@ -234,6 +234,10 @@ void Cipher::decryptFile(vector<string> paths, Keygen* keygen)
         }
         emit recoverFile(successDecMsg(progress));
     }
+    catch(InvalidRefsException& e) {
+        emit error(e.what(), "-- It seems that you are trying to decrypt file\
+ that hasn't been encrypted by xkrypt or refs has been corrupt!!");
+    }
     catch(exception& e) {
         emit error(e.what());
     }
