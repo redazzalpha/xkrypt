@@ -4,7 +4,7 @@
 #include "aesgcm.h"
 #include "aescbc.h"
 #include "aeseax.h"
-#include "serial.h"
+#include "keygenserial.h"
 #include "keygen.h"
 #include "rsassa.h"
 #include "rsaoeap.h"
@@ -38,7 +38,8 @@ private:
     Cipher m_cipher;
     QThread m_threadCipher;
     ProcessBar m_processBar;
-    Serial m_serial;
+    Keygen* m_keygen = new Keygen;
+    KeygenSerial m_kserial;
     AbstractActionBase* m_currentAction;
     FileImporter m_fimporterEnc;
     FileImporter m_fimporterDec;
@@ -46,7 +47,6 @@ private:
     std::string m_path;
     std::string m_dir;
     std::string m_fname;
-    Keygen* m_keygen = new Keygen;
 
     QList<AbstractActionBase*> m_actions = QList<AbstractActionBase*> {
         new ActionKeyMgr(),
@@ -93,7 +93,6 @@ public:
 
     // destructor
     ~MainWindow();
-
 
 private:
     // methods

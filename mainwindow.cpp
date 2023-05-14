@@ -150,7 +150,7 @@ void MainWindow::generateKey(Encoding encoding)
 
     m_keygen->setKeyLength(keylength);
     m_keygen->generateKey();
-    setKeyLoadedText(QString::fromStdString(m_serial.keyToString(*m_keygen, encoding)));
+    setKeyLoadedText(QString::fromStdString(m_kserial.serialize(*m_keygen, encoding)));
 }
 void MainWindow::shortcuts()
 {
@@ -170,13 +170,14 @@ void MainWindow::importSymmectric()
     try {
         m_fimporterKey.clear();
         Encoding encoding = static_cast<Encoding>(ui->m_keyMEncodingsI->currentIndex());
-        bool imported = m_serial.importKeygen(m_keygen, (ifstream*)m_fimporterKey.importFile(this, "Import symmetric key"));
+        ifstream* keyFile = (ifstream*)m_fimporterKey.importFile(this, "Import symmetric key");
+        bool imported = m_kserial.deserialize(keyFile, m_keygen);
         if(m_keygen->isReady() && imported) {
-            string keyStr = m_serial.keyToString(*m_keygen, encoding);
+            string keyStr = m_kserial.serialize(*m_keygen, encoding);
             setKeyLoadedText(QString::fromStdString(keyStr));
 
             string message = "key " + std::to_string(m_keygen->getKey().size()) + " bytes - encoded ";
-            message += m_serial.encodingToString(encoding);
+            message += m_kserial.serializeEncoding(encoding);
             message += "<br />has been successfully imported";
             dialogSuccess(message);
         }
@@ -574,9 +575,9 @@ void MainWindow::on_m_keyMGenerate_clicked()
     generateKey(encoding);
     if(ui->m_keyMSaveOnF->isChecked()) {
         if(!dialogSave(this).empty()) {
-            m_serial.keyToFile(m_path, *m_keygen, encoding);
+            m_kserial.serialize(m_path, *m_keygen, encoding);
             ui->m_keyMSaveOnF->setChecked(false);
-            dialogSuccess(m_serial.writeSuccess(m_path, *m_keygen, encoding));
+            dialogSuccess(m_kserial.successMesssage(m_path, *m_keygen, encoding));
         }
     }
 }
@@ -693,13 +694,13 @@ void MainWindow::cipherText(const std::string &cipherText)
 void MainWindow::recoverFile(const string& success)
 {
     Encoding encoding = static_cast<Encoding>(ui->m_decTabFileEncodings->currentIndex());
-    dialogSuccess(success + " Encoding: " + m_serial.encodingToString(encoding));
+    dialogSuccess(success + " Encoding: " + m_kserial.serializeEncoding(encoding));
 }
 void MainWindow::cipherFile(const string& success)
 {
     Encoding encoding = static_cast<Encoding>(ui->m_encTabFileEncodings->currentIndex());
     ui->m_encTabFileEncFname->setChecked(true);
-    dialogSuccess(success + " Encoding: " + m_serial.encodingToString(encoding));
+    dialogSuccess(success + " Encoding: " + m_kserial.serializeEncoding(encoding));
 }
 void MainWindow::cipherError(const std::string& error)
 {

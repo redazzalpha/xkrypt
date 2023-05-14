@@ -7,7 +7,7 @@
 
 class Keygen {
 private:
-    CryptoPP::AutoSeededRandomPool m_prng;
+    CryptoPP::AutoSeededX917RNG<CryptoPP::AES> m_prng;
     CryptoPP::SecByteBlock m_key {0};
     CryptoPP::SecByteBlock m_iv {0};
     KeyLength m_keyLength = KeyLength::LENGTH_DEFAULT;

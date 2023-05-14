@@ -1,4 +1,4 @@
-#include "serial.h"
+#include "keygenserial.h"
 #include "base64.h"
 #include "defines.h"
 #include "files.h"
@@ -13,10 +13,10 @@ using namespace CryptoPP;
 using namespace std;
 
 // constructors
-Serial::Serial(){};
+KeygenSerial::KeygenSerial(){};
 
 // methods
-bool Serial::importKeygen(Keygen* keygen, ifstream* file) const noexcept(false)
+bool KeygenSerial::deserialize(ifstream* file, Keygen* keygen) const noexcept(false)
 {
     bool imported = false;
 
@@ -49,7 +49,7 @@ bool Serial::importKeygen(Keygen* keygen, ifstream* file) const noexcept(false)
 
     return imported;
 }
-void Serial::keyToFile(const string& path, Keygen& keygen, const Encoding encoding) const
+void KeygenSerial::serialize(const string& where, Keygen& keygen, const Encoding encoding) const
 {
     size_t ivSize = keygen.getIv().size();
     size_t keySize = keygen.getKey().size();
@@ -62,7 +62,7 @@ void Serial::keyToFile(const string& path, Keygen& keygen, const Encoding encodi
     CryptoPP::byte* keyIv = new CryptoPP::byte[keyIvSize];
     StringSource refsSource(&xkrypt_refs[0], xkrypt_refs.size(), false);
     StringSource keyIvSource(keyIv, keyIvSize, false);
-    FileSink fs(path.c_str(), true);
+    FileSink fs(where.c_str(), true);
 
     memcpy(keyIv, keygen.getIv().BytePtr(), ivSize);
     memcpy(keyIv + ivSize, keygen.getKey().BytePtr(), keySize);
@@ -85,10 +85,8 @@ void Serial::keyToFile(const string& path, Keygen& keygen, const Encoding encodi
 
     refsSource.PumpAll();
     keyIvSource.PumpAll();
-
-
 }
-string Serial::keyToString(Keygen& keygen, const Encoding encoding) const
+string KeygenSerial::serialize(Keygen& keygen, const Encoding encoding) const
 {
     StringSource keySource(keygen.getKey().BytePtr(), keygen.getKey().size(), false);
     string key;
@@ -110,7 +108,7 @@ string Serial::keyToString(Keygen& keygen, const Encoding encoding) const
     keySource.PumpAll();
     return key;
 }
-string Serial::encodingToString(const Encoding encoding) const
+string KeygenSerial::serializeEncoding(const Encoding encoding) const
 {
     string encodingStr;
     switch(static_cast<int>(encoding))  {
@@ -121,10 +119,10 @@ string Serial::encodingToString(const Encoding encoding) const
     }
 }
 
-string Serial::writeSuccess(const string& path, Keygen& keygen, const Encoding encoding)
+string KeygenSerial::successMesssage(const string& path, Keygen& keygen, const Encoding encoding)
 {
     string message = "key " + std::to_string(keygen.getKey().size()) + " bytes - encoded ";
-    message += encodingToString(encoding);
+    message += serializeEncoding(encoding);
     message += "<br />has been successfully written on file<br />" + path;
     return message;
 }

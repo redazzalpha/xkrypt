@@ -31,12 +31,12 @@ SOURCES += \
     except.cpp \
     fileimporter.cpp \
     keygen.cpp \
+    keygenserial.cpp \
     main.cpp \
     mainwindow.cpp \
     processbar.cpp \
     rsaoeap.cpp \
     rsassa.cpp \
-    serial.cpp \
     structures.cpp
 
 HEADERS += \
@@ -64,11 +64,11 @@ HEADERS += \
     except.h \
     fileimporter.h \
     keygen.h \
+    keygenserial.h \
     mainwindow.h \
     processbar.h \
     rsaoeap.h \
     rsassa.h \
-    serial.h \
     structures.h
 
 FORMS += \
