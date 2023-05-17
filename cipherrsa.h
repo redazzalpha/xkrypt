@@ -9,7 +9,7 @@
  * encrypts decrypts and generates keys
  */
 
-class AbstractCipherRsa : public AbstractCipherBase {
+class AbstractCipherRsa : public AbstractCipher {
 public:
     static const std::string AlgName;
 
@@ -22,12 +22,12 @@ public:
     // methods
     virtual std::string algName() const final;
     virtual std::string modeName() const override = 0;
-    virtual Alg algId() const final;
+    virtual Algorithms algId() const final;
     virtual Mode modeId() const override = 0;
-    virtual std::string encryptText(const std::string& plain, Keygen* keygen, const Encoding encoding) override = 0;
-    virtual std::string decryptText(const std::string& cipher, Keygen* keygen, const Encoding encoding) override = 0;
-    virtual void encryptFile(const std::string& path, Keygen* keygen, const Encoding encoding) override = 0;
-    virtual void decryptFile(const std::string& path, Keygen* keygen, const Encoding encoding) override = 0;
+    virtual std::string encryptText(const std::string& plain, AbstractKeygen* keygen, const Encoding encoding) override = 0;
+    virtual std::string decryptText(const std::string& cipher, AbstractKeygen* keygen, const Encoding encoding) override = 0;
+    virtual void encryptFile(const std::string& path, AbstractKeygen* keygen, const Encoding encoding) override = 0;
+    virtual void decryptFile(const std::string& path, AbstractKeygen* keygen, const Encoding encoding) override = 0;
 };
 
 #endif // CIPHERRSA_H

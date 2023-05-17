@@ -8,6 +8,7 @@
 #include "modes.h"
 #include "except.h"
 #include <QFile>
+#include <keygenaes.h>
 
 using namespace CryptoPP;
 using namespace std;
@@ -29,11 +30,12 @@ Mode AesCBC::modeId() const
 {
     return Mode::CBC;
 }
-string AesCBC::encryptText(const string& plain, Keygen* keygen, const Encoding encoding)
+string AesCBC::encryptText(const string& plain, AbstractKeygen* keygen, const Encoding encoding)
 {
+    KeygenAes* keygen_aes = (KeygenAes*)keygen;
     std::string cipher = "";
-    const SecByteBlock& key = keygen->getKey();
-    const SecByteBlock& iv = keygen->getIv();
+    const SecByteBlock& key = keygen_aes->getKey();
+    const SecByteBlock& iv = keygen_aes->getIv();
     StringSink* ss = new StringSink(cipher);
     CBC_Mode<CryptoPP::AES>::Encryption encryptor;
     encryptor.SetKeyWithIV(key, key.size(), iv);
@@ -49,11 +51,12 @@ string AesCBC::encryptText(const string& plain, Keygen* keygen, const Encoding e
     StringSource(plain, true, textFilter);
     return cipher;
 }
-string AesCBC::decryptText(const string& cipher, Keygen* keygen, const Encoding encoding)
+string AesCBC::decryptText(const string& cipher, AbstractKeygen* keygen, const Encoding encoding)
 {
+    KeygenAes* keygen_aes = (KeygenAes*)keygen;
     std::string recover;
-    const SecByteBlock& key = keygen->getKey();
-    const SecByteBlock& iv = keygen->getIv();
+    const SecByteBlock& key = keygen_aes->getKey();
+    const SecByteBlock& iv = keygen_aes->getIv();
     StringSink* ss = new StringSink(recover);
     CBC_Mode<CryptoPP::AES>::Decryption decryptor;
     decryptor.SetKeyWithIV(key, key.size(), iv);
@@ -68,11 +71,12 @@ string AesCBC::decryptText(const string& cipher, Keygen* keygen, const Encoding 
 
     return recover;
 }
-void AesCBC::encryptFile(const string& path, Keygen* keygen, const Encoding encoding)
+void AesCBC::encryptFile(const string& path, AbstractKeygen* keygen, const Encoding encoding)
 {
+    KeygenAes* keygen_aes = (KeygenAes*)keygen;
     string filename, output;
-    const SecByteBlock& key = keygen->getKey();
-    const SecByteBlock& iv = keygen->getIv();
+    const SecByteBlock& key = keygen_aes->getKey();
+    const SecByteBlock& iv = keygen_aes->getIv();
     CBC_Mode<CryptoPP::AES>::Encryption encryptor;
     DirFname dirfname = extractFname(path);
 
@@ -103,11 +107,12 @@ void AesCBC::encryptFile(const string& path, Keygen* keygen, const Encoding enco
         QFile(out).rename(QString::fromStdString(output.substr(0, output.size()-strlen(FILE_TEMP_SUFFIX))));
     }
 }
-void AesCBC::decryptFile(const string& path, Keygen* keygen, const Encoding encoding)
+void AesCBC::decryptFile(const string& path, AbstractKeygen* keygen, const Encoding encoding)
 {
+    KeygenAes* keygen_aes = (KeygenAes*)keygen;
     string filename, output;
-    const SecByteBlock& key = keygen->getKey();
-    const SecByteBlock& iv = keygen->getIv();
+    const SecByteBlock& key = keygen_aes->getKey();
+    const SecByteBlock& iv = keygen_aes->getIv();
     CBC_Mode<CryptoPP::AES>::Decryption decryptor;
     DirFname dirfname = extractFname(path);
 

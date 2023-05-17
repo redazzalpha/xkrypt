@@ -8,7 +8,7 @@ class Cipher : public QObject {
     Q_OBJECT
 
 private:
-    AbstractCipherBase* m_cipher = new AesCBC;
+    AbstractCipher* m_cipher = new AesCBC;
     bool m_run = true;
 
 public:
@@ -26,7 +26,7 @@ public:
 
     std::string algName() const;
     std::string modeName() const;
-    Alg algId() const;
+    Algorithms algId() const;
     Mode modeId() const;
     std::string successEncMsg(const int succeed = 1);
     std::string successDecMsg(const int succeed = 1);
@@ -37,10 +37,10 @@ public:
 
 
 public slots:
-    std::string encryptText(const std::string& plain, Keygen* keygen, const Encoding encoding);
-    std::string decryptText(const std::string& cipher, Keygen* keygen, const Encoding encoding);
-    void encryptFile(std::vector<std::string> paths, Keygen* keygen, const Encoding encoding);
-    void decryptFile(std::vector<std::string> paths, Keygen* keygen);
+    std::string encryptText(const std::string& plain, AbstractKeygen* keygen, const Encoding encoding);
+    std::string decryptText(const std::string& cipher, AbstractKeygen* keygen, const Encoding encoding);
+    void encryptFile(std::vector<std::string> paths, AbstractKeygen* keygen, const Encoding encoding);
+    void decryptFile(std::vector<std::string> paths, AbstractKeygen* keygen);
 
 signals:
     void finished();

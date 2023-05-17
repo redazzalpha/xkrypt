@@ -5,7 +5,7 @@
 #include "aescbc.h"
 #include "aeseax.h"
 #include "keygenserial.h"
-#include "keygen.h"
+#include "keygenaes.h"
 #include "rsassa.h"
 #include "rsaoeap.h"
 #include "enums.h"
@@ -25,6 +25,7 @@
 #include <QThread>
 #include <processbar.h>
 #include <aesctr.h>
+#include <QComboBox>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -38,7 +39,7 @@ private:
     Cipher m_cipher;
     QThread m_threadCipher;
     ProcessBar m_processBar;
-    Keygen* m_keygen = new Keygen;
+    AbstractKeygen* m_keygen = new KeygenAes;
     KeygenSerial m_kserial;
     AbstractActionBase* m_currentAction;
     FileImporter m_fimporterEnc;
@@ -47,6 +48,42 @@ private:
     std::string m_path;
     std::string m_dir;
     std::string m_fname;
+    std::vector<std::string> m_algorithms = {
+        AbstractCipherAes::AlgName,
+        AbstractCipherRsa::AlgName,
+    };
+    std::multimap<std::string, std::string> m_modes = {
+        {AbstractCipherAes::AlgName, AesCBC::ModeName},
+        {AbstractCipherAes::AlgName, AesCCM::ModeName},
+        {AbstractCipherAes::AlgName, AesCFB::ModeName},
+        {AbstractCipherAes::AlgName, AesCTR::ModeName},
+        {AbstractCipherAes::AlgName, AesEAX::ModeName},
+        {AbstractCipherAes::AlgName, AesECB::ModeName},
+        {AbstractCipherAes::AlgName, AesGCM::ModeName},
+        {AbstractCipherAes::AlgName, AesOFB::ModeName},
+
+        {AbstractCipherRsa::AlgName, RsaOEAP::ModeName},
+        {AbstractCipherRsa::AlgName, RsaSSA::ModeName},
+    };
+    std::multimap<std::string, std::string> m_keysizes = {
+        {AbstractCipherAes::AlgName, std::to_string(static_cast<int>(Aes::KeySize::LENGTH_16))},
+        {AbstractCipherAes::AlgName, std::to_string(static_cast<int>(Aes::KeySize::LENGTH_32))},
+
+        {AbstractCipherRsa::AlgName, std::to_string(static_cast<int>(Rsa::KeySize::LENGTH_1024))},
+        {AbstractCipherRsa::AlgName, std::to_string(static_cast<int>(Rsa::KeySize::LENGTH_2048))},
+        {AbstractCipherRsa::AlgName, std::to_string(static_cast<int>(Rsa::KeySize::LENGTH_3072))},
+        {AbstractCipherRsa::AlgName, std::to_string(static_cast<int>(Rsa::KeySize::LENGTH_4096))},
+        {AbstractCipherRsa::AlgName, std::to_string(static_cast<int>(Rsa::KeySize::LENGTH_6144))},
+    };
+    std::multimap<std::string, std::string> m_encodings = {
+        {AbstractCipherAes::AlgName, "Base64"},
+        {AbstractCipherAes::AlgName, "Hex"},
+        {AbstractCipherAes::AlgName, "None"},
+
+        {AbstractCipherRsa::AlgName, "BER"},
+        {AbstractCipherRsa::AlgName, "DER"},
+        {AbstractCipherRsa::AlgName, "PEM"},
+    };
 
     QList<AbstractActionBase*> m_actions = QList<AbstractActionBase*> {
         new ActionKeyMgr(),
@@ -54,37 +91,14 @@ private:
         new ActionDecrypt(),
         new ActionQuit(),
     };
-    QList<QString>* m_algorithms = new QList<QString> {
-        QString::fromStdString(AbstractCipherAes::AlgName),
-        QString::fromStdString(AbstractCipherRsa::AlgName),
-    };
-    QList<QString>* m_aesModes = new QList<QString>{
-        QString::fromStdString(AesCBC::ModeName),
-        QString::fromStdString(AesCCM::ModeName),
-        QString::fromStdString(AesCFB::ModeName),
-        QString::fromStdString(AesCTR::ModeName),
-        QString::fromStdString(AesEAX::ModeName),
-        QString::fromStdString(AesECB::ModeName),
-        QString::fromStdString(AesGCM::ModeName),
-        QString::fromStdString(AesOFB::ModeName),
-    };
-    QList<QString>* m_rsaModes = new QList<QString>{
-        QString::fromStdString(RsaOEAP::ModeName),
-        QString::fromStdString(RsaSSA::ModeName),
-    };
-    QList<QString>* m_aesKeys = new QList<QString>{
-        QString::number(static_cast<int>(KeyLength::LENGTH_DEFAULT)),
-        QString::number(static_cast<int>(KeyLength::LENGTH_32)),
-    };
-    QList<QString>* m_keyEncodings = new QList<QString>{
-        "Base64",
-        "Hex",
-        "None",
-    };
-    QList<QString>* m_enc_dec_encodings = new QList<QString>{
-        "Base64",
-        "Hex",
-    };
+    QList<QString>* m_algTypes = new QList<QString>;
+    QList<QString>* m_aesModes = new QList<QString>;
+    QList<QString>* m_rsaModes = new QList<QString>;
+    QList<QString>* m_aesKeysizes = new QList<QString>;
+    QList<QString>* m_rsaKeysizes = new QList<QString>;
+    QList<QString>* m_aesEncodings = new QList<QString>;
+    QList<QString>* m_rsaEncodings = new QList<QString>;
+    QList<QString>* m_aesText_encodings = new QList<QString>;
 
     bool m_warning = true;
 public:
@@ -97,21 +111,23 @@ public:
 private:
     // methods
     void uiInit();
+    void initAlgorithms();
+    void initModes();
+    void initKeysizes();
+    void initEncodings();
     void connectItems();
     void connectCipher();
-    void connectProcess1();
-    void generateKey(Encoding encodingIndex);
     void shortcuts();
     void toolTips();
-    void importAsymmectric();
-    void importSymmectric();
-    KeyLength keylengthFrom(const int index);
+    void generateAes();
+    void generateRsa();
+    void importAes();
+    void importRsa();
+    template<class T>
+    void saveKey(T* keygen);
+    size_t keysizeFrom(const std::string &size);
+    Encoding encodingFrom(QComboBox *combo);
 
-    void processEncText();
-    void processDecText();
-    void processEncFile(std::vector<std::string>& paths);
-    void processDecFile(std::vector<std::string>& paths);
-    
     bool isFileExist(const std::string& path) const;
     QMessageBox::ButtonRole dialogFileExists(const std::string& message);
     bool dialogInsertFilename(const std::string& message);
@@ -121,11 +137,11 @@ private:
     void dialogError(const std::string& message, const std::string& description = "");
     std::string dialogSave(QWidget* parent = nullptr, const std::string& caption = "Select saving directory", const std::string& openDir = "");
 
-    void keyLoadedSelectable(const Qt::TextInteractionFlags flags) const;
-    void setKeyLoadedStyle(const QString &style) const;
     void setFilesLoadedStyle(const QString &style) const;
+    void setKeyLoadedStyle(const QString &style) const;
     void setKeyLoadedText(const QString &keyStr) const;
     void setKeyLoadedSelectable(const bool selectable) const;
+    void keyLoadedSelectable(const Qt::TextInteractionFlags flags) const;
 
     bool isRunningThread();
     std::string refsToString();
@@ -133,7 +149,6 @@ private:
     void closeEvent(QCloseEvent* event) override;
 
 private slots:
-
     void on_m_encTabTextEncrypt_clicked();
     void on_m_decTabTextDecrypt_clicked();
     void on_m_encTabTextReset_clicked();
@@ -150,12 +165,13 @@ private slots:
     void on_m_keyMGenerate_clicked();
     void on_m_keyMImport_clicked();
     void on_m_keyMDisable_toggled(bool checked);
-
-    void setComboModes(const QString& alg);
+    
+    void setType(const QString & type);
+    void setMode(const QString& alg);
     void hideKey(const bool isChecked);
+    void flushKey();
     void colorKeyLoaded();
     void colorFilesLoaded();
-    void flushKey();
 
     void recoverText(const std::string &recoverText);
     void cipherText(const std::string &cipherText);
@@ -166,8 +182,6 @@ private slots:
 
     void toogleEncFname(bool checked);
     void actionSelected();
-    void disable();
-    void enable();
     void dectectFields(
         const std::string& alg,
         const std::string& mode,
@@ -176,10 +190,10 @@ private slots:
     );
 
 signals:
-    void startEncFile(std::vector<std::string> paths, Keygen* keygen, const Encoding encoding);
-    void startDecFile(std::vector<std::string> paths, Keygen* keygen);
-    void startEncText(const std::string& plain, Keygen* keygen, const Encoding encoding);
-    void startDecText(const std::string& cipher, Keygen* keygen, const Encoding encoding);
+    void startEncFile(std::vector<std::string> paths, KeygenAes* keygen, const Encoding encoding);
+    void startDecFile(std::vector<std::string> paths, KeygenAes* keygen);
+    void startEncText(const std::string& plain, KeygenAes* keygen, const Encoding encoding);
+    void startDecText(const std::string& cipher, KeygenAes* keygen, const Encoding encoding);
     void startProcess(const int progress = 0);
 };
 

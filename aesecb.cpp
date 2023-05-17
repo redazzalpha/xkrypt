@@ -7,6 +7,7 @@
 #include "modes.h"
 
 #include <QFile>
+#include <keygenaes.h>
 
 using namespace CryptoPP;
 using namespace std;
@@ -28,10 +29,11 @@ Mode AesECB::modeId() const
 {
     return Mode::ECB;
 }
-string AesECB::encryptText(const string& plain, Keygen* keygen, const Encoding encoding) noexcept(false)
+string AesECB::encryptText(const string& plain, AbstractKeygen* keygen, const Encoding encoding) noexcept(false)
 {
+    KeygenAes* keygen_aes = (KeygenAes*)keygen;
     std::string cipher = "";
-    const SecByteBlock& key = keygen->getKey();
+    const SecByteBlock& key = keygen_aes->getKey();
     StringSink* ss = new StringSink(cipher);
     ECB_Mode<CryptoPP::AES>::Encryption encryptor;
     encryptor.SetKey(key, key.size());
@@ -47,10 +49,11 @@ string AesECB::encryptText(const string& plain, Keygen* keygen, const Encoding e
     StringSource(plain, true, textFilter);
     return cipher;
 }
-string AesECB::decryptText(const string& cipher, Keygen* keygen, const Encoding encoding) noexcept(false)
+string AesECB::decryptText(const string& cipher, AbstractKeygen* keygen, const Encoding encoding) noexcept(false)
 {
+    KeygenAes* keygen_aes = (KeygenAes*)keygen;
     std::string recover;
-    const SecByteBlock& key = keygen->getKey();
+    const SecByteBlock& key = keygen_aes->getKey();
     StringSink* ss = new StringSink(recover);
     ECB_Mode<CryptoPP::AES>::Decryption decryptor;
     decryptor.SetKey(key, key.size());
@@ -65,10 +68,11 @@ string AesECB::decryptText(const string& cipher, Keygen* keygen, const Encoding 
 
     return recover;
 }
-void AesECB::encryptFile(const string& path, Keygen* keygen, const Encoding encoding)
+void AesECB::encryptFile(const string& path, AbstractKeygen* keygen, const Encoding encoding)
 {
+    KeygenAes* keygen_aes = (KeygenAes*)keygen;
     string filename, output;
-    const SecByteBlock& key = keygen->getKey();
+    const SecByteBlock& key = keygen_aes->getKey();
     ECB_Mode<CryptoPP::AES>::Encryption encryptor;
     DirFname dirfname = extractFname(path);
 
@@ -99,10 +103,11 @@ void AesECB::encryptFile(const string& path, Keygen* keygen, const Encoding enco
         QFile(out).rename(QString::fromStdString(output.substr(0, output.size()-strlen(FILE_TEMP_SUFFIX))));
     }
 }
-void AesECB::decryptFile(const string& path, Keygen* keygen, const Encoding encoding)
+void AesECB::decryptFile(const string& path, AbstractKeygen* keygen, const Encoding encoding)
 {
+    KeygenAes* keygen_aes = (KeygenAes*)keygen;
     string filename, output;
-    const SecByteBlock& key = keygen->getKey();
+    const SecByteBlock& key = keygen_aes->getKey();
     ECB_Mode<CryptoPP::AES>::Decryption decryptor;
     DirFname dirfname = extractFname(path);
 

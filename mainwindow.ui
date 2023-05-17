@@ -95,6 +95,19 @@
        <item>
         <layout class="QHBoxLayout" name="hlayout_11">
          <item>
+          <widget class="QLabel" name="label_22">
+           <property name="minimumSize">
+            <size>
+             <width>155</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>Type</string>
+           </property>
+          </widget>
+         </item>
+         <item>
           <widget class="QLabel" name="label_11">
            <property name="minimumSize">
             <size>
@@ -104,19 +117,6 @@
            </property>
            <property name="text">
             <string>Encoding</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="label_22">
-           <property name="minimumSize">
-            <size>
-             <width>0</width>
-             <height>0</height>
-            </size>
-           </property>
-           <property name="text">
-            <string>Type</string>
            </property>
           </widget>
          </item>
@@ -138,6 +138,16 @@
        <item>
         <layout class="QHBoxLayout" name="hlayout_8">
          <item>
+          <widget class="QComboBox" name="m_keyMTypesI">
+           <property name="minimumSize">
+            <size>
+             <width>155</width>
+             <height>0</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+         <item>
           <widget class="QComboBox" name="m_keyMEncodingsI">
            <property name="minimumSize">
             <size>
@@ -146,9 +156,6 @@
             </size>
            </property>
           </widget>
-         </item>
-         <item>
-          <widget class="QComboBox" name="m_keyMType"/>
          </item>
          <item>
           <widget class="QPushButton" name="m_keyMImport">
@@ -252,6 +259,19 @@
            <item>
             <layout class="QHBoxLayout" name="hlayout_5">
              <item>
+              <widget class="QLabel" name="label_23">
+               <property name="minimumSize">
+                <size>
+                 <width>155</width>
+                 <height>0</height>
+                </size>
+               </property>
+               <property name="text">
+                <string>Type</string>
+               </property>
+              </widget>
+             </item>
+             <item>
               <widget class="QLabel" name="label_13">
                <property name="minimumSize">
                 <size>
@@ -260,7 +280,7 @@
                 </size>
                </property>
                <property name="text">
-                <string>Bytes</string>
+                <string>Size</string>
                </property>
               </widget>
              </item>
@@ -289,7 +309,17 @@
            <item>
             <layout class="QHBoxLayout" name="hlayout_6">
              <item>
-              <widget class="QComboBox" name="m_keyMLength">
+              <widget class="QComboBox" name="m_keyMTypesG">
+               <property name="minimumSize">
+                <size>
+                 <width>155</width>
+                 <height>0</height>
+                </size>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QComboBox" name="m_keyMSizes">
                <property name="minimumSize">
                 <size>
                  <width>70</width>

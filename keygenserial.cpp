@@ -2,6 +2,7 @@
 #include "base64.h"
 #include "defines.h"
 #include "files.h"
+#include "cryptopp/pem.h"
 #include "hex.h"
 #include "except.h"
 #include <QFileDialog>
@@ -16,12 +17,12 @@ using namespace std;
 KeygenSerial::KeygenSerial(){};
 
 // methods
-bool KeygenSerial::deserialize(ifstream* file, Keygen* keygen) const noexcept(false)
+bool KeygenSerial::deserialize(ifstream* file, KeygenAes* keygen) const noexcept(false)
 {
     bool imported = false;
 
     if(file) {
-        size_t ivsize = static_cast<size_t>(IvLength::LENGTH_DEFAULT);
+        size_t ivsize = static_cast<size_t>(Aes::IvSize::LENGTH_DEFAULT);
         string refs, keyiv;
         FileSource fs(*file, false);
 
@@ -49,25 +50,39 @@ bool KeygenSerial::deserialize(ifstream* file, Keygen* keygen) const noexcept(fa
 
     return imported;
 }
-void KeygenSerial::serialize(const string& where, Keygen& keygen, const Encoding encoding) const
+bool KeygenSerial::deserialize(ifstream* file, KeygenRsa* keygen) const noexcept(false)
 {
-    size_t ivSize = keygen.getIv().size();
-    size_t keySize = keygen.getKey().size();
+    FileSource fsource(*file, true);
+    switch(keygen->encoding()) {
+    case Encoding::BER :
+    case Encoding::DER:
+        keygen->getPrivate()->Load(fsource);
+        break;
+    case Encoding::PEM :
+        CryptoPP::PEM_Load(fsource, *keygen->getPrivate());
+        break;
+    default: throw EncodingException();
+    }
+}
+void KeygenSerial::serialize(const string& where, KeygenAes* keygen) const
+{
+    size_t ivSize = keygen->getIv().size();
+    size_t keySize = keygen->getKey().size();
     size_t keyIvSize = ivSize + keySize;
     std::vector<CryptoPP::byte> xkrypt_refs {
         XKRYPT_REF_VERSION,
         XKRYPT_REF_MODEL,
-        (CryptoPP::byte)encoding,
+        (CryptoPP::byte)keygen->encoding(),
     };
     CryptoPP::byte* keyIv = new CryptoPP::byte[keyIvSize];
     StringSource refsSource(&xkrypt_refs[0], xkrypt_refs.size(), false);
     StringSource keyIvSource(keyIv, keyIvSize, false);
     FileSink fs(where.c_str(), true);
 
-    memcpy(keyIv, keygen.getIv().BytePtr(), ivSize);
-    memcpy(keyIv + ivSize, keygen.getKey().BytePtr(), keySize);
+    memcpy(keyIv, keygen->getIv().BytePtr(), ivSize);
+    memcpy(keyIv + ivSize, keygen->getKey().BytePtr(), keySize);
 
-    switch(encoding) {
+    switch(keygen->encoding()) {
     case Encoding::BASE64 :
         keyIvSource.Attach(new Base64Encoder);
         break;
@@ -86,12 +101,28 @@ void KeygenSerial::serialize(const string& where, Keygen& keygen, const Encoding
     refsSource.PumpAll();
     keyIvSource.PumpAll();
 }
-string KeygenSerial::serialize(Keygen& keygen, const Encoding encoding) const
+void KeygenSerial::serialize(const string& where, KeygenRsa* keygen) const
 {
-    StringSource keySource(keygen.getKey().BytePtr(), keygen.getKey().size(), false);
+    FileSink fsink(where.data(), true);
+    switch(keygen->encoding()) {
+    case Encoding::BER :
+        keygen->getPrivate()->::PKCS8PrivateKey::BEREncode(fsink);
+        break;
+    case Encoding::DER:
+        keygen->getPrivate()->DEREncode(fsink);
+        break;
+    case Encoding::PEM :
+        CryptoPP::PEM_Save(fsink, *keygen->getPrivate());
+        break;
+    default: throw EncodingException();
+    }
+}
+string KeygenSerial::serialize(KeygenAes* keygen) const
+{
+    StringSource keySource(keygen->getKey().BytePtr(), keygen->getKey().size(), false);
     string key;
 
-    switch(encoding) {
+    switch(keygen->encoding()) {
     case Encoding::BASE64 :
         keySource.Attach(new Base64Encoder);
         break;
@@ -108,22 +139,31 @@ string KeygenSerial::serialize(Keygen& keygen, const Encoding encoding) const
     keySource.PumpAll();
     return key;
 }
+string KeygenSerial::serialize(KeygenRsa* keygen) const
+{
+    return "Asymmetric Rsa key\nkey size: " + std::to_string(keygen->keysize()) + " bits" ;
+}
 string KeygenSerial::serializeEncoding(const Encoding encoding) const
 {
-    string encodingStr;
-    switch(static_cast<int>(encoding))  {
+    switch(encoding)  {
     case Encoding::BASE64: return "Base64";
     case Encoding::HEX: return "Hex";
     case Encoding::NONE: return "None";
-    default: return "Unknown";
+    case Encoding::BER: return "Ber";
+    case Encoding::DER: return "Der";
+    case Encoding::PEM: return "Pem";
+    default: throw EncodingException();
     }
 }
 
-string KeygenSerial::successMesssage(const string& path, Keygen& keygen, const Encoding encoding)
+string KeygenSerial::successWriteKey(const string& path, KeygenAes* keygen)
 {
-    string message = "key " + std::to_string(keygen.getKey().size()) + " bytes - encoded ";
-    message += serializeEncoding(encoding);
+    string message = "key " + std::to_string(keygen->getKey().size()) + " bytes - encoded ";
+    message += serializeEncoding(keygen->encoding());
     message += "<br />has been successfully written on file<br />" + path;
     return message;
+}
+string KeygenSerial::successWriteKey(const string& path, KeygenRsa* keygen)
+{
 }
 

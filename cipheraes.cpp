@@ -17,7 +17,7 @@ std::string AbstractCipherAes::algName() const
 {
     return AbstractCipherAes::AlgName;
 }
-Alg AbstractCipherAes::algId() const
+Algorithms AbstractCipherAes::algId() const
 {
-    return Alg::AES;
+    return Algorithms::AES;
 }

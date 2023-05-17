@@ -9,36 +9,36 @@ using namespace CryptoPP;
 using namespace std;
 
 // constructors
-AbstractCipherBase::AbstractCipherBase(){}
+AbstractCipher::AbstractCipher(){}
 
 // destructor
-AbstractCipherBase::~AbstractCipherBase(){}
+AbstractCipher::~AbstractCipher(){}
 
 // methods
-void AbstractCipherBase::setEncfname(bool newEncfname)
+void AbstractCipher::setEncfname(bool newEncfname)
 {
     m_encfname = newEncfname;
 }
-void AbstractCipherBase::setDecfname(bool newDecfname)
+void AbstractCipher::setDecfname(bool newDecfname)
 {
     m_decfname = newDecfname;
 }
-bool AbstractCipherBase::encfname() const
+bool AbstractCipher::encfname() const
 {
     return m_encfname;
 }
-bool AbstractCipherBase::decfname() const
+bool AbstractCipher::decfname() const
 {
     return m_decfname;
 }
 
-DirFname AbstractCipherBase::extractFname(const std::string& path) const {
+DirFname AbstractCipher::extractFname(const std::string& path) const {
     int pos = path.find_last_of(DELIMITOR);
     string dir = path.substr(0, pos);
     string fname = path.substr(pos+1, path.size() - pos);
     return DirFname(dir, fname);
 }
-string AbstractCipherBase::pumpRefs(const string &path)
+string AbstractCipher::pumpRefs(const string &path)
 {
     string refs, decodedRefs;
     FileSource source(path.c_str(), false, new StringSink(refs));
@@ -48,7 +48,7 @@ string AbstractCipherBase::pumpRefs(const string &path)
     StringSource(refs.c_str(), true, new Base64Decoder(new CryptoPP::StringSink(decodedRefs)));
     return decodedRefs;
 }
-void AbstractCipherBase::injectRefs(FileSink* fs, const Encoding encoding)
+void AbstractCipher::injectRefs(FileSink* fs, const Encoding encoding)
 {
     std::vector<CryptoPP::byte> xkrypt_refs {
         XKRYPT_REF_VERSION,
@@ -60,7 +60,7 @@ void AbstractCipherBase::injectRefs(FileSink* fs, const Encoding encoding)
     };
     StringSource refsSource(&xkrypt_refs[0], xkrypt_refs.size(), true, new Base64Encoder(new Redirector(*fs)));
 }
-int AbstractCipherBase::afterRefs(FileSource* fs)
+int AbstractCipher::afterRefs(FileSource* fs)
 {
     string sink;
     int i = 0;
@@ -69,7 +69,7 @@ int AbstractCipherBase::afterRefs(FileSource* fs)
     fs->Detach();
     return i;
 }
-string AbstractCipherBase::checkRefs(const std::string &path)
+string AbstractCipher::checkRefs(const std::string &path)
 {
     string refs = pumpRefs(path);
     if(refs.size() != XKRYPT_REF_SIZE) throw InvalidRefsException();

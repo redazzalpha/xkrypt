@@ -13,7 +13,7 @@ std::string AbstractCipherRsa::algName() const
 {
     return AbstractCipherRsa::AlgName;
 }
-Alg AbstractCipherRsa::algId() const
+Algorithms AbstractCipherRsa::algId() const
 {
-    return Alg::RSA;
+    return Algorithms::RSA;
 }

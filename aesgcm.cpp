@@ -7,6 +7,7 @@
 #include "except.h"
 
 #include <QFile>
+#include <keygenaes.h>
 
 using namespace CryptoPP;
 using namespace std;
@@ -28,12 +29,12 @@ Mode AesGCM::modeId() const
 {
     return Mode::GCM;
 }
-string AesGCM::encryptText(const string& plain, Keygen* keygen, const Encoding encoding) noexcept(false)
+string AesGCM::encryptText(const string& plain, AbstractKeygen* keygen, const Encoding encoding) noexcept(false)
 {
-
+    KeygenAes* keygen_aes = (KeygenAes*)keygen;
     std::string cipher = "";
-    const SecByteBlock& key = keygen->getKey();
-    const SecByteBlock& iv = keygen->getIv();
+    const SecByteBlock& key = keygen_aes->getKey();
+    const SecByteBlock& iv = keygen_aes->getIv();
     StringSink* ss = new StringSink(cipher);
     CryptoPP::GCM<CryptoPP::AES>::Encryption encryptor;
     encryptor.SetKeyWithIV(key, key.size(), iv);
@@ -49,11 +50,12 @@ string AesGCM::encryptText(const string& plain, Keygen* keygen, const Encoding e
     StringSource(plain, true, textFilter);
     return cipher;
 }
-string AesGCM::decryptText(const string& cipher, Keygen* keygen, const Encoding encoding) noexcept(false)
+string AesGCM::decryptText(const string& cipher, AbstractKeygen* keygen, const Encoding encoding) noexcept(false)
 {
+    KeygenAes* keygen_aes = (KeygenAes*)keygen;
     std::string recover;
-    const SecByteBlock& key = keygen->getKey();
-    const SecByteBlock& iv = keygen->getIv();
+    const SecByteBlock& key = keygen_aes->getKey();
+    const SecByteBlock& iv = keygen_aes->getIv();
     StringSink* ss = new StringSink(recover);
     CryptoPP::GCM<CryptoPP::AES>::Decryption decryptor;
     decryptor.SetKeyWithIV(key, key.size(), iv);
@@ -68,11 +70,12 @@ string AesGCM::decryptText(const string& cipher, Keygen* keygen, const Encoding 
 
     return recover;
 }
-void AesGCM::encryptFile(const string& path, Keygen* keygen, const Encoding encoding)
+void AesGCM::encryptFile(const string& path, AbstractKeygen* keygen, const Encoding encoding)
 {
+    KeygenAes* keygen_aes = (KeygenAes*)keygen;
     string filename, output;
-    const SecByteBlock& key = keygen->getKey();
-    const SecByteBlock& iv = keygen->getIv();
+    const SecByteBlock& key = keygen_aes->getKey();
+    const SecByteBlock& iv = keygen_aes->getIv();
     CryptoPP::GCM<CryptoPP::AES>::Encryption encryptor;
     DirFname dirfname = extractFname(path);
 
@@ -103,11 +106,12 @@ void AesGCM::encryptFile(const string& path, Keygen* keygen, const Encoding enco
         QFile(out).rename(QString::fromStdString(output.substr(0, output.size()-strlen(FILE_TEMP_SUFFIX))));
     }
 }
-void AesGCM::decryptFile(const string& path, Keygen* keygen, const Encoding encoding)
+void AesGCM::decryptFile(const string& path, AbstractKeygen* keygen, const Encoding encoding)
 {
+    KeygenAes* keygen_aes = (KeygenAes*)keygen;
     string filename, output;
-    const SecByteBlock& key = keygen->getKey();
-    const SecByteBlock& iv = keygen->getIv();
+    const SecByteBlock& key = keygen_aes->getKey();
+    const SecByteBlock& iv = keygen_aes->getIv();
     CryptoPP::GCM<CryptoPP::AES>::Decryption decryptor;
     DirFname dirfname = extractFname(path);
 

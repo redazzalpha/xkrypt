@@ -56,7 +56,7 @@ string Cipher::modeName() const
 {
     return m_cipher->modeName();
 }
-Alg Cipher::algId() const
+Algorithms Cipher::algId() const
 {
     return m_cipher->algId();
 }
@@ -116,8 +116,8 @@ void Cipher::cipherDetect(const string& refs)
 {
     string alg;
     switch(refs[3]) {
-    case Alg::AES : alg = AbstractCipherAes::AlgName; break;
-    case Alg::RSA : alg = AbstractCipherAes::AlgName; break;
+    case Algorithms::AES : alg = AbstractCipherAes::AlgName; break;
+    case Algorithms::RSA : alg = AbstractCipherAes::AlgName; break;
     default: throw AlgRefsException();
     }
 
@@ -161,7 +161,7 @@ string Cipher::encodeText(const std::string &text, const Encoding encoding)
 }
 
 // slots
-string Cipher::encryptText(const string& plain, Keygen* keygen, const Encoding encoding) noexcept(false)
+string Cipher::encryptText(const string& plain, AbstractKeygen* keygen, const Encoding encoding) noexcept(false)
 {
     std::string cipher = "";
     try {
@@ -176,7 +176,7 @@ string Cipher::encryptText(const string& plain, Keygen* keygen, const Encoding e
     return cipher;
 
 }
-string Cipher::decryptText(const string& cipher, Keygen* keygen, const Encoding encoding) noexcept(false)
+string Cipher::decryptText(const string& cipher, AbstractKeygen* keygen, const Encoding encoding) noexcept(false)
 {
     string recover;
     try {
@@ -190,7 +190,7 @@ string Cipher::decryptText(const string& cipher, Keygen* keygen, const Encoding 
     }
     return recover;
 }
-void Cipher::encryptFile(vector<string> paths, Keygen* keygen, const Encoding encoding)
+void Cipher::encryptFile(vector<string> paths, AbstractKeygen* keygen, const Encoding encoding)
 {
     try {
         size_t size = paths.size(), progress;
@@ -207,7 +207,7 @@ void Cipher::encryptFile(vector<string> paths, Keygen* keygen, const Encoding en
         emit error(e.what());
     }
 }
-void Cipher::decryptFile(vector<string> paths, Keygen* keygen)
+void Cipher::decryptFile(vector<string> paths, AbstractKeygen* keygen)
 {
     try {
         size_t size = paths.size(), progress;

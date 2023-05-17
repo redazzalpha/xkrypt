@@ -21,19 +21,19 @@ Mode RsaSSA::modeId() const
 {
     return Mode::SSA;
 }
-string RsaSSA::encryptText(const string& plain, Keygen* keygen, const Encoding encoding) noexcept(false)
+string RsaSSA::encryptText(const string& plain, AbstractKeygen* keygen, const Encoding encoding) noexcept(false)
 {
     std::cout << "cipher Rsa ssa encrypt" << std::endl;
 }
-string RsaSSA::decryptText(const string& cipher, Keygen* keygen, const Encoding encoding) noexcept(false)
+string RsaSSA::decryptText(const string& cipher, AbstractKeygen* keygen, const Encoding encoding) noexcept(false)
 {
     std::cout << "cipher Rsa ssa decrypt" << std::endl;
 }
-void RsaSSA::encryptFile(const string& path, Keygen* keygen, const Encoding encoding)
+void RsaSSA::encryptFile(const string& path, AbstractKeygen* keygen, const Encoding encoding)
 {
     std::cout<< "in the rsa ssa slot encrypt" << std::endl;
 }
-void RsaSSA::decryptFile(const string& path, Keygen* keygen, const Encoding encoding)
+void RsaSSA::decryptFile(const string& path, AbstractKeygen* keygen, const Encoding encoding)
 {
     std::cout<< "in the rsa ssa slot derypt" << std::endl;
 }

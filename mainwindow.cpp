@@ -38,10 +38,15 @@ MainWindow::~MainWindow()
 {
     delete ui;
     delete m_keygen;
+    delete m_algTypes;
     delete m_aesModes;
     delete m_rsaModes;
-    delete m_algorithms;
-    delete m_keyEncodings;
+    delete m_aesKeysizes;
+    delete m_rsaKeysizes;
+    delete m_aesEncodings;
+    delete m_rsaEncodings;
+    delete m_aesText_encodings;
+
     foreach(AbstractActionBase* action, m_actions) delete action;
 }
 
@@ -49,6 +54,10 @@ MainWindow::~MainWindow()
 void MainWindow::uiInit()
 {
     ui->setupUi(this);
+    initAlgorithms();
+    initModes();
+    initKeysizes();
+    initEncodings();
 
     // tab widgets
     ui->m_encTab->setTabText(0, TAB_NAME_FILE);
@@ -57,34 +66,72 @@ void MainWindow::uiInit()
     ui->m_decTab->setTabText(1, TAB_NAME_TEXT);
 
     // comboxes
-    ui->m_keyMLength->addItems(*m_aesKeys);
-    ui->m_keyMEncodingsI->addItems(*m_keyEncodings);
-    ui->m_keyMEncodingsG->addItems(*m_keyEncodings);
-    ui->m_keyMType->addItems(*m_algorithms);
+    ui->m_keyMSizes->addItems(*m_aesKeysizes);
+    ui->m_keyMEncodingsI->addItems(*m_aesEncodings);
+    ui->m_keyMEncodingsG->addItems(*m_aesEncodings);
+    ui->m_keyMTypesI->addItems(*m_algTypes);
+    ui->m_keyMTypesG->addItems(*m_algTypes);
 
-    ui->m_encTabFileAlgs->addItems(*m_algorithms);
+    ui->m_encTabFileAlgs->addItems(*m_algTypes);
     ui->m_encTabFileModes->addItems(*m_aesModes);
-    ui->m_encTabFileEncodings->addItems(*m_keyEncodings);
-    ui->m_decTabFileAlgs->addItems(*m_algorithms);
+    ui->m_encTabFileEncodings->addItems(*m_aesEncodings);
+    ui->m_decTabFileAlgs->addItems(*m_algTypes);
     ui->m_decTabFileModes->addItems(*m_aesModes);
-    ui->m_decTabFileEncodings->addItems(*m_keyEncodings);
+    ui->m_decTabFileEncodings->addItems(*m_aesEncodings);
 
-    ui->m_encTabTextAlgs->addItems(*m_algorithms);
+    ui->m_encTabTextAlgs->addItems(*m_algTypes);
     ui->m_encTabTextModes->addItems(*m_aesModes);
-    ui->m_encTabTextEncodings->addItems(*m_enc_dec_encodings);
-    ui->m_decTabTextAlgs->addItems(*m_algorithms);
+    ui->m_encTabTextEncodings->addItems(*m_aesText_encodings);
+    ui->m_decTabTextAlgs->addItems(*m_algTypes);
     ui->m_decTabTextModes->addItems(*m_aesModes);
-    ui->m_decTabTextEncodings->addItems(*m_enc_dec_encodings);
+    ui->m_decTabTextEncodings->addItems(*m_aesText_encodings);
+}
+void MainWindow::initAlgorithms()
+{
+    for(string& alg : m_algorithms) {
+        m_algTypes->push_back(QString::fromStdString(alg));
+    }
+}
+void MainWindow::initModes()
+{
+    for(pair<const string&, const string&> p : m_modes) {
+        if(p.first == AbstractCipherAes::AlgName)
+            m_aesModes->push_back(QString::fromStdString(p.second));
+        if(p.first == AbstractCipherRsa::AlgName)
+            m_rsaModes->push_back(QString::fromStdString(p.second));
+    }
+}
+void MainWindow::initKeysizes()
+{
+    for(pair<const string&, const string&> p : m_keysizes) {
+        if(p.first == AbstractCipherAes::AlgName)
+            m_aesKeysizes->push_back(QString::fromStdString(p.second));
+        if(p.first == AbstractCipherRsa::AlgName)
+            m_rsaKeysizes->push_back(QString::fromStdString(p.second));
+    }
+}
+void MainWindow::initEncodings()
+{
+    for(pair<const string&, const string&> p : m_encodings) {
+        if(p.first == AbstractCipherAes::AlgName) {
+            m_aesEncodings->push_back(QString::fromStdString(p.second));
+            if(p.second != "None") m_aesText_encodings->push_back(QString::fromStdString(p.second));
+        }
+        if(p.first == AbstractCipherRsa::AlgName)
+            m_rsaEncodings->push_back(QString::fromStdString(p.second));
+    }
 }
 void MainWindow::connectItems()
 {
     connectCipher();
 
     // connect combos
-    QObject::connect(ui->m_encTabFileAlgs, &QComboBox::textActivated, this, &MainWindow::setComboModes);
-    QObject::connect(ui->m_decTabFileAlgs, &QComboBox::textActivated, this, &MainWindow::setComboModes);
-    QObject::connect(ui->m_encTabTextAlgs, &QComboBox::textActivated, this, &MainWindow::setComboModes);
-    QObject::connect(ui->m_decTabTextAlgs, &QComboBox::textActivated, this, &MainWindow::setComboModes);
+    QObject::connect(ui->m_encTabFileAlgs, &QComboBox::textActivated, this, &MainWindow::setMode);
+    QObject::connect(ui->m_decTabFileAlgs, &QComboBox::textActivated, this, &MainWindow::setMode);
+    QObject::connect(ui->m_encTabTextAlgs, &QComboBox::textActivated, this, &MainWindow::setMode);
+    QObject::connect(ui->m_decTabTextAlgs, &QComboBox::textActivated, this, &MainWindow::setMode);
+    QObject::connect(ui->m_keyMTypesG, &QComboBox::textActivated, this, &MainWindow::setType);
+    QObject::connect(ui->m_keyMTypesI, &QComboBox::textActivated, this, &MainWindow::setType);
 
     // connect checkboxes
     QObject::connect(ui->m_keyMHide, &QCheckBox::clicked, this, &MainWindow::hideKey);
@@ -142,16 +189,6 @@ void MainWindow::connectCipher()
 
     QObject::connect(&m_processBar, &ProcessBar::canceled, this, &MainWindow::cipherKill);
 }
-
-void MainWindow::generateKey(Encoding encoding)
-{
-    const int keylengthIndex = ui->m_keyMLength->currentIndex();
-    const KeyLength keylength = keylengthFrom(keylengthIndex);
-
-    m_keygen->setKeyLength(keylength);
-    m_keygen->generateKey();
-    setKeyLoadedText(QString::fromStdString(m_kserial.serialize(*m_keygen, encoding)));
-}
 void MainWindow::shortcuts()
 {
     m_actions[0]->setShortcut(QKeySequence("Alt+k"));
@@ -165,18 +202,48 @@ void MainWindow::toolTips()
     m_actions[1]->setToolTip("Alt+e");
     m_actions[2]->setToolTip("Alt+d");
 }
-void MainWindow::importSymmectric()
+void MainWindow::generateAes()
+{
+    delete m_keygen;
+    m_keygen = new KeygenAes;
+
+    const string& keysizeText = ui->m_keyMSizes->currentText().toStdString();
+    const size_t keysize = keysizeFrom(keysizeText);
+
+    m_keygen->generateKey(keysize, encodingFrom(ui->m_keyMEncodingsG));
+    setKeyLoadedText(QString::fromStdString(m_kserial.serialize((KeygenAes*)m_keygen)));
+
+    if(ui->m_keyMSaveOnF->isChecked())
+        saveKey((KeygenAes*)m_keygen);
+
+}
+void MainWindow::generateRsa()
+{
+    delete m_keygen;
+    m_keygen = new KeygenRsa;
+
+    const string& keysizeText = ui->m_keyMSizes->currentText().toStdString();
+    const size_t keysize = keysizeFrom(keysizeText);
+
+    m_keygen->generateKey(keysize, encodingFrom(ui->m_keyMEncodingsG));
+    setKeyLoadedText(QString::fromStdString(m_kserial.serialize((KeygenRsa*)m_keygen)));
+
+    if(ui->m_keyMSaveOnF->isChecked())
+        saveKey((KeygenRsa*)m_keygen);
+
+}
+void MainWindow::importAes()
 {
     try {
         m_fimporterKey.clear();
         Encoding encoding = static_cast<Encoding>(ui->m_keyMEncodingsI->currentIndex());
         ifstream* keyFile = (ifstream*)m_fimporterKey.importFile(this, "Import symmetric key");
-        bool imported = m_kserial.deserialize(keyFile, m_keygen);
+        bool imported = m_kserial.deserialize(keyFile, (KeygenAes*)m_keygen);
         if(m_keygen->isReady() && imported) {
-            string keyStr = m_kserial.serialize(*m_keygen, encoding);
+            string keyStr = m_kserial.serialize((KeygenAes*)m_keygen);
             setKeyLoadedText(QString::fromStdString(keyStr));
 
-            string message = "key " + std::to_string(m_keygen->getKey().size()) + " bytes - encoded ";
+            string message = "key " + std::to_string(((KeygenAes*)m_keygen)->getKey().size()) + " bytes - encoded ";
             message += m_kserial.serializeEncoding(encoding);
             message += "<br />has been successfully imported";
             dialogSuccess(message);
@@ -186,24 +253,71 @@ void MainWindow::importSymmectric()
         dialogError(e.what());
     }
 }
-void MainWindow::importAsymmectric()
+void MainWindow::importRsa()
 {
-}
-KeyLength MainWindow::keylengthFrom(const int index)
-{
-    KeyLength keylength;
-    switch(index) {
-    case 0 : keylength = KeyLength::LENGTH_DEFAULT; break;
-    case 1 : keylength = KeyLength::LENGTH_32; break;
-    case 2 : keylength = KeyLength::LENGTH_64; break;
-    case 3 : keylength = KeyLength::LENGTH_128; break;
-    case 4 : keylength = KeyLength::LENGTH_256; break;
-    case 5 : keylength = KeyLength::LENGTH_512; break;
-    case 6 : keylength = KeyLength::LENGTH_1024; break;
-    case 7 : keylength = KeyLength::LENGTH_2048; break;
-    default: keylength = static_cast<KeyLength>(0);
+    encodingFrom(ui->m_keyMEncodingsG);
+
+    try {
+        m_fimporterKey.clear();
+        Encoding encoding = static_cast<Encoding>(ui->m_keyMEncodingsI->currentIndex());
+        m_fimporterKey.importFiles(this, "Import asymmetric keys");
+        auto paths = m_fimporterKey.getFilePaths();
+
+        stringstream ss;
+        if(paths.size() == 2)
+            for(const string& path : paths) ss << path << "\n";
+        else ss << NO_FILE_LOADED;
+        ui->m_encTabFileSelected->setPlainText(QString::fromStdString(ss.str()));
     }
-    return keylength;
+    catch(exception& e) {
+        dialogError(e.what());
+    }
+}
+template<class T>
+void MainWindow::saveKey(T* keygen)
+{
+    if(!dialogSave(this).empty()) {
+        m_kserial.serialize(m_path, keygen);
+        ui->m_keyMSaveOnF->setChecked(false);
+        dialogSuccess(m_kserial.successWriteKey(m_path, keygen));
+    }
+}
+size_t MainWindow::keysizeFrom(const string& size)
+{
+    return QString::fromStdString(size).toInt();
+}
+Encoding MainWindow::encodingFrom(QComboBox* combo)
+{
+    Encoding encoding;
+    string pattern = "Encodings";
+    string comboName = combo->objectName().toStdString();
+    int index = comboName.find(pattern);
+    string type = comboName.substr(0, index);
+    string section = comboName.substr(index + pattern.size());
+    const QObject* parent = combo->parent();
+    QComboBox*  comboType = parent->findChild<QComboBox*>(QString::fromStdString(type + "Types" + section));
+
+    if(comboType->currentText() == QString::fromStdString(AbstractCipherAes::AlgName)) {
+        switch(combo->currentIndex()) {
+        case 0 :  encoding = Encoding::BASE64; break;
+        case 1 : encoding = Encoding::HEX; break;
+        case 2 : encoding = Encoding::NONE; break;
+        default: throw EncodingException();
+        }
+    }
+
+    else if(comboType->currentText() == QString::fromStdString(AbstractCipherRsa::AlgName)) {
+        switch(combo->currentIndex()) {
+        case 0 : encoding = Encoding::BER; break;
+        case 1 : encoding = Encoding::DER; break;
+        case 2 : encoding = Encoding::PEM; break;
+        default: throw EncodingException();
+        }
+    }
+
+    else throw EncodingException();
+
+    return encoding;
 }
 
 bool MainWindow::isFileExist(const string& path) const
@@ -380,14 +494,6 @@ string MainWindow::dialogSave(QWidget* parent, const string& caption, const stri
     return m_path;
 }
 
-void MainWindow::keyLoadedSelectable(const Qt::TextInteractionFlags flags) const
-{
-    ui->m_keyMLoaded->setTextInteractionFlags(flags);
-    ui->m_encTabFileLoaded->setTextInteractionFlags(flags);
-    ui->m_decTabFileLoaded->setTextInteractionFlags(flags);
-    ui->m_encTabTextLoaded->setTextInteractionFlags(flags);
-    ui->m_decTabTextLoaded->setTextInteractionFlags(flags);
-}
 void MainWindow::setFilesLoadedStyle(const QString& style) const
 {
     QPlainTextEdit* sender = static_cast<QPlainTextEdit*>(QObject::sender());
@@ -413,6 +519,14 @@ void MainWindow::setKeyLoadedSelectable(const bool selectable) const
 {
     if(selectable)keyLoadedSelectable(Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard);
     else keyLoadedSelectable(Qt::NoTextInteraction);
+}
+void MainWindow::keyLoadedSelectable(const Qt::TextInteractionFlags flags) const
+{
+    ui->m_keyMLoaded->setTextInteractionFlags(flags);
+    ui->m_encTabFileLoaded->setTextInteractionFlags(flags);
+    ui->m_decTabFileLoaded->setTextInteractionFlags(flags);
+    ui->m_encTabTextLoaded->setTextInteractionFlags(flags);
+    ui->m_decTabTextLoaded->setTextInteractionFlags(flags);
 }
 
 bool MainWindow::isRunningThread()
@@ -456,7 +570,7 @@ void MainWindow::on_m_encTabTextEncrypt_clicked()
 
         m_processBar.setMax();
         m_threadCipher.start();
-        emit startEncText(plainText, m_keygen, encoding);
+        emit startEncText(plainText, (KeygenAes*)m_keygen, encoding);
     }
     catch(exception& e) {
         dialogError(e.what());
@@ -477,7 +591,7 @@ void MainWindow::on_m_decTabTextDecrypt_clicked()
 
         m_processBar.setMax();
         m_threadCipher.start();
-        emit startDecText(cipherText, m_keygen, encoding);
+        emit startDecText(cipherText, (KeygenAes*)m_keygen, encoding);
     }
     catch(exception& e) {
         dialogError(e.what());
@@ -534,7 +648,7 @@ void MainWindow::on_m_encTabFileEncrypt_clicked()
 
         m_processBar.setMax(size);
         m_threadCipher.start();
-        emit startEncFile(paths, m_keygen, encoding);
+        emit startEncFile(paths, (KeygenAes*)m_keygen, encoding);
     }
     catch (std::exception& e) {
         dialogError(e.what());
@@ -552,7 +666,7 @@ void MainWindow::on_m_decTabFileDecrypt_clicked()
         string mode = ui->m_decTabFileModes->currentText().toStdString();
         m_processBar.setMax(size);
         m_threadCipher.start();
-        emit startDecFile(paths, m_keygen);
+        emit startDecFile(paths, (KeygenAes*)m_keygen);
     }
     catch (std::exception& e) {
         dialogError(e.what());
@@ -571,21 +685,16 @@ void MainWindow::on_m_decTabFileClear_clicked()
 
 void MainWindow::on_m_keyMGenerate_clicked()
 {
-    Encoding encoding = static_cast<Encoding>(ui->m_keyMEncodingsG->currentIndex());
-    generateKey(encoding);
-    if(ui->m_keyMSaveOnF->isChecked()) {
-        if(!dialogSave(this).empty()) {
-            m_kserial.serialize(m_path, *m_keygen, encoding);
-            ui->m_keyMSaveOnF->setChecked(false);
-            dialogSuccess(m_kserial.successMesssage(m_path, *m_keygen, encoding));
-        }
-    }
+    if(ui->m_keyMTypesG->currentText() == QString::fromStdString(AbstractCipherAes::AlgName))
+        generateAes();
+    if(ui->m_keyMTypesG->currentText() == QString::fromStdString(AbstractCipherRsa::AlgName))
+        generateRsa();
 }
 void MainWindow::on_m_keyMImport_clicked()
 {
-    string type = ui->m_keyMType->currentText().toStdString();
-    if(type == AbstractCipherAes::AlgName) importSymmectric();
-    if(type == AbstractCipherRsa::AlgName)importAsymmectric();
+    string type = ui->m_keyMTypesI->currentText().toStdString();
+    if(type == AbstractCipherAes::AlgName) importAes();
+    if(type == AbstractCipherRsa::AlgName) importRsa();
 }
 void MainWindow::on_m_keyMDisable_toggled(bool checked)
 {
@@ -593,7 +702,33 @@ void MainWindow::on_m_keyMDisable_toggled(bool checked)
     else m_warning = true;
 }
 
-void MainWindow::setComboModes(const QString& alg)
+void MainWindow::setType(const QString &type)
+{
+    QObject* sender = QObject::sender();
+    QObject* parent = sender->parent();
+    bool isImport = sender->objectName() == "m_keyMTypesI";
+    string encodingName = "m_keyMEncodings" ;
+
+    QComboBox* comboSizes = static_cast<QComboBox*>(parent->findChild<QComboBox*>("m_keyMSizes"));
+    QComboBox* comboEncodings = static_cast<QComboBox*>(parent->findChild<QComboBox*>(QString::fromStdString(encodingName + (isImport? "I":"G"))));
+    comboEncodings->clear();
+    if(type.toStdString() == AbstractCipherAes::AlgName) {
+        comboEncodings->addItems(*m_aesEncodings);
+        if(!isImport){
+            comboSizes->clear();
+            comboSizes->addItems(*m_aesKeysizes);
+        }
+    }
+    else if(type.toStdString() == AbstractCipherRsa::AlgName) {
+        comboEncodings->addItems(*m_rsaEncodings);
+        if(!isImport){
+            comboSizes->clear();
+            comboSizes->addItems(*m_rsaKeysizes);
+        }
+    }
+
+}
+void MainWindow::setMode(const QString& alg)
 {
     QComboBox* sender = static_cast<QComboBox*>(QObject::sender());
     QObject* parent = sender->parent();
@@ -620,6 +755,12 @@ void MainWindow::hideKey(const bool isChecked)
         setKeyLoadedSelectable(true);
     }
 }
+void MainWindow::flushKey()
+{
+    m_keygen->flush();
+    ui->m_keyMHide->setChecked(false);
+    setKeyLoadedText(NO_KEY_LOADED);
+}
 void MainWindow::colorKeyLoaded()
 {
     QPlainTextEdit* sender = static_cast<QPlainTextEdit*>(QObject::sender());
@@ -639,12 +780,6 @@ void MainWindow::colorFilesLoaded()
     if(isEmpty) setFilesLoadedStyle(STYLE_RED);
     else setFilesLoadedStyle(STYLE_NORMAL);
 
-}
-void MainWindow::flushKey()
-{
-    m_keygen->flush();
-    ui->m_keyMHide->setChecked(false);
-    setKeyLoadedText(NO_KEY_LOADED);
 }
 
 void MainWindow::recoverText(const std::string &recoverText)
@@ -740,15 +875,11 @@ void MainWindow::actionSelected()
     }
 }
 
-void MainWindow::disable()
-{
-    setDisabled(true);
-}
-void MainWindow::enable()
-{
-    setDisabled(false);
-}
-void MainWindow::dectectFields(const string &alg, const string &mode, const Encoding encoding, const bool decfname)
+void MainWindow::dectectFields(
+    const string &alg,
+    const string &mode,
+    const Encoding encoding,
+    const bool decfname)
 {
     QComboBox* combo = ui->m_decTabFileModes;
     combo->clear();
@@ -759,5 +890,4 @@ void MainWindow::dectectFields(const string &alg, const string &mode, const Enco
     ui->m_decTabFileEncodings->setCurrentIndex(encoding);
     ui->m_decTabFileDecFname->setChecked(decfname);
 }
-
 

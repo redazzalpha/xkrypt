@@ -30,7 +30,9 @@ SOURCES += \
     cipherrsa.cpp \
     except.cpp \
     fileimporter.cpp \
-    keygen.cpp \
+    keygenaes.cpp \
+    keygenbase.cpp \
+    keygenrsa.cpp \
     keygenserial.cpp \
     main.cpp \
     mainwindow.cpp \
@@ -63,7 +65,9 @@ HEADERS += \
     enums.h \
     except.h \
     fileimporter.h \
-    keygen.h \
+    keygenaes.h \
+    keygenbase.h \
+    keygenrsa.h \
     keygenserial.h \
     mainwindow.h \
     processbar.h \
