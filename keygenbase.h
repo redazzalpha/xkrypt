@@ -22,6 +22,7 @@ public:
     virtual void generateKey(size_t keysize, Encoding encoding) = 0;
     virtual bool isReady() const = 0;
     virtual void flush() = 0;
+    virtual AbstractKeygen* keygenCpy() = 0;
 
     void setKeysize(size_t keysize);
     void setEncoding(Encoding newEncoding);

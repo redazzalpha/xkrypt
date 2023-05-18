@@ -4,7 +4,7 @@
 #include "actionbase.h"
 
 
-class AbstractActionPage : public AbstractActionBase {
+class AbstractActionPage : public AbstractAction {
 public:
     // constructor
     AbstractActionPage(const std::string& toolTipText, const std::string& iconPath);

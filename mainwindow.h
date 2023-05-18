@@ -4,7 +4,7 @@
 #include "aesgcm.h"
 #include "aescbc.h"
 #include "aeseax.h"
-#include "keygenserial.h"
+#include "keygen_serial.h"
 #include "keygenaes.h"
 #include "rsassa.h"
 #include "rsaoeap.h"
@@ -40,8 +40,8 @@ private:
     QThread m_threadCipher;
     ProcessBar m_processBar;
     AbstractKeygen* m_keygen = new KeygenAes;
-    KeygenSerial m_kserial;
-    AbstractActionBase* m_currentAction;
+    Keygen_serial m_kserial;
+    AbstractAction* m_currentAction;
     FileImporter m_fimporterEnc;
     FileImporter m_fimporterDec;
     FileImporter m_fimporterKey;
@@ -85,7 +85,7 @@ private:
         {AbstractCipherRsa::AlgName, "PEM"},
     };
 
-    QList<AbstractActionBase*> m_actions = QList<AbstractActionBase*> {
+    QList<AbstractAction*> m_actions = QList<AbstractAction*> {
         new ActionKeyMgr(),
         new ActionEncrypt(),
         new ActionDecrypt(),
@@ -119,12 +119,6 @@ private:
     void connectCipher();
     void shortcuts();
     void toolTips();
-    void generateAes();
-    void generateRsa();
-    void importAes();
-    void importRsa();
-    template<class T>
-    void saveKey(T* keygen);
     size_t keysizeFrom(const std::string &size);
     Encoding encodingFrom(QComboBox *combo);
 
@@ -145,8 +139,15 @@ private:
 
     bool isRunningThread();
     std::string refsToString();
-
     void closeEvent(QCloseEvent* event) override;
+    void importFile(FileImporter& fimporter, const std::string &caption);
+
+    template <class T>
+    void generateKey();
+    template<class T>
+    void saveKey();
+    template <class T>
+    void importKey(const std::string& caption);
 
 private slots:
     void on_m_encTabTextEncrypt_clicked();
@@ -190,10 +191,10 @@ private slots:
     );
 
 signals:
-    void startEncFile(std::vector<std::string> paths, KeygenAes* keygen, const Encoding encoding);
-    void startDecFile(std::vector<std::string> paths, KeygenAes* keygen);
-    void startEncText(const std::string& plain, KeygenAes* keygen, const Encoding encoding);
-    void startDecText(const std::string& cipher, KeygenAes* keygen, const Encoding encoding);
+    void startEncText(const std::string& plain, AbstractKeygen* keygen, const Encoding encoding);
+    void startDecText(const std::string& cipher, AbstractKeygen* keygen, const Encoding encoding);
+    void startEncFile(std::vector<std::string> paths, AbstractKeygen* keygen, const Encoding encoding);
+    void startDecFile(std::vector<std::string> paths, AbstractKeygen* keygen);
     void startProcess(const int progress = 0);
 };
 

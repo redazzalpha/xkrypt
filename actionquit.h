@@ -1,7 +1,7 @@
 #ifndef ACTIONQUIT_H
 #define ACTIONQUIT_H
 
-#include "action.h"
+#include "actionglobal.h"
 
 /**
  * KActionQuit class represents QAction object
@@ -9,7 +9,7 @@
  * quit application
  */
 
-class ActionQuit : public AbstractAction {
+class ActionQuit : public AbstractActionGlobal {
 public:
     // constructors
     ActionQuit();

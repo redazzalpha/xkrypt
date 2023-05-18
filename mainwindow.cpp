@@ -47,7 +47,7 @@ MainWindow::~MainWindow()
     delete m_rsaEncodings;
     delete m_aesText_encodings;
 
-    foreach(AbstractActionBase* action, m_actions) delete action;
+    foreach(AbstractAction* action, m_actions) delete action;
 }
 
 // private methods
@@ -72,17 +72,17 @@ void MainWindow::uiInit()
     ui->m_keyMTypesI->addItems(*m_algTypes);
     ui->m_keyMTypesG->addItems(*m_algTypes);
 
-    ui->m_encTabFileAlgs->addItems(*m_algTypes);
+    ui->m_encTabFileTypes->addItems(*m_algTypes);
     ui->m_encTabFileModes->addItems(*m_aesModes);
     ui->m_encTabFileEncodings->addItems(*m_aesEncodings);
-    ui->m_decTabFileAlgs->addItems(*m_algTypes);
+    ui->m_decTabFileTypes->addItems(*m_algTypes);
     ui->m_decTabFileModes->addItems(*m_aesModes);
     ui->m_decTabFileEncodings->addItems(*m_aesEncodings);
 
-    ui->m_encTabTextAlgs->addItems(*m_algTypes);
+    ui->m_encTabTextTypes->addItems(*m_algTypes);
     ui->m_encTabTextModes->addItems(*m_aesModes);
     ui->m_encTabTextEncodings->addItems(*m_aesText_encodings);
-    ui->m_decTabTextAlgs->addItems(*m_algTypes);
+    ui->m_decTabTextTypes->addItems(*m_algTypes);
     ui->m_decTabTextModes->addItems(*m_aesModes);
     ui->m_decTabTextEncodings->addItems(*m_aesText_encodings);
 }
@@ -126,10 +126,10 @@ void MainWindow::connectItems()
     connectCipher();
 
     // connect combos
-    QObject::connect(ui->m_encTabFileAlgs, &QComboBox::textActivated, this, &MainWindow::setMode);
-    QObject::connect(ui->m_decTabFileAlgs, &QComboBox::textActivated, this, &MainWindow::setMode);
-    QObject::connect(ui->m_encTabTextAlgs, &QComboBox::textActivated, this, &MainWindow::setMode);
-    QObject::connect(ui->m_decTabTextAlgs, &QComboBox::textActivated, this, &MainWindow::setMode);
+    QObject::connect(ui->m_encTabFileTypes, &QComboBox::textActivated, this, &MainWindow::setMode);
+    QObject::connect(ui->m_decTabFileTypes, &QComboBox::textActivated, this, &MainWindow::setMode);
+    QObject::connect(ui->m_encTabTextTypes, &QComboBox::textActivated, this, &MainWindow::setMode);
+    QObject::connect(ui->m_decTabTextTypes, &QComboBox::textActivated, this, &MainWindow::setMode);
     QObject::connect(ui->m_keyMTypesG, &QComboBox::textActivated, this, &MainWindow::setType);
     QObject::connect(ui->m_keyMTypesI, &QComboBox::textActivated, this, &MainWindow::setType);
 
@@ -146,11 +146,11 @@ void MainWindow::connectItems()
     QObject::connect(ui->m_decTabFileSelected, &QPlainTextEdit::textChanged, this, &MainWindow::colorFilesLoaded);
 
     // create and connect actions
-    foreach (AbstractActionBase* action, m_actions) {
+    foreach (AbstractAction* action, m_actions) {
         ui->m_toolBar->addAction(action);
-        QObject::connect(action, &QAction::triggered, action, &AbstractActionBase::onActionClick);
-        QObject::connect(action, &AbstractActionBase::quit, this, &QMainWindow::close);
-        QObject::connect(action, &AbstractActionBase::setStackPage, ui->m_mainStack, &QStackedWidget::setCurrentIndex);
+        QObject::connect(action, &QAction::triggered, action, &AbstractAction::onActionClick);
+        QObject::connect(action, &AbstractAction::quit, this, &QMainWindow::close);
+        QObject::connect(action, &AbstractAction::setStackPage, ui->m_mainStack, &QStackedWidget::setCurrentIndex);
         QObject::connect(action, &QAction::triggered, this, &MainWindow::actionSelected);
     }
 }
@@ -201,86 +201,6 @@ void MainWindow::toolTips()
     m_actions[0]->setToolTip("Alt+k");
     m_actions[1]->setToolTip("Alt+e");
     m_actions[2]->setToolTip("Alt+d");
-}
-void MainWindow::generateAes()
-{
-    delete m_keygen;
-    m_keygen = new KeygenAes;
-
-    const string& keysizeText = ui->m_keyMSizes->currentText().toStdString();
-    const size_t keysize = keysizeFrom(keysizeText);
-
-    m_keygen->generateKey(keysize, encodingFrom(ui->m_keyMEncodingsG));
-    setKeyLoadedText(QString::fromStdString(m_kserial.serialize((KeygenAes*)m_keygen)));
-
-    if(ui->m_keyMSaveOnF->isChecked())
-        saveKey((KeygenAes*)m_keygen);
-
-}
-void MainWindow::generateRsa()
-{
-    delete m_keygen;
-    m_keygen = new KeygenRsa;
-
-    const string& keysizeText = ui->m_keyMSizes->currentText().toStdString();
-    const size_t keysize = keysizeFrom(keysizeText);
-
-    m_keygen->generateKey(keysize, encodingFrom(ui->m_keyMEncodingsG));
-    setKeyLoadedText(QString::fromStdString(m_kserial.serialize((KeygenRsa*)m_keygen)));
-
-    if(ui->m_keyMSaveOnF->isChecked())
-        saveKey((KeygenRsa*)m_keygen);
-
-}
-void MainWindow::importAes()
-{
-    try {
-        m_fimporterKey.clear();
-        Encoding encoding = static_cast<Encoding>(ui->m_keyMEncodingsI->currentIndex());
-        ifstream* keyFile = (ifstream*)m_fimporterKey.importFile(this, "Import symmetric key");
-        bool imported = m_kserial.deserialize(keyFile, (KeygenAes*)m_keygen);
-        if(m_keygen->isReady() && imported) {
-            string keyStr = m_kserial.serialize((KeygenAes*)m_keygen);
-            setKeyLoadedText(QString::fromStdString(keyStr));
-
-            string message = "key " + std::to_string(((KeygenAes*)m_keygen)->getKey().size()) + " bytes - encoded ";
-            message += m_kserial.serializeEncoding(encoding);
-            message += "<br />has been successfully imported";
-            dialogSuccess(message);
-        }
-    }
-    catch(exception& e) {
-        dialogError(e.what());
-    }
-}
-void MainWindow::importRsa()
-{
-    encodingFrom(ui->m_keyMEncodingsG);
-
-    try {
-        m_fimporterKey.clear();
-        Encoding encoding = static_cast<Encoding>(ui->m_keyMEncodingsI->currentIndex());
-        m_fimporterKey.importFiles(this, "Import asymmetric keys");
-        auto paths = m_fimporterKey.getFilePaths();
-
-        stringstream ss;
-        if(paths.size() == 2)
-            for(const string& path : paths) ss << path << "\n";
-        else ss << NO_FILE_LOADED;
-        ui->m_encTabFileSelected->setPlainText(QString::fromStdString(ss.str()));
-    }
-    catch(exception& e) {
-        dialogError(e.what());
-    }
-}
-template<class T>
-void MainWindow::saveKey(T* keygen)
-{
-    if(!dialogSave(this).empty()) {
-        m_kserial.serialize(m_path, keygen);
-        ui->m_keyMSaveOnF->setChecked(false);
-        dialogSuccess(m_kserial.successWriteKey(m_path, keygen));
-    }
 }
 size_t MainWindow::keysizeFrom(const string& size)
 {
@@ -546,11 +466,80 @@ string MainWindow::refsToString()
 
     return refs;
 }
-
-// protected methods
 void MainWindow::closeEvent(QCloseEvent*)
 {
     QMainWindow::close();
+}
+
+void MainWindow::importFile(FileImporter& fimporter, const string& caption)
+{
+    fimporter.importFiles(this, caption);
+
+    stringstream ss;
+    auto paths = fimporter.getFilePaths();
+
+    if(paths.size() > 0)
+        for(const string& path : fimporter.getFilePaths()) ss << path << "\n";
+    else ss << NO_FILE_LOADED;
+    if(caption.find("encrypt") < caption.size())
+    ui->m_encTabFileSelected->setPlainText(QString::fromStdString(ss.str()));
+    if(caption.find("decrypt") < caption.size())
+    ui->m_decTabFileSelected->setPlainText(QString::fromStdString(ss.str()));
+}
+
+template<class T>
+void MainWindow::generateKey()
+{
+    delete m_keygen;
+    m_keygen = new T;
+
+    const string& keysizeText = ui->m_keyMSizes->currentText().toStdString();
+    const size_t keysize = keysizeFrom(keysizeText);
+
+    m_keygen->generateKey(keysize, encodingFrom(ui->m_keyMEncodingsG));
+    setKeyLoadedText(QString::fromStdString(m_kserial.serialize((T*)m_keygen)));
+
+    if(ui->m_keyMSaveOnF->isChecked())
+        saveKey<T>();
+}
+template<class T>
+void MainWindow::saveKey()
+{
+    if(!dialogSave(this).empty()) {
+        m_kserial.serialize(m_path, (T*)m_keygen);
+        ui->m_keyMSaveOnF->setChecked(false);
+        dialogSuccess(m_kserial.successWriteKey(m_path, (T*)m_keygen));
+    }
+}
+template<class T>
+void MainWindow::importKey(const string &caption)
+{
+    AbstractKeygen* keygen_cpy = m_keygen->keygenCpy();
+    delete m_keygen;
+    m_keygen = new T;
+
+    try {
+        m_fimporterKey.clear();
+        Encoding encoding = encodingFrom(ui->m_keyMEncodingsI);
+        ifstream* keyFile = (ifstream*)m_fimporterKey.importFile(this, caption);
+        m_keygen->setEncoding(encoding);
+        bool imported = m_kserial.deserialize(keyFile, (T*)m_keygen);
+        if(m_keygen->isReady() && imported) {
+            string keyStr = m_kserial.serialize((T*)m_keygen);
+            setKeyLoadedText(QString::fromStdString(keyStr));
+            delete keygen_cpy;
+
+            string message = "key " + std::to_string(((T*)m_keygen)->keysize()) + " bytes - encoded ";
+            message += m_kserial.serializeEncoding(encoding);
+            message += "<br />has been successfully imported";
+            dialogSuccess(message);
+        }
+        else m_keygen = keygen_cpy;
+    }
+    catch(exception& e) {
+        m_keygen = keygen_cpy;
+        dialogError(e.what());
+    }
 }
 
 // slots
@@ -561,16 +550,16 @@ void MainWindow::on_m_encTabTextEncrypt_clicked()
         string plainText = ui->m_encTabTextField->toPlainText().toStdString();
 
         if(plainText.empty()) throw EmptyTextException();
-        string alg = ui->m_encTabTextAlgs->currentText().toStdString();
+        string alg = ui->m_encTabTextTypes->currentText().toStdString();
         string mode = ui->m_encTabTextModes->currentText().toStdString();
-        Encoding encoding = static_cast<Encoding>(ui->m_encTabTextEncodings->currentIndex());
+        Encoding encoding = encodingFrom(ui->m_encTabTextEncodings);
         
         m_cipher.cipherNew(alg, mode);
         m_cipher.setEncfname(false);
 
         m_processBar.setMax();
         m_threadCipher.start();
-        emit startEncText(plainText, (KeygenAes*)m_keygen, encoding);
+        emit startEncText(plainText, m_keygen, encoding);
     }
     catch(exception& e) {
         dialogError(e.what());
@@ -583,15 +572,15 @@ void MainWindow::on_m_decTabTextDecrypt_clicked()
         string cipherText = ui->m_decTabTextField->toPlainText().toStdString();
 
         if(cipherText.empty()) throw EmptyTextException();
-        string alg = ui->m_decTabTextAlgs->currentText().toStdString();
+        string alg = ui->m_decTabTextTypes->currentText().toStdString();
         string mode = ui->m_decTabTextModes->currentText().toStdString();
-        Encoding encoding = static_cast<Encoding>(ui->m_decTabTextEncodings->currentIndex());
+        Encoding encoding = encodingFrom(ui->m_decTabTextEncodings);
         
         m_cipher.cipherNew(alg, mode);
 
         m_processBar.setMax();
         m_threadCipher.start();
-        emit startDecText(cipherText, (KeygenAes*)m_keygen, encoding);
+        emit startDecText(cipherText, m_keygen, encoding);
     }
     catch(exception& e) {
         dialogError(e.what());
@@ -608,27 +597,11 @@ void MainWindow::on_m_decTabTextReset_clicked()
 
 void MainWindow::on_m_encTabFileImport_clicked()
 {
-    m_fimporterEnc.importFiles(this, "Select file(s) to encrypt");
-
-    stringstream ss;
-    auto paths = m_fimporterEnc.getFilePaths();
-
-    if(paths.size() > 0)
-        for(const string& path : paths) ss << path << "\n";
-    else ss << NO_FILE_LOADED;
-    ui->m_encTabFileSelected->setPlainText(QString::fromStdString(ss.str()));
+    importFile(m_fimporterEnc, "Select file(s) to encrypt");
 }
 void MainWindow::on_m_decTabFileImport_clicked()
 {
-    m_fimporterDec.importFiles(this, "Select file(s) to decrypt");
-
-    stringstream ss;
-    auto paths = m_fimporterDec.getFilePaths();
-
-    if(paths.size() > 0)
-        for(const string& path : m_fimporterDec.getFilePaths()) ss << path << "\n";
-    else ss << NO_FILE_LOADED;
-    ui->m_decTabFileSelected->setPlainText(QString::fromStdString(ss.str()));
+    importFile(m_fimporterDec, "Select file(s) to decrypt");
 }
 
 void MainWindow::on_m_encTabFileEncrypt_clicked()
@@ -638,9 +611,9 @@ void MainWindow::on_m_encTabFileEncrypt_clicked()
         size_t size = paths.size();
         if(size < 1) throw FileSelectedException("-- error no file selected");
 
-        string alg = ui->m_encTabFileAlgs->currentText().toStdString();
+        string alg = ui->m_encTabFileTypes->currentText().toStdString();
         string mode = ui->m_encTabFileModes->currentText().toStdString();
-        Encoding encoding = static_cast<Encoding>(ui->m_encTabFileEncodings->currentIndex());
+        Encoding encoding = encodingFrom(ui->m_encTabFileEncodings);
         bool encFname = ui->m_encTabFileEncFname->isChecked();
         
         m_cipher.cipherNew(alg, mode);
@@ -648,7 +621,7 @@ void MainWindow::on_m_encTabFileEncrypt_clicked()
 
         m_processBar.setMax(size);
         m_threadCipher.start();
-        emit startEncFile(paths, (KeygenAes*)m_keygen, encoding);
+        emit startEncFile(paths, m_keygen, encoding);
     }
     catch (std::exception& e) {
         dialogError(e.what());
@@ -657,16 +630,20 @@ void MainWindow::on_m_encTabFileEncrypt_clicked()
 void MainWindow::on_m_decTabFileDecrypt_clicked()
 {
     try {
-        size_t size = 0;
         vector<string> paths = m_fimporterDec.getFilePaths();
-        size =  paths.size();
-        if(size < 1) throw FileSelectedException();
+        size_t size = paths.size();
+        if(size < 1) throw FileSelectedException("-- error no file selected");
+        /*
+         * useless cause of detect fields function
+         * and refs system
+        */
+//      string alg = ui->m_decTabFileAlgs->currentText().toStdString();
+//      string mode = ui->m_decTabFileModes->currentText().toStdString();
+//      Encoding encoding = encodingFrom(ui->m_decTabFileEncodings);
 
-        string alg = ui->m_decTabFileAlgs->currentText().toStdString();
-        string mode = ui->m_decTabFileModes->currentText().toStdString();
         m_processBar.setMax(size);
         m_threadCipher.start();
-        emit startDecFile(paths, (KeygenAes*)m_keygen);
+        emit startDecFile(paths, m_keygen);
     }
     catch (std::exception& e) {
         dialogError(e.what());
@@ -684,17 +661,17 @@ void MainWindow::on_m_decTabFileClear_clicked()
 }
 
 void MainWindow::on_m_keyMGenerate_clicked()
-{
+{    
     if(ui->m_keyMTypesG->currentText() == QString::fromStdString(AbstractCipherAes::AlgName))
-        generateAes();
+        generateKey<KeygenAes>();
     if(ui->m_keyMTypesG->currentText() == QString::fromStdString(AbstractCipherRsa::AlgName))
-        generateRsa();
+        generateKey<KeygenRsa>();
 }
 void MainWindow::on_m_keyMImport_clicked()
 {
     string type = ui->m_keyMTypesI->currentText().toStdString();
-    if(type == AbstractCipherAes::AlgName) importAes();
-    if(type == AbstractCipherRsa::AlgName) importRsa();
+    if(type == AbstractCipherAes::AlgName) importKey<KeygenAes>("Import symmetric key");
+    if(type == AbstractCipherRsa::AlgName) importKey<KeygenRsa>("Import asymmetric key");
 }
 void MainWindow::on_m_keyMDisable_toggled(bool checked)
 {
@@ -828,12 +805,12 @@ void MainWindow::cipherText(const std::string &cipherText)
 }
 void MainWindow::recoverFile(const string& success)
 {
-    Encoding encoding = static_cast<Encoding>(ui->m_decTabFileEncodings->currentIndex());
+    Encoding encoding = encodingFrom(ui->m_decTabFileEncodings);
     dialogSuccess(success + " Encoding: " + m_kserial.serializeEncoding(encoding));
 }
 void MainWindow::cipherFile(const string& success)
 {
-    Encoding encoding = static_cast<Encoding>(ui->m_encTabFileEncodings->currentIndex());
+    Encoding encoding = encodingFrom(ui->m_encTabFileEncodings);
     ui->m_encTabFileEncFname->setChecked(true);
     dialogSuccess(success + " Encoding: " + m_kserial.serializeEncoding(encoding));
 }
@@ -855,8 +832,8 @@ void MainWindow::toogleEncFname(bool checked)
 }
 void MainWindow::actionSelected()
 {
-    AbstractActionBase* sender = static_cast<AbstractActionBase*>(QObject::sender());
-    AbstractActionBase* current = m_currentAction;
+    AbstractAction* sender = static_cast<AbstractAction*>(QObject::sender());
+    AbstractAction* current = m_currentAction;
     if(sender != current) {
         string senderPath = sender->iconPath();
         string currentPath = current->iconPath();
@@ -871,7 +848,7 @@ void MainWindow::actionSelected()
         iconPath = senderPath.substr(0, len) + IMG_SELECTED_SUFFIX;
         sender->setIcon(iconPath);
 
-        m_currentAction = static_cast<AbstractActionBase*>(sender);
+        m_currentAction = static_cast<AbstractAction*>(sender);
     }
 }
 
@@ -885,9 +862,11 @@ void MainWindow::dectectFields(
     combo->clear();
     if(alg == AbstractCipherAes::AlgName) combo->addItems(*m_aesModes);
     if(alg == AbstractCipherRsa::AlgName) combo->addItems(*m_rsaModes);
-    ui->m_decTabFileAlgs->setCurrentText(QString::fromStdString(alg));
+    ui->m_decTabFileTypes->setCurrentText(QString::fromStdString(alg));
     ui->m_decTabFileModes->setCurrentText(QString::fromStdString(mode));
     ui->m_decTabFileEncodings->setCurrentIndex(encoding);
     ui->m_decTabFileDecFname->setChecked(decfname);
 }
+
+
 

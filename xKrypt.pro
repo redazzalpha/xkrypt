@@ -9,10 +9,10 @@ CONFIG += c++17
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    action.cpp \
     actionbase.cpp \
     actiondecrypt.cpp \
     actionencrypt.cpp \
+    actionglobal.cpp \
     actionkeyMgr.cpp \
     actionpage.cpp \
     actionquit.cpp \
@@ -30,10 +30,10 @@ SOURCES += \
     cipherrsa.cpp \
     except.cpp \
     fileimporter.cpp \
+    keygen_serial.cpp \
     keygenaes.cpp \
     keygenbase.cpp \
     keygenrsa.cpp \
-    keygenserial.cpp \
     main.cpp \
     mainwindow.cpp \
     processbar.cpp \
@@ -42,10 +42,10 @@ SOURCES += \
     structures.cpp
 
 HEADERS += \
-    action.h \
     actionbase.h \
     actiondecrypt.h \
     actionencrypt.h \
+    actionglobal.h \
     actionkeyMgr.h \
     actionpage.h \
     actionquit.h \
@@ -65,10 +65,10 @@ HEADERS += \
     enums.h \
     except.h \
     fileimporter.h \
+    keygen_serial.h \
     keygenaes.h \
     keygenbase.h \
     keygenrsa.h \
-    keygenserial.h \
     mainwindow.h \
     processbar.h \
     rsaoeap.h \

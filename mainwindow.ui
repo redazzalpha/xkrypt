@@ -853,7 +853,7 @@
          <item>
           <layout class="QHBoxLayout" name="hlayout_4">
            <item>
-            <widget class="QComboBox" name="m_encTabFileAlgs">
+            <widget class="QComboBox" name="m_encTabFileTypes">
              <property name="minimumSize">
               <size>
                <width>150</width>
@@ -1092,7 +1092,7 @@
          <item>
           <layout class="QHBoxLayout" name="hlayout_10">
            <item>
-            <widget class="QComboBox" name="m_encTabTextAlgs">
+            <widget class="QComboBox" name="m_encTabTextTypes">
              <property name="minimumSize">
               <size>
                <width>150</width>
@@ -1470,7 +1470,7 @@
          <item>
           <layout class="QHBoxLayout" name="hlayout_2">
            <item>
-            <widget class="QComboBox" name="m_decTabFileAlgs">
+            <widget class="QComboBox" name="m_decTabFileTypes">
              <property name="enabled">
               <bool>false</bool>
              </property>
@@ -1694,7 +1694,7 @@
          <item>
           <layout class="QHBoxLayout" name="hlayout_21">
            <item>
-            <widget class="QComboBox" name="m_decTabTextAlgs">
+            <widget class="QComboBox" name="m_decTabTextTypes">
              <property name="minimumSize">
               <size>
                <width>150</width>

@@ -13,6 +13,10 @@ private:
 public:
     // constructors
     KeygenRsa(size_t keysize = static_cast<size_t>(Rsa::KeySize::LENGTH_DEFAULT));
+    KeygenRsa(const KeygenRsa& a);
+
+    // operators
+    KeygenRsa& operator=(const KeygenRsa& a);
 
     // destructor
     virtual ~KeygenRsa();
@@ -22,6 +26,8 @@ public:
     virtual void generateKey(size_t keysize, Encoding encoding) override;
     virtual bool isReady() const override;
     virtual void flush() override;
+    virtual KeygenRsa* keygenCpy() override;
+
     CryptoPP::RSA::PrivateKey* getPrivate();
     CryptoPP::RSA::PublicKey* getPublic();
 };

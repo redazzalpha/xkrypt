@@ -2,21 +2,21 @@
 #include <iostream>
 
 // constructors
-AbstractActionBase::AbstractActionBase(const std::string& toolTipText, const std::string& iconPath)
+AbstractAction::AbstractAction(const std::string& toolTipText, const std::string& iconPath)
 {
     setIcon(iconPath);
     setToolTip(QString::fromStdString(toolTipText));
 }
 
-std::string AbstractActionBase::iconPath()
+std::string AbstractAction::iconPath()
 {
     return m_iconPath;
 }
 
 // destructor
-AbstractActionBase::~AbstractActionBase(){}
+AbstractAction::~AbstractAction(){}
 
-void AbstractActionBase::setIcon(const std::string &iconPath)
+void AbstractAction::setIcon(const std::string &iconPath)
 {
     m_iconPath = iconPath;
     m_pixmap = QPixmap(QString::fromStdString(m_iconPath));

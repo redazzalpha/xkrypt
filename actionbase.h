@@ -9,7 +9,7 @@
  * This class is used to remplace QAction object
  */
 
-class AbstractActionBase: public QAction {
+class AbstractAction: public QAction {
     Q_OBJECT
 
 protected:
@@ -19,11 +19,11 @@ protected:
 
 public:
     // constructor
-    AbstractActionBase(const std::string& toolTipText, const std::string& iconPath);
+    AbstractAction(const std::string& toolTipText, const std::string& iconPath);
     std::string iconPath();
 
     // destructor
-    virtual ~AbstractActionBase();
+    virtual ~AbstractAction();
 
     // methods
     void setIcon(const std::string& iconPath);
