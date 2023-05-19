@@ -64,21 +64,13 @@ Mode Cipher::modeId() const
 {
     return m_cipher->modeId();
 }
-string Cipher::successEncMsg(const int succeed)
+string Cipher::successMsg(const int succeed, const bool mode)
 {
-    return  "Encryption successfull!<br />" +
-        std::to_string(succeed) + " file(s) written<br />"
-        "Using " +
-           algName() + " - " + modeName() +
-        " mode<br />";
-}
-string Cipher::successDecMsg(const int succeed)
-{
-    return  "Decryption successfull!<br />" +
-        std::to_string(succeed) + " file(s) written<br />" +
-        "Using " +
-           algName() + " - " + modeName() +
-        " mode<br />";
+    stringstream ss;
+    ss << (mode?"Encryption ": "Decryption ") << "successfull!<br />";
+    ss << std::to_string(succeed) + " file(s) written<br />";
+    ss << "Using "  << algName() + " - " + modeName() << " mode<br />";
+    return ss.str();
 }
 void Cipher::cipherNew(const string& alg, const string& mode)
 {
@@ -201,7 +193,7 @@ void Cipher::encryptFile(vector<string> paths, AbstractKeygen* keygen, const Enc
             m_cipher->encryptFile(path, keygen, encoding);
             emit proceed(progress+1);
         }
-        emit cipherFile(successEncMsg(progress));
+        emit cipherFile(successMsg(progress));
     }
     catch(exception& e) {
         emit error(e.what());
@@ -232,7 +224,7 @@ void Cipher::decryptFile(vector<string> paths, AbstractKeygen* keygen)
             emit autoDetect(m_cipher->algName(), m_cipher->modeName(), encoding, refs[5]);
             emit proceed(progress+1);
         }
-        emit recoverFile(successDecMsg(progress));
+        emit recoverFile(successMsg(progress, false));
     }
     catch(InvalidRefsException& e) {
         emit error(e.what(), "-- It seems that you are trying to decrypt file\

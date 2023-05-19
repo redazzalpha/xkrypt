@@ -28,8 +28,7 @@ public:
     std::string modeName() const;
     Algorithms algId() const;
     Mode modeId() const;
-    std::string successEncMsg(const int succeed = 1);
-    std::string successDecMsg(const int succeed = 1);
+    std::string successMsg(const int succeed = 1, const bool mode = true);
     void cipherNew(const std::string& alg, const std::string& mode);
     void cipherDetect(const std::string &refs);
     void kill();

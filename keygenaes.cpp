@@ -77,6 +77,7 @@ void KeygenAes::setKey(CryptoPP::SecByteBlock key)
 {
     m_key.CleanNew(0);
     m_key = key;
+    m_keysize = m_key.size();
 }
 void KeygenAes::setIv(CryptoPP::SecByteBlock iv)
 {

@@ -28,8 +28,14 @@ public:
     virtual void flush() override;
     virtual KeygenRsa* keygenCpy() override;
 
+    void setPrivate(CryptoPP::RSA::PrivateKey *newPrivate);
+    void setPublic(CryptoPP::RSA::PrivateKey *privateKey);
+    void setPublic(CryptoPP::RSA::PublicKey *newPublic);
     CryptoPP::RSA::PrivateKey* getPrivate();
     CryptoPP::RSA::PublicKey* getPublic();
+
+    CryptoPP::InvertibleRSAFunction params();
+
 };
 
 #endif // KEYGENRSA_H

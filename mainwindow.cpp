@@ -184,9 +184,7 @@ void MainWindow::connectCipher()
     QObject::connect(&m_cipher, &Cipher::error, &m_processBar, &ProcessBar::hide);
 
     QObject::connect(&m_cipher, &Cipher::processing, &m_processBar, &ProcessBar::processing);
-
     QObject::connect(&m_cipher, &Cipher::autoDetect, this, &MainWindow::dectectFields);
-
     QObject::connect(&m_processBar, &ProcessBar::canceled, this, &MainWindow::cipherKill);
 }
 void MainWindow::shortcuts()
@@ -225,7 +223,6 @@ Encoding MainWindow::encodingFrom(QComboBox* combo)
         default: throw EncodingException();
         }
     }
-
     else if(comboType->currentText() == QString::fromStdString(AbstractCipherRsa::AlgName)) {
         switch(combo->currentIndex()) {
         case 0 : encoding = Encoding::BER; break;
@@ -234,7 +231,6 @@ Encoding MainWindow::encodingFrom(QComboBox* combo)
         default: throw EncodingException();
         }
     }
-
     else throw EncodingException();
 
     return encoding;
@@ -459,7 +455,7 @@ string MainWindow::refsToString()
     refs.resize(XKRYPT_REF_SIZE);
     refs[0] = XKRYPT_REF_VERSION;
     refs[1] = XKRYPT_REF_MODEL;
-    refs[2] = (CryptoPP::byte)ui->m_encTabTextEncodings->currentIndex();
+    refs[2] = (CryptoPP::byte)encodingFrom(ui->m_encTabTextEncodings);
     refs[3] = (CryptoPP::byte)m_cipher.algId();
     refs[4] = (CryptoPP::byte)m_cipher.modeId();
     refs[5] = (CryptoPP::byte)m_cipher.encfname();
@@ -481,10 +477,11 @@ void MainWindow::importFile(FileImporter& fimporter, const string& caption)
     if(paths.size() > 0)
         for(const string& path : fimporter.getFilePaths()) ss << path << "\n";
     else ss << NO_FILE_LOADED;
+
     if(caption.find("encrypt") < caption.size())
-    ui->m_encTabFileSelected->setPlainText(QString::fromStdString(ss.str()));
+        ui->m_encTabFileSelected->setPlainText(QString::fromStdString(ss.str()));
     if(caption.find("decrypt") < caption.size())
-    ui->m_decTabFileSelected->setPlainText(QString::fromStdString(ss.str()));
+        ui->m_decTabFileSelected->setPlainText(QString::fromStdString(ss.str()));
 }
 
 template<class T>
@@ -508,7 +505,7 @@ void MainWindow::saveKey()
     if(!dialogSave(this).empty()) {
         m_kserial.serialize(m_path, (T*)m_keygen);
         ui->m_keyMSaveOnF->setChecked(false);
-        dialogSuccess(m_kserial.successWriteKey(m_path, (T*)m_keygen));
+        dialogSuccess(m_kserial.successWriteKey(m_path, m_keygen));
     }
 }
 template<class T>
@@ -529,10 +526,11 @@ void MainWindow::importKey(const string &caption)
             setKeyLoadedText(QString::fromStdString(keyStr));
             delete keygen_cpy;
 
-            string message = "key " + std::to_string(((T*)m_keygen)->keysize()) + " bytes - encoded ";
-            message += m_kserial.serializeEncoding(encoding);
-            message += "<br />has been successfully imported";
-            dialogSuccess(message);
+            stringstream ss;
+            ss << "key "  << std::to_string(((T*)m_keygen)->keysize()) << " bytes ";
+            ss << " - encoded " << m_kserial.serializeEncoding(encoding) << "<br />";
+            ss << "has been successfully imported";
+            dialogSuccess(ss.str());
         }
         else m_keygen = keygen_cpy;
     }
@@ -766,7 +764,7 @@ void MainWindow::recoverText(const std::string &recoverText)
             std::ofstream file(m_path, std::ios::out | std::ios::trunc);
             file << recoverText;
             file.close();
-            dialogSuccess(m_cipher.successDecMsg() + "at " + m_path);
+            dialogSuccess(m_cipher.successMsg(1, false) + "at " + m_path);
         }
         ui->m_decTabTextSaveOnF->setChecked(false);
         ui->m_decTabTextField->setPlainText(QString::fromStdString(recoverText));
@@ -794,7 +792,7 @@ void MainWindow::cipherText(const std::string &cipherText)
             file << m_cipher.encodeText(refsToString(), Encoding::BASE64);;
             file << cipherText;
             file.close();
-            dialogSuccess(m_cipher.successEncMsg() + "at " + m_path);
+            dialogSuccess(m_cipher.successMsg() + "at " + m_path);
         }
         ui->m_encTabTextSaveOnF->setChecked(false);
         ui->m_encTabTextField->setPlainText(QString::fromStdString(cipherText));
@@ -864,7 +862,7 @@ void MainWindow::dectectFields(
     if(alg == AbstractCipherRsa::AlgName) combo->addItems(*m_rsaModes);
     ui->m_decTabFileTypes->setCurrentText(QString::fromStdString(alg));
     ui->m_decTabFileModes->setCurrentText(QString::fromStdString(mode));
-    ui->m_decTabFileEncodings->setCurrentIndex(encoding);
+    ui->m_decTabFileEncodings->setCurrentText(QString::fromStdString(m_kserial.serializeEncoding(encoding)));
     ui->m_decTabFileDecFname->setChecked(decfname);
 }
 
