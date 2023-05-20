@@ -1,6 +1,6 @@
 #include "cipherrsa.h"
 
-const std::string AbstractCipherRsa::AlgName = "Asymmectric - Rsa";
+const std::string AbstractCipherRsa::AlgName = "Asymmetric - Rsa";
 
 // constructors
 AbstractCipherRsa::AbstractCipherRsa(){}

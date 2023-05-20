@@ -54,7 +54,7 @@ MainWindow::~MainWindow()
 void MainWindow::uiInit()
 {
     ui->setupUi(this);
-    initAlgorithms();
+    initTypes();
     initModes();
     initKeysizes();
     initEncodings();
@@ -72,21 +72,25 @@ void MainWindow::uiInit()
     ui->m_keyMTypesI->addItems(*m_algTypes);
     ui->m_keyMTypesG->addItems(*m_algTypes);
 
+    ui->m_encTabFileTypes->setEnabled(false);
+    ui->m_encTabTextTypes->setEnabled(false);
+
+
     ui->m_encTabFileTypes->addItems(*m_algTypes);
-    ui->m_encTabFileModes->addItems(*m_aesModes);
-    ui->m_encTabFileEncodings->addItems(*m_aesEncodings);
     ui->m_decTabFileTypes->addItems(*m_algTypes);
+    ui->m_encTabFileModes->addItems(*m_aesModes);
     ui->m_decTabFileModes->addItems(*m_aesModes);
+    ui->m_encTabFileEncodings->addItems(*m_aesEncodings);
     ui->m_decTabFileEncodings->addItems(*m_aesEncodings);
 
     ui->m_encTabTextTypes->addItems(*m_algTypes);
-    ui->m_encTabTextModes->addItems(*m_aesModes);
-    ui->m_encTabTextEncodings->addItems(*m_aesText_encodings);
     ui->m_decTabTextTypes->addItems(*m_algTypes);
+    ui->m_encTabTextModes->addItems(*m_aesModes);
     ui->m_decTabTextModes->addItems(*m_aesModes);
+    ui->m_encTabTextEncodings->addItems(*m_aesText_encodings);
     ui->m_decTabTextEncodings->addItems(*m_aesText_encodings);
 }
-void MainWindow::initAlgorithms()
+void MainWindow::initTypes()
 {
     for(string& alg : m_algorithms) {
         m_algTypes->push_back(QString::fromStdString(alg));
@@ -126,12 +130,12 @@ void MainWindow::connectItems()
     connectCipher();
 
     // connect combos
-    QObject::connect(ui->m_encTabTextTypes, &QComboBox::textActivated, this, &MainWindow::setTypeCipher);
-    QObject::connect(ui->m_decTabTextTypes, &QComboBox::textActivated, this, &MainWindow::setTypeCipher);
-    QObject::connect(ui->m_encTabFileTypes, &QComboBox::textActivated, this, &MainWindow::setTypeCipher);
-    QObject::connect(ui->m_decTabFileTypes, &QComboBox::textActivated, this, &MainWindow::setTypeCipher);
-    QObject::connect(ui->m_keyMTypesG, &QComboBox::textActivated, this, &MainWindow::setTypeKey);
-    QObject::connect(ui->m_keyMTypesI, &QComboBox::textActivated, this, &MainWindow::setTypeKey);
+    QObject::connect(ui->m_encTabTextTypes, &QComboBox::currentTextChanged, this, &MainWindow::setTypeCipher);
+    QObject::connect(ui->m_decTabTextTypes, &QComboBox::currentTextChanged, this, &MainWindow::setTypeCipher);
+    QObject::connect(ui->m_encTabFileTypes, &QComboBox::currentTextChanged, this, &MainWindow::setTypeCipher);
+    QObject::connect(ui->m_decTabFileTypes, &QComboBox::currentTextChanged, this, &MainWindow::setTypeCipher);
+    QObject::connect(ui->m_keyMTypesG, &QComboBox::currentTextChanged, this, &MainWindow::setTypeKey);
+    QObject::connect(ui->m_keyMTypesI, &QComboBox::currentTextChanged, this, &MainWindow::setTypeKey);
 
     // connect checkboxes
     QObject::connect(ui->m_keyMHide, &QCheckBox::clicked, this, &MainWindow::hideKey);
@@ -184,7 +188,7 @@ void MainWindow::connectCipher()
     QObject::connect(&m_cipher, &Cipher::error, &m_processBar, &ProcessBar::hide);
 
     QObject::connect(&m_cipher, &Cipher::processing, &m_processBar, &ProcessBar::processing);
-    QObject::connect(&m_cipher, &Cipher::autoDetect, this, &MainWindow::dectectFields);
+    QObject::connect(&m_cipher, &Cipher::autoDetect, this, &MainWindow::detectFields);
     QObject::connect(&m_processBar, &ProcessBar::canceled, this, &MainWindow::cipherKill);
 }
 void MainWindow::shortcuts()
@@ -511,6 +515,9 @@ void MainWindow::generateKey()
     m_keygen->generateKey(keysize, encodingFrom(ui->m_keyMEncodingsG));
     setKeyLoadedText(QString::fromStdString(m_kserial.serialize((T*)m_keygen)));
 
+    ui->m_encTabFileTypes->setCurrentText(ui->m_keyMTypesG->currentText());
+    ui->m_encTabTextTypes->setCurrentText(ui->m_keyMTypesG->currentText());
+
     if(ui->m_keyMSaveOnF->isChecked())
         saveKey<T>();
 }
@@ -539,6 +546,10 @@ void MainWindow::importKey(const string &caption)
         if(m_keygen->isReady() && imported) {
             string keyStr = m_kserial.serialize((T*)m_keygen);
             setKeyLoadedText(QString::fromStdString(keyStr));
+
+            ui->m_encTabFileTypes->setCurrentText(ui->m_keyMTypesI->currentText());
+            ui->m_encTabTextTypes->setCurrentText(ui->m_keyMTypesI->currentText());
+
             delete keygen_cpy;
 
             stringstream ss;
@@ -859,7 +870,7 @@ void MainWindow::actionSelected()
         m_currentAction = static_cast<AbstractAction*>(sender);
     }
 }
-void MainWindow::dectectFields(
+void MainWindow::detectFields(
     const string &alg,
     const string &mode,
     const Encoding encoding,
