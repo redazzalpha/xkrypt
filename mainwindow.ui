@@ -811,7 +811,7 @@
               </size>
              </property>
              <property name="text">
-              <string>Algorithm</string>
+              <string>Type</string>
              </property>
             </widget>
            </item>
@@ -1028,7 +1028,7 @@
               </size>
              </property>
              <property name="text">
-              <string>Algorithm</string>
+              <string>Type</string>
              </property>
             </widget>
            </item>
@@ -1428,7 +1428,7 @@
               </size>
              </property>
              <property name="text">
-              <string>Algorithm</string>
+              <string>Type</string>
              </property>
             </widget>
            </item>
@@ -1646,7 +1646,7 @@
               </size>
              </property>
              <property name="text">
-              <string>Algorithm</string>
+              <string>Type</string>
              </property>
             </widget>
            </item>

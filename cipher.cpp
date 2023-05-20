@@ -10,8 +10,7 @@
 #include "cipher.h"
 #include "cipheraes.h"
 #include "cipherrsa.h"
-#include "rsaoeap.h"
-#include "rsassa.h"
+#include "rsaoaep.h"
 #include "except.h"
 #include <QFile>
 #include <base64.h>
@@ -95,8 +94,7 @@ void Cipher::cipherNew(const string& alg, const string& mode)
 
     // rsa algs
     else if(alg == AbstractCipherRsa::AlgName) {
-        if(mode == RsaOEAP::ModeName) m_cipher = new RsaOEAP;
-        else if(mode == RsaSSA::ModeName) m_cipher = new RsaSSA;
+        if(mode == RsaOAEP::ModeName) m_cipher = new RsaOAEP;
         // default. shouldn't go here but used to remove clang warnings
         else throw ModelException();
     }
@@ -109,7 +107,7 @@ void Cipher::cipherDetect(const string& refs)
     string alg;
     switch(refs[3]) {
     case Algorithms::AES : alg = AbstractCipherAes::AlgName; break;
-    case Algorithms::RSA : alg = AbstractCipherAes::AlgName; break;
+    case Algorithms::RSA : alg = AbstractCipherRsa::AlgName; break;
     default: throw AlgRefsException();
     }
 
@@ -129,8 +127,7 @@ void Cipher::cipherDetect(const string& refs)
     }
     if(alg == AbstractCipherRsa::AlgName) {
         switch(refs[4]) {
-        case Mode::OEAP :  mode = RsaOEAP::ModeName; break;
-        case Mode::SSA :  mode = RsaSSA::ModeName; break;
+        case Mode::OEAP :  mode = RsaOAEP::ModeName; break;
         default: throw ModeRefsException();
         }
     }
@@ -210,7 +207,7 @@ void Cipher::decryptFile(vector<string> paths, AbstractKeygen* keygen)
 
             string refs = m_cipher->checkRefs(path);
             Encoding encoding;
-            switch(refs[2]) {
+            switch(static_cast<Encoding>(refs[2])) {
             case Encoding::BASE64 : encoding = Encoding::BASE64; break;
             case Encoding::HEX : encoding = Encoding::HEX; break;
             case Encoding::NONE : encoding = Encoding::NONE; break;

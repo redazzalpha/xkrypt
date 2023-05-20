@@ -6,8 +6,7 @@
 #include "aeseax.h"
 #include "keygen_serial.h"
 #include "keygenaes.h"
-#include "rsassa.h"
-#include "rsaoeap.h"
+#include "rsaoaep.h"
 #include "enums.h"
 #include "actionkeyMgr.h"
 #include "actionencrypt.h"
@@ -62,8 +61,7 @@ private:
         {AbstractCipherAes::AlgName, AesGCM::ModeName},
         {AbstractCipherAes::AlgName, AesOFB::ModeName},
 
-        {AbstractCipherRsa::AlgName, RsaOEAP::ModeName},
-        {AbstractCipherRsa::AlgName, RsaSSA::ModeName},
+        {AbstractCipherRsa::AlgName, RsaOAEP::ModeName},
     };
     std::multimap<std::string, std::string> m_keysizes = {
         {AbstractCipherAes::AlgName, std::to_string(static_cast<int>(Aes::KeySize::LENGTH_16))},
@@ -121,6 +119,7 @@ private:
     void toolTips();
     size_t keysizeFrom(const std::string &size);
     Encoding encodingFrom(QComboBox *combo);
+    Encoding encodingFrom2(QComboBox *combo);
 
     bool isFileExist(const std::string& path) const;
     QMessageBox::ButtonRole dialogFileExists(const std::string& message);
@@ -167,12 +166,13 @@ private slots:
     void on_m_keyMImport_clicked();
     void on_m_keyMDisable_toggled(bool checked);
     
-    void setType(const QString & type);
-    void setMode(const QString& alg);
+    void setTypeKey(const QString & type);
+    void setTypeCipher(const QString& alg);
     void hideKey(const bool isChecked);
     void flushKey();
     void colorKeyLoaded();
     void colorFilesLoaded();
+    void autoEncfname1();
 
     void recoverText(const std::string &recoverText);
     void cipherText(const std::string &cipherText);
@@ -181,7 +181,6 @@ private slots:
     void cipherError(const std::string &error);
     void cipherKill();
 
-    void toogleEncFname(bool checked);
     void actionSelected();
     void dectectFields(
         const std::string& alg,

@@ -1,17 +1,18 @@
-#ifndef RSASSA_H
-#define RSASSA_H
+#ifndef RSAOAEP_H
+#define RSAOAEP_H
 
 #include "cipherrsa.h"
 
-class RsaSSA : public AbstractCipherRsa {
+
+class RsaOAEP : public AbstractCipherRsa {
 public:
     static const std::string ModeName;
 
     // constructors
-    RsaSSA();
+    RsaOAEP();
 
     // destructor
-    virtual ~RsaSSA();
+    virtual ~RsaOAEP();
 
     // methods
     virtual std::string modeName() const override;
@@ -22,4 +23,4 @@ public:
     virtual void decryptFile(const std::string& path, AbstractKeygen* keygen, const Encoding encoding) override;
 };
 
-#endif // RSASSA_H
+#endif // RSAOAEP_H

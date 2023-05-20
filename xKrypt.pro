@@ -37,8 +37,7 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     processbar.cpp \
-    rsaoeap.cpp \
-    rsassa.cpp \
+    rsaoaep.cpp \
     structures.cpp
 
 HEADERS += \
@@ -71,8 +70,7 @@ HEADERS += \
     keygenrsa.h \
     mainwindow.h \
     processbar.h \
-    rsaoeap.h \
-    rsassa.h \
+    rsaoaep.h \
     structures.h
 
 FORMS += \
