@@ -135,7 +135,7 @@ void MainWindow::connectItems()
 
     // connect checkboxes
     QObject::connect(ui->m_keyMHide, &QCheckBox::clicked, this, &MainWindow::hideKey);
-    QObject::connect(ui->m_encTabTextSaveOnF, &QCheckBox::stateChanged, this, &MainWindow::autoEncfname1);
+    QObject::connect(ui->m_encTabTextSaveOnF, &QCheckBox::stateChanged, this, &MainWindow::autoEncfname);
 
     // connect buttons
     QObject::connect(ui->m_keyMFlush, &QPushButton::clicked, this, &MainWindow::flushKey);
@@ -731,7 +731,7 @@ void MainWindow::setTypeCipher(const QString& alg)
         mode->addItems(*m_aesModes);
     if(alg.toStdString() == AbstractCipherRsa::AlgName)
         mode->addItems(*m_rsaModes);
-    autoEncfname1();
+    autoEncfname();
 }
 void MainWindow::hideKey(const bool isChecked)
 {
@@ -824,7 +824,6 @@ void MainWindow::recoverFile(const string& success)
 }
 void MainWindow::cipherFile(const string& success)
 {
-    autoEncfname1();
     Encoding encoding = encodingFrom(ui->m_encTabFileEncodings);
     dialogSuccess(success + " Encoding: " + m_kserial.serializeEncoding(encoding));
 }
@@ -876,7 +875,7 @@ void MainWindow::dectectFields(
     ui->m_decTabFileDecFname->setChecked(decfname);
 }
 
-void MainWindow::autoEncfname1()
+void MainWindow::autoEncfname()
 {
     QObject* sender = QObject::sender();
     QObject* parent = sender->parent();
