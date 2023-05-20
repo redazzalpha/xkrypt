@@ -126,16 +126,16 @@ void MainWindow::connectItems()
     connectCipher();
 
     // connect combos
-    QObject::connect(ui->m_encTabTextTypes, &QComboBox::textActivated, this, &MainWindow::setTypeCipher);
-    QObject::connect(ui->m_decTabTextTypes, &QComboBox::textActivated, this, &MainWindow::setTypeCipher);
-    QObject::connect(ui->m_encTabFileTypes, &QComboBox::textActivated, this, &MainWindow::setTypeCipher);
-    QObject::connect(ui->m_decTabFileTypes, &QComboBox::textActivated, this, &MainWindow::setTypeCipher);
-    QObject::connect(ui->m_keyMTypesG, &QComboBox::textActivated, this, &MainWindow::setTypeKey);
-    QObject::connect(ui->m_keyMTypesI, &QComboBox::textActivated, this, &MainWindow::setTypeKey);
+    QObject::connect(ui->m_encTabTextTypes, &QComboBox::currentTextChanged, this, &MainWindow::setTypeCipher);
+    QObject::connect(ui->m_decTabTextTypes, &QComboBox::currentTextChanged, this, &MainWindow::setTypeCipher);
+    QObject::connect(ui->m_encTabFileTypes, &QComboBox::currentTextChanged, this, &MainWindow::setTypeCipher);
+    QObject::connect(ui->m_decTabFileTypes, &QComboBox::currentTextChanged, this, &MainWindow::setTypeCipher);
+    QObject::connect(ui->m_keyMTypesG, &QComboBox::currentTextChanged, this, &MainWindow::setTypeKey);
+    QObject::connect(ui->m_keyMTypesI, &QComboBox::currentTextChanged, this, &MainWindow::setTypeKey);
 
     // connect checkboxes
     QObject::connect(ui->m_keyMHide, &QCheckBox::clicked, this, &MainWindow::hideKey);
-    QObject::connect(ui->m_encTabTextSaveOnF, &QCheckBox::stateChanged, this, &MainWindow::autoEncfname1);
+    QObject::connect(ui->m_encTabTextSaveOnF, &QCheckBox::stateChanged, this, &MainWindow::autoEncfname);
 
     // connect buttons
     QObject::connect(ui->m_keyMFlush, &QPushButton::clicked, this, &MainWindow::flushKey);
@@ -541,6 +541,10 @@ void MainWindow::importKey(const string &caption)
             setKeyLoadedText(QString::fromStdString(keyStr));
             delete keygen_cpy;
 
+
+            ui->m_encTabFileTypes->setCurrentIndex(1);
+
+
             stringstream ss;
             ss << "key "  << std::to_string(((T*)m_keygen)->keysize()) << " bytes ";
             ss << " - encoded " << m_kserial.serializeEncoding(encoding) << "<br />";
@@ -731,7 +735,7 @@ void MainWindow::setTypeCipher(const QString& alg)
         mode->addItems(*m_aesModes);
     if(alg.toStdString() == AbstractCipherRsa::AlgName)
         mode->addItems(*m_rsaModes);
-    autoEncfname1();
+    autoEncfname();
 }
 void MainWindow::hideKey(const bool isChecked)
 {
@@ -824,7 +828,6 @@ void MainWindow::recoverFile(const string& success)
 }
 void MainWindow::cipherFile(const string& success)
 {
-    autoEncfname1();
     Encoding encoding = encodingFrom(ui->m_encTabFileEncodings);
     dialogSuccess(success + " Encoding: " + m_kserial.serializeEncoding(encoding));
 }
@@ -876,7 +879,7 @@ void MainWindow::dectectFields(
     ui->m_decTabFileDecFname->setChecked(decfname);
 }
 
-void MainWindow::autoEncfname1()
+void MainWindow::autoEncfname()
 {
     QObject* sender = QObject::sender();
     QObject* parent = sender->parent();

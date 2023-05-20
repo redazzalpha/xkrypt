@@ -172,7 +172,7 @@ private slots:
     void flushKey();
     void colorKeyLoaded();
     void colorFilesLoaded();
-    void autoEncfname1();
+    void autoEncfname();
 
     void recoverText(const std::string &recoverText);
     void cipherText(const std::string &cipherText);
