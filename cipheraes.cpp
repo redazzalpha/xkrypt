@@ -4,7 +4,7 @@
 
 using namespace std;
 
-const std::string AbstractCipherAes::AlgName = "Symmectric - Aes";
+const std::string AbstractCipherAes::AlgName = "Symmetric - Aes";
 
 // constructors
 AbstractCipherAes::AbstractCipherAes() {}

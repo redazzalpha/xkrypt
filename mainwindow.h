@@ -109,7 +109,7 @@ public:
 private:
     // methods
     void uiInit();
-    void initAlgorithms();
+    void initTypes();
     void initModes();
     void initKeysizes();
     void initEncodings();
@@ -182,7 +182,7 @@ private slots:
     void cipherKill();
 
     void actionSelected();
-    void dectectFields(
+    void detectFields(
         const std::string& alg,
         const std::string& mode,
         const Encoding encoding,

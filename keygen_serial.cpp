@@ -137,7 +137,11 @@ string Keygen_serial::serialize(KeygenAes* keygen) const
 
     keySource.Attach(new StringSink(key));
     keySource.PumpAll();
-    return key;
+
+    stringstream ss;
+    ss << "-- Symmetric key:\n";
+    ss << key;
+    return ss.str();
 }
 string Keygen_serial::serialize(KeygenRsa* keygen) const
 {
@@ -145,7 +149,7 @@ string Keygen_serial::serialize(KeygenRsa* keygen) const
     InvertibleRSAFunction params = keygen->params();
 
     stringstream ss;
-    ss << "Rsa keys\n";
+    ss << "--Asymmetric Rsa keys:\n";
     ss << "size: " << std::to_string(keygen->keysize()) + " bits\n";
     ss << "modulus: " << truncateInteger(params.GetModulus()) << "...\n";
     ss << "prime1: " << truncateInteger(params.GetPrime1()) << "...\n";
