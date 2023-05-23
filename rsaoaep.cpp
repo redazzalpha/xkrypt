@@ -84,7 +84,7 @@ void RsaOAEP::encryptFile(const string& path, AbstractKeygen* keygen, const Enco
     FileSink* fs = new FileSink((output = dirfname.m_dir + DELIMITOR + filename).c_str());
     PK_EncryptorFilter* fileFilter = new PK_EncryptorFilter(prng, encryptor);
 
-    injectRefs(fs, encoding);
+    injectRefs(fs, keygen);
     switch(encoding) {
     case Encoding::BASE64 : fileFilter->Attach(new Base64Encoder(new Redirector(*fs))); break;
     case Encoding::HEX : fileFilter->Attach(new HexEncoder(new Redirector(*fs))); break;

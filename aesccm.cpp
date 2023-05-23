@@ -34,8 +34,8 @@ string AesCCM::encryptText(const string& plain, AbstractKeygen* keygen, const En
 {
     KeygenAes* keygen_aes = (KeygenAes*)keygen;
     std::string cipher = "";
-    const SecByteBlock& key = keygen_aes->getKey();
-    const SecByteBlock& iv = keygen_aes->getIv();
+    const SecByteBlock& key = keygen_aes->key();
+    const SecByteBlock& iv = keygen_aes->Iv();
     StringSink* ss = new StringSink(cipher);
     CryptoPP::CCM<CryptoPP::AES, XKRYPT_TAG_SIZE>::Encryption encryptor;
     encryptor.SetKeyWithIV(key, key.size(), iv);
@@ -68,8 +68,8 @@ string AesCCM::decryptText(const string& cipher, AbstractKeygen* keygen, const E
 {
     KeygenAes* keygen_aes = (KeygenAes*)keygen;
     std::string recover;
-    const SecByteBlock& key = keygen_aes->getKey();
-    const SecByteBlock& iv = keygen_aes->getIv();
+    const SecByteBlock& key = keygen_aes->key();
+    const SecByteBlock& iv = keygen_aes->Iv();
     StringSink* ss = new StringSink(recover);
     CryptoPP::CCM<CryptoPP::AES, XKRYPT_TAG_SIZE>::Decryption decryptor;
     BufferedTransformation* decoder;
@@ -108,8 +108,8 @@ void AesCCM::encryptFile(const string& path, AbstractKeygen* keygen, const Encod
 {
     KeygenAes* keygen_aes = (KeygenAes*)keygen;
     string filename, output;
-    const SecByteBlock& key = keygen_aes->getKey();
-    const SecByteBlock& iv = keygen_aes->getIv();
+    const SecByteBlock& key = keygen_aes->key();
+    const SecByteBlock& iv = keygen_aes->Iv();
     CryptoPP::CCM<CryptoPP::AES, XKRYPT_TAG_SIZE>::Encryption encryptor;
     DirFname dirfname = extractFname(path);
 
@@ -130,7 +130,7 @@ void AesCCM::encryptFile(const string& path, AbstractKeygen* keygen, const Encod
     AuthenticatedEncryptionFilter* fileFilter = new AuthenticatedEncryptionFilter(encryptor);
     FileSink* fs = new FileSink((output = dirfname.m_dir + DELIMITOR + filename).c_str());
 
-    injectRefs(fs, encoding);
+    injectRefs(fs, keygen);
     switch(encoding) {
     case Encoding::BASE64 : fileFilter->Attach(new Base64Encoder(fs)); break;
     case Encoding::HEX : fileFilter->Attach(new HexEncoder(fs)); break;
@@ -150,8 +150,8 @@ void AesCCM::decryptFile(const string& path, AbstractKeygen* keygen, const Encod
 {
     KeygenAes* keygen_aes = (KeygenAes*)keygen;
     string filename, output;
-    const SecByteBlock& key = keygen_aes->getKey();
-    const SecByteBlock& iv = keygen_aes->getIv();
+    const SecByteBlock& key = keygen_aes->key();
+    const SecByteBlock& iv = keygen_aes->Iv();
     CryptoPP::CCM<CryptoPP::AES, XKRYPT_TAG_SIZE>::Decryption decryptor;
     DirFname dirfname = extractFname(path);
 

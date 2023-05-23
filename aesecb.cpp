@@ -33,7 +33,7 @@ string AesECB::encryptText(const string& plain, AbstractKeygen* keygen, const En
 {
     KeygenAes* keygen_aes = (KeygenAes*)keygen;
     std::string cipher = "";
-    const SecByteBlock& key = keygen_aes->getKey();
+    const SecByteBlock& key = keygen_aes->key();
     StringSink* ss = new StringSink(cipher);
     ECB_Mode<CryptoPP::AES>::Encryption encryptor;
     encryptor.SetKey(key, key.size());
@@ -53,7 +53,7 @@ string AesECB::decryptText(const string& cipher, AbstractKeygen* keygen, const E
 {
     KeygenAes* keygen_aes = (KeygenAes*)keygen;
     std::string recover;
-    const SecByteBlock& key = keygen_aes->getKey();
+    const SecByteBlock& key = keygen_aes->key();
     StringSink* ss = new StringSink(recover);
     ECB_Mode<CryptoPP::AES>::Decryption decryptor;
     decryptor.SetKey(key, key.size());
@@ -72,7 +72,7 @@ void AesECB::encryptFile(const string& path, AbstractKeygen* keygen, const Encod
 {
     KeygenAes* keygen_aes = (KeygenAes*)keygen;
     string filename, output;
-    const SecByteBlock& key = keygen_aes->getKey();
+    const SecByteBlock& key = keygen_aes->key();
     ECB_Mode<CryptoPP::AES>::Encryption encryptor;
     DirFname dirfname = extractFname(path);
 
@@ -87,7 +87,7 @@ void AesECB::encryptFile(const string& path, AbstractKeygen* keygen, const Encod
     encryptor.SetKey(key, key.size());
     StreamTransformationFilter* fileFilter = new StreamTransformationFilter(encryptor);
 
-    injectRefs(fs, encoding);
+    injectRefs(fs, keygen);
     switch(encoding) {
     case Encoding::BASE64 : fileFilter->Attach(new Base64Encoder(fs)); break;
     case Encoding::HEX : fileFilter->Attach(new HexEncoder(fs)); break;
@@ -107,7 +107,7 @@ void AesECB::decryptFile(const string& path, AbstractKeygen* keygen, const Encod
 {
     KeygenAes* keygen_aes = (KeygenAes*)keygen;
     string filename, output;
-    const SecByteBlock& key = keygen_aes->getKey();
+    const SecByteBlock& key = keygen_aes->key();
     ECB_Mode<CryptoPP::AES>::Decryption decryptor;
     DirFname dirfname = extractFname(path);
 

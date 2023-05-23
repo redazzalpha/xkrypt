@@ -8,6 +8,9 @@ class KeygenAes : public  AbstractKeygen {
 private:
     CryptoPP::SecByteBlock m_key {0};
     CryptoPP::SecByteBlock m_iv {0};
+    CryptoPP::SecByteBlock m_pk {0};
+    CryptoPP::SecByteBlock m_pkiv {0};
+    bool m_pkState;
 
 public:
     // constructors
@@ -27,8 +30,17 @@ public:
 
     void setKey(CryptoPP::SecByteBlock key);
     void setIv(CryptoPP::SecByteBlock iv);
-    const CryptoPP::SecByteBlock& getKey() const;
-    const CryptoPP::SecByteBlock& getIv() const;
+    void setPk(CryptoPP::SecByteBlock pk);
+    void setPkIv(CryptoPP::SecByteBlock pkiv);
+    void setPkState(bool newPkState);
+    CryptoPP::SecByteBlock& key();
+    CryptoPP::SecByteBlock& Iv();
+    CryptoPP::SecByteBlock& pk();
+    CryptoPP::SecByteBlock& pkiv();
+    bool pkState() const;
+
+    KeygenAes* pkDerive(const std::string& password, const bool create = true);
+    CryptoPP::SecByteBlock& genPkIv();
 
 };
 

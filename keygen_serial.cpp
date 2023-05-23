@@ -23,7 +23,7 @@ bool Keygen_serial::deserialize(ifstream* file, KeygenAes* keygen) const noexcep
 
     if(file) {
         string refs, keyiv;
-        size_t ivsize = keygen->getIv().size();
+        size_t ivsize = keygen->Iv().size();
         FileSource fs(*file, false);
 
         fs.Attach(new StringSink(refs));
@@ -72,8 +72,8 @@ bool Keygen_serial::deserialize(ifstream* file, KeygenRsa* keygen) const noexcep
 }
 void Keygen_serial::serialize(const string& path, KeygenAes* keygen) const
 {
-    size_t ivSize = keygen->getIv().size();
-    size_t keySize = keygen->getKey().size();
+    size_t ivSize = keygen->Iv().size();
+    size_t keySize = keygen->key().size();
     size_t keyIvSize = ivSize + keySize;
     std::vector<CryptoPP::byte> xkrypt_refs {
         XKRYPT_REF_VERSION,
@@ -85,8 +85,8 @@ void Keygen_serial::serialize(const string& path, KeygenAes* keygen) const
     StringSource keyIvSource(keyIv, keyIvSize, false);
     FileSink fs(path.c_str(), true);
 
-    memcpy(keyIv, keygen->getIv().BytePtr(), ivSize);
-    memcpy(keyIv + ivSize, keygen->getKey().BytePtr(), keySize);
+    memcpy(keyIv, keygen->Iv().BytePtr(), ivSize);
+    memcpy(keyIv + ivSize, keygen->key().BytePtr(), keySize);
 
     switch(keygen->encoding()) {
     case Encoding::BASE64 : keyIvSource.Attach(new Base64Encoder); break;
@@ -125,7 +125,7 @@ void Keygen_serial::serialize(const string& path, KeygenRsa* keygen) const
 }
 string Keygen_serial::serialize(KeygenAes* keygen) const
 {
-    StringSource keySource(keygen->getKey().BytePtr(), keygen->getKey().size(), false);
+    StringSource keySource(keygen->key().BytePtr(), keygen->key().size(), false);
     string key;
 
     switch(keygen->encoding()) {

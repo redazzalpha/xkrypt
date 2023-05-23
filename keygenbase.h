@@ -9,6 +9,7 @@ protected:
     CryptoPP::AutoSeededX917RNG<CryptoPP::AES> m_prng;
     size_t m_keysize;
     Encoding m_encoding = Encoding::NONE;
+    CryptoPP::SecByteBlock m_salt {0};
 
 public:
     // constructors
@@ -28,6 +29,10 @@ public:
     void setEncoding(Encoding newEncoding);
     size_t keysize() const;
     Encoding encoding() const;
+    CryptoPP::SecByteBlock& salt();
+
+    CryptoPP::SecByteBlock& genSalt();
+    void setSalt(const CryptoPP::SecByteBlock &newSalt);
 };
 
 #endif // KEYGENBASE_H

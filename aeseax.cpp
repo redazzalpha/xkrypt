@@ -31,8 +31,8 @@ string AesEAX::encryptText(const string& plain, AbstractKeygen* keygen, const En
 {
     KeygenAes* keygen_aes = (KeygenAes*)keygen;
     std::string cipher = "";
-    const SecByteBlock& key = keygen_aes->getKey();
-    const SecByteBlock& iv = keygen_aes->getIv();
+    const SecByteBlock& key = keygen_aes->key();
+    const SecByteBlock& iv = keygen_aes->Iv();
     StringSink* ss = new StringSink(cipher);
     CryptoPP::EAX<CryptoPP::AES>::Encryption encryptor;
     encryptor.SetKeyWithIV(key, key.size(), iv);
@@ -52,8 +52,8 @@ string AesEAX::decryptText(const string& cipher, AbstractKeygen* keygen, const E
 {
     KeygenAes* keygen_aes = (KeygenAes*)keygen;
     std::string recover;
-    const SecByteBlock& key = keygen_aes->getKey();
-    const SecByteBlock& iv = keygen_aes->getIv();
+    const SecByteBlock& key = keygen_aes->key();
+    const SecByteBlock& iv = keygen_aes->Iv();
     StringSink* ss = new StringSink(recover);
     CryptoPP::EAX<CryptoPP::AES>::Decryption decryptor;
     decryptor.SetKeyWithIV(key, key.size(), iv);
@@ -72,8 +72,8 @@ void AesEAX::encryptFile(const string& path, AbstractKeygen* keygen, const Encod
 {
     KeygenAes* keygen_aes = (KeygenAes*)keygen;
     string filename, output;
-    const SecByteBlock& key = keygen_aes->getKey();
-    const SecByteBlock& iv = keygen_aes->getIv();
+    const SecByteBlock& key = keygen_aes->key();
+    const SecByteBlock& iv = keygen_aes->Iv();
     CryptoPP::EAX<CryptoPP::AES>::Encryption encryptor;
     DirFname dirfname = extractFname(path);
 
@@ -88,7 +88,7 @@ void AesEAX::encryptFile(const string& path, AbstractKeygen* keygen, const Encod
     encryptor.SetKeyWithIV(key, key.size(), iv);
     AuthenticatedEncryptionFilter* fileFilter = new AuthenticatedEncryptionFilter(encryptor);
 
-    injectRefs(fs, encoding);
+    injectRefs(fs, keygen);
     switch(encoding) {
     case Encoding::BASE64 : fileFilter->Attach(new Base64Encoder(fs)); break;
     case Encoding::HEX : fileFilter->Attach(new HexEncoder(fs)); break;
@@ -108,8 +108,8 @@ void AesEAX::decryptFile(const string& path, AbstractKeygen* keygen, const Encod
 {
     KeygenAes* keygen_aes = (KeygenAes*)keygen;
     string filename, output;
-    const SecByteBlock& key = keygen_aes->getKey();
-    const SecByteBlock& iv = keygen_aes->getIv();
+    const SecByteBlock& key = keygen_aes->key();
+    const SecByteBlock& iv = keygen_aes->Iv();
     CryptoPP::EAX<CryptoPP::AES>::Decryption decryptor;
     DirFname dirfname = extractFname(path);
 

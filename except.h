@@ -102,6 +102,17 @@ public:
     // methods
     virtual const char* what() const noexcept;
 };
+class SaltRefsException : public std::exception {
+private:
+    const char* m_message;
+
+public:
+    // constructors
+    SaltRefsException(const char* message = "-- error: Invalid end refs check<br />file is corrupt or unknown");
+
+    // methods
+    virtual const char* what() const noexcept;
+};
 class AlgException : public std::exception {
 private:
     const char* m_message;

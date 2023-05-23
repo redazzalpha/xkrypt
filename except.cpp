@@ -108,6 +108,15 @@ const char*  DecFnameRefsException::what() const noexcept
     return m_message;
 }
 
+SaltRefsException::SaltRefsException(const char* message)
+{
+    m_message = message;
+}
+const char*  SaltRefsException::what() const noexcept
+{
+    return m_message;
+}
+
 UnreadyKeyException::UnreadyKeyException(const char* message)
 {
     m_message = message;

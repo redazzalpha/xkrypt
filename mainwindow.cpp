@@ -72,10 +72,6 @@ void MainWindow::uiInit()
     ui->m_keyMTypesI->addItems(*m_algTypes);
     ui->m_keyMTypesG->addItems(*m_algTypes);
 
-    ui->m_encTabFileTypes->setEnabled(false);
-    ui->m_encTabTextTypes->setEnabled(false);
-
-
     ui->m_encTabFileTypes->addItems(*m_algTypes);
     ui->m_decTabFileTypes->addItems(*m_algTypes);
     ui->m_encTabFileModes->addItems(*m_aesModes);
@@ -130,16 +126,17 @@ void MainWindow::connectItems()
     connectCipher();
 
     // connect combos
-    QObject::connect(ui->m_encTabTextTypes, &QComboBox::currentTextChanged, this, &MainWindow::setTypeCipher);
-    QObject::connect(ui->m_decTabTextTypes, &QComboBox::currentTextChanged, this, &MainWindow::setTypeCipher);
-    QObject::connect(ui->m_encTabFileTypes, &QComboBox::currentTextChanged, this, &MainWindow::setTypeCipher);
-    QObject::connect(ui->m_decTabFileTypes, &QComboBox::currentTextChanged, this, &MainWindow::setTypeCipher);
+    QObject::connect(ui->m_encTabTextTypes, &QComboBox::currentTextChanged, this, &MainWindow::setTypeMode);
+    QObject::connect(ui->m_decTabTextTypes, &QComboBox::currentTextChanged, this, &MainWindow::setTypeMode);
+    QObject::connect(ui->m_encTabFileTypes, &QComboBox::currentTextChanged, this, &MainWindow::setTypeMode);
+    QObject::connect(ui->m_decTabFileTypes, &QComboBox::currentTextChanged, this, &MainWindow::setTypeMode);
     QObject::connect(ui->m_keyMTypesG, &QComboBox::currentTextChanged, this, &MainWindow::setTypeKey);
     QObject::connect(ui->m_keyMTypesI, &QComboBox::currentTextChanged, this, &MainWindow::setTypeKey);
 
     // connect checkboxes
     QObject::connect(ui->m_keyMHide, &QCheckBox::clicked, this, &MainWindow::hideKey);
     QObject::connect(ui->m_encTabTextSaveOnF, &QCheckBox::stateChanged, this, &MainWindow::autoEncfname);
+    QObject::connect(ui->m_keyMPk, &QCheckBox::stateChanged, this, &MainWindow::usePassword);
 
     // connect buttons
     QObject::connect(ui->m_keyMFlush, &QPushButton::clicked, this, &MainWindow::flushKey);
@@ -239,7 +236,6 @@ Encoding MainWindow::encodingFrom(QComboBox* combo)
 
     return encoding;
 }
-
 Encoding MainWindow::encodingFrom2(QComboBox *combo)
 {
     Encoding encoding;
@@ -502,6 +498,14 @@ void MainWindow::importFile(FileImporter& fimporter, const string& caption)
     if(caption.find("decrypt") < caption.size())
         ui->m_decTabFileSelected->setPlainText(QString::fromStdString(ss.str()));
 }
+void MainWindow::layoutLoop(QHBoxLayout* layout, bool checked)
+{
+    QWidget* keyMCombo;
+    for(int i = 0; i < layout->count(); i++) {
+        keyMCombo = layout->itemAt(i)->widget();
+        if(keyMCombo) keyMCombo->setDisabled(checked);
+    }
+}
 
 template<class T>
 void MainWindow::generateKey()
@@ -516,7 +520,9 @@ void MainWindow::generateKey()
     setKeyLoadedText(QString::fromStdString(m_kserial.serialize((T*)m_keygen)));
 
     ui->m_encTabFileTypes->setCurrentText(ui->m_keyMTypesG->currentText());
+    ui->m_decTabFileTypes->setCurrentText(ui->m_keyMTypesG->currentText());
     ui->m_encTabTextTypes->setCurrentText(ui->m_keyMTypesG->currentText());
+    ui->m_decTabTextTypes->setCurrentText(ui->m_keyMTypesG->currentText());
 
     if(ui->m_keyMSaveOnF->isChecked())
         saveKey<T>();
@@ -643,9 +649,11 @@ void MainWindow::on_m_encTabFileEncrypt_clicked()
         m_cipher.cipherNew(alg, mode);
         m_cipher.setEncfname(encFname);
 
+//        if(ui->m_keyMPk->isChecked()) ((KeygenAes*)m_keygen)->pkDerive("0000");
         m_processBar.setMax(size);
         m_threadCipher.start();
         emit startEncFile(paths, m_keygen, encoding);
+
     }
     catch (std::exception& e) {
         dialogError(e.what());
@@ -657,6 +665,7 @@ void MainWindow::on_m_decTabFileDecrypt_clicked()
         vector<string> paths = m_fimporterDec.getFilePaths();
         size_t size = paths.size();
         if(size < 1) throw FileSelectedException("-- error no file selected");
+
         /*
          * useless cause of detect fields function
          * and refs system
@@ -665,6 +674,7 @@ void MainWindow::on_m_decTabFileDecrypt_clicked()
 //      string mode = ui->m_decTabFileModes->currentText().toStdString();
 //      Encoding encoding = encodingFrom(ui->m_decTabFileEncodings);
 
+//        if(ui->m_keyMPk->isChecked()) ((KeygenAes*)m_keygen)->setPkState(true);
         m_processBar.setMax(size);
         m_threadCipher.start();
         emit startDecFile(paths, m_keygen);
@@ -707,29 +717,28 @@ void MainWindow::setTypeKey(const QString &type)
 {
     QObject* sender = QObject::sender();
     QObject* parent = sender->parent();
-    bool isImport = sender->objectName() == "m_keyMTypesI";
+    bool isGenerate = sender->objectName() == "m_keyMTypesG";
     string encodingName = "m_keyMEncodings" ;
-
     QComboBox* comboSizes = static_cast<QComboBox*>(parent->findChild<QComboBox*>("m_keyMSizes"));
-    QComboBox* comboEncodings = static_cast<QComboBox*>(parent->findChild<QComboBox*>(QString::fromStdString(encodingName + (isImport? "I":"G"))));
+    QComboBox* comboEncodings = static_cast<QComboBox*>(parent->findChild<QComboBox*>(QString::fromStdString(encodingName + (isGenerate? "G":"I"))));
     comboEncodings->clear();
+
     if(type.toStdString() == AbstractCipherAes::AlgName) {
         comboEncodings->addItems(*m_aesEncodings);
-        if(!isImport){
+        if(isGenerate){
             comboSizes->clear();
             comboSizes->addItems(*m_aesKeysizes);
         }
     }
     else if(type.toStdString() == AbstractCipherRsa::AlgName) {
         comboEncodings->addItems(*m_rsaEncodings);
-        if(!isImport){
+        if(isGenerate){
             comboSizes->clear();
             comboSizes->addItems(*m_rsaKeysizes);
         }
     }
-
 }
-void MainWindow::setTypeCipher(const QString& alg)
+void MainWindow::setTypeMode(const QString& alg)
 {
     QComboBox* sender = static_cast<QComboBox*>(QObject::sender());
     QObject* parent = sender->parent();
@@ -743,6 +752,25 @@ void MainWindow::setTypeCipher(const QString& alg)
     if(alg.toStdString() == AbstractCipherRsa::AlgName)
         mode->addItems(*m_rsaModes);
     autoEncfname();
+}
+void MainWindow::setTypeCipher(const string& alg, bool checked)
+{
+    string pattern = "^m_.+Types.?$";
+    auto list = QObject::findChildren<QComboBox*>(QRegularExpression(QString::fromStdString(pattern)));
+
+    static QRegularExpression regex("m_keyMTypes.?");
+    for(QComboBox* combo : list) {
+        if(checked) {
+            combo->setCurrentText(QString::fromStdString(alg));
+            combo->setDisabled(checked);
+        }
+        else if(!checked) {
+            if(combo->objectName().contains(regex))
+                combo->setDisabled(checked);
+            if(dynamic_cast<KeygenRsa*>(m_keygen))
+                combo->setCurrentText(QString::fromStdString(AbstractCipherRsa::AlgName));
+        }
+    }
 }
 void MainWindow::hideKey(const bool isChecked)
 {
@@ -782,6 +810,50 @@ void MainWindow::colorFilesLoaded()
     if(isEmpty) setFilesLoadedStyle(STYLE_RED);
     else setFilesLoadedStyle(STYLE_NORMAL);
 
+}
+void MainWindow::autoEncfname()
+{
+    QObject* sender = QObject::sender();
+    QObject* parent = sender->parent();
+    string senderName = sender->objectName().toStdString();
+
+    std::smatch match;
+    std::regex regex (".*(Types|SaveOnF)$");
+    std::regex_search (senderName, match, regex);
+
+    string typeName = senderName.substr(0, senderName.find(match[1]));
+    string checkboxName = typeName + "EncFname";
+    string checkboxSName = typeName + "SaveOnF";
+    string comboName = senderName.substr(0, senderName.find(match[1])) + "Types";
+    QCheckBox* checkboxEncf = parent->findChild<QCheckBox*>(QString::fromStdString(checkboxName));
+    QCheckBox* checkboxSaveOnF = parent->findChild<QCheckBox*>(QString::fromStdString(checkboxSName));
+    QComboBox* comboType = parent->findChild<QComboBox*>(QString::fromStdString(comboName));
+    bool checkedS = checkboxSaveOnF?checkboxSaveOnF->isChecked(): true;
+
+    if(checkboxEncf) {
+        if(checkedS && comboType->currentText() == QString::fromStdString(AbstractCipherAes::AlgName)) {
+            checkboxEncf->setChecked(true);
+            checkboxEncf->setEnabled(true);
+        }
+        else if(checkedS && comboType->currentText() == QString::fromStdString(AbstractCipherRsa::AlgName)) {
+            checkboxEncf->setChecked(false);
+            checkboxEncf->setEnabled(false);
+        }
+        else if(checkedS) {
+            checkboxEncf->setChecked(false);
+            checkboxEncf->setEnabled(false);
+        }
+    }
+}
+void MainWindow::usePassword(bool checked)
+{
+    string pattern = "^m_keyM.+Layout\\d?$";
+    auto list = QObject::findChildren<QHBoxLayout*>(QRegularExpression(QString::fromStdString(pattern))) ;
+    for(auto layout : list) {
+        layoutLoop(layout, checked);
+    }
+
+    setTypeCipher(AbstractCipherAes::AlgName, checked);
 }
 
 void MainWindow::recoverText(const std::string &recoverText)
@@ -886,38 +958,6 @@ void MainWindow::detectFields(
     ui->m_decTabFileDecFname->setChecked(decfname);
 }
 
-void MainWindow::autoEncfname()
-{
-    QObject* sender = QObject::sender();
-    QObject* parent = sender->parent();
-    string senderName = sender->objectName().toStdString();
-
-    std::smatch match;
-    std::regex regex (".*(Types|SaveOnF)$");
-    std::regex_search (senderName, match, regex);
-
-    string typeName = senderName.substr(0, senderName.find(match[1]));
-    string checkboxName = typeName + "EncFname";
-    string checkboxSName = typeName + "SaveOnF";
-    string comboName = senderName.substr(0, senderName.find(match[1])) + "Types";
-    QCheckBox* checkboxEncf = parent->findChild<QCheckBox*>(QString::fromStdString(checkboxName));
-    QCheckBox* checkboxSaveOnF = parent->findChild<QCheckBox*>(QString::fromStdString(checkboxSName));
-    QComboBox* comboType = parent->findChild<QComboBox*>(QString::fromStdString(comboName));
-    bool checkedS = checkboxSaveOnF?checkboxSaveOnF->isChecked(): true;
-
-    if(comboType->currentText() == QString::fromStdString(AbstractCipherAes::AlgName) && checkedS) {
-        checkboxEncf->setChecked(true);
-        checkboxEncf->setEnabled(true);
-    }
-    else if(comboType->currentText() == QString::fromStdString(AbstractCipherRsa::AlgName) && checkedS) {
-        checkboxEncf->setChecked(false);
-        checkboxEncf->setEnabled(false);
-    }
-    else {
-        checkboxEncf->setChecked(false);
-        checkboxEncf->setEnabled(false);
-    }
-}
 
 
 

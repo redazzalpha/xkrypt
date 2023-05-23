@@ -140,6 +140,7 @@ private:
     std::string refsToString();
     void closeEvent(QCloseEvent* event) override;
     void importFile(FileImporter& fimporter, const std::string &caption);
+    void layoutLoop(QHBoxLayout *layout, bool checked);
 
     template <class T>
     void generateKey();
@@ -167,12 +168,14 @@ private slots:
     void on_m_keyMDisable_toggled(bool checked);
     
     void setTypeKey(const QString & type);
-    void setTypeCipher(const QString& alg);
+    void setTypeMode(const QString& alg);
+    void setTypeCipher(const std::string &alg, bool checked);
     void hideKey(const bool isChecked);
     void flushKey();
     void colorKeyLoaded();
     void colorFilesLoaded();
     void autoEncfname();
+    void usePassword(bool checked);
 
     void recoverText(const std::string &recoverText);
     void cipherText(const std::string &cipherText);

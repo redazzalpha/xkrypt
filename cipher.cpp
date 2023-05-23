@@ -11,7 +11,9 @@
 #include "cipheraes.h"
 #include "cipherrsa.h"
 #include "rsaoaep.h"
+#include "defines.h"
 #include "except.h"
+#include "keygenaes.h"
 #include <QFile>
 #include <base64.h>
 #include <files.h>
@@ -187,7 +189,16 @@ void Cipher::encryptFile(vector<string> paths, AbstractKeygen* keygen, const Enc
             const string path = paths[progress];
             DirFname dirfname = m_cipher->extractFname(path);
             emit processing(dirfname.m_fname);
-            m_cipher->encryptFile(path, keygen, encoding);
+
+//            if(auto kg_aes_cast = dynamic_cast<KeygenAes*>(keygen)) {
+//                KeygenAes keygenPk(*kg_aes_cast);
+//                keygenPk.setKey(kg_aes_cast->pk());
+//                keygenPk.setIv(kg_aes_cast->pkiv());
+//                m_cipher->encryptFile(path, &keygenPk, encoding);
+//            }
+//            else
+                m_cipher->encryptFile(path, keygen, encoding);
+
             emit proceed(progress+1);
         }
         emit cipherFile(successMsg(progress));
@@ -216,6 +227,26 @@ void Cipher::decryptFile(vector<string> paths, AbstractKeygen* keygen)
 
             cipherDetect(refs);
             m_cipher->setDecfname(refs[5]);
+
+            StringSource(
+                (CryptoPP::byte*)&refs[XKRYPT_REF_SIZE_UNIT],
+                XKRYPT_SALT_SIZE, true,
+                new ArraySink(keygen->salt(), keygen->salt().size())
+            );
+
+//            if(auto kg_aes_cast = dynamic_cast<KeygenAes*>(keygen)) {
+//                StringSource(
+//                    (CryptoPP::byte*)&refs[XKRYPT_REF_SIZE_UNIT + XKRYPT_SALT_SIZE],
+//                    XKRYPT_IV_SIZE, true,
+//                    new ArraySink(kg_aes_cast->Iv(), kg_aes_cast->Iv().size())
+//                    );
+
+//                kg_aes_cast->pkDerive("0000", false);
+//                KeygenAes keygenPk(*kg_aes_cast);
+//                keygenPk.setKey(kg_aes_cast->pk());
+//                m_cipher->decryptFile(path, &keygenPk, encoding);
+//            }
+//            else
             m_cipher->decryptFile(path, keygen, encoding);
 
             emit autoDetect(m_cipher->algName(), m_cipher->modeName(), encoding, refs[5]);
