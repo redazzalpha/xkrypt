@@ -90,18 +90,13 @@ void Cipher::cipherNew(const string& alg, const string& mode)
         else if(mode == AesCFB::ModeName) m_cipher = new AesCFB;
         else if(mode == AesOFB::ModeName) m_cipher = new AesOFB;
         else if(mode == AesCTR::ModeName) m_cipher = new AesCTR;
-        // default. shouldn't go here but used to remove clang warnings
         else throw ModeException();
     }
-
     // rsa algs
     else if(alg == AbstractCipherRsa::AlgName) {
         if(mode == RsaOAEP::ModeName) m_cipher = new RsaOAEP;
-        // default. shouldn't go here but used to remove clang warnings
-        else throw ModelException();
+        else throw ModeException();
     }
-
-    // default. shouldn't go here but used to remove clang warnings
     else throw AlgException();
 }
 void Cipher::cipherDetect(const string& refs)
@@ -184,20 +179,23 @@ string Cipher::decryptText(const string& cipher, AbstractKeygen* keygen, const E
 void Cipher::encryptFile(vector<string> paths, AbstractKeygen* keygen, const Encoding encoding)
 {
     try {
+        AbstractKeygen* kg;
         size_t size = paths.size(), progress;
         for(progress = 0; progress < size && m_run; progress++) {
             const string path = paths[progress];
             DirFname dirfname = m_cipher->extractFname(path);
             emit processing(dirfname.m_fname);
 
-//            if(auto kg_aes_cast = dynamic_cast<KeygenAes*>(keygen)) {
-//                KeygenAes keygenPk(*kg_aes_cast);
-//                keygenPk.setKey(kg_aes_cast->pk());
-//                keygenPk.setIv(kg_aes_cast->pkiv());
-//                m_cipher->encryptFile(path, &keygenPk, encoding);
-//            }
-//            else
-                m_cipher->encryptFile(path, keygen, encoding);
+            keygen->setEncoding(encoding);
+
+            if(auto kg_aes_cast = dynamic_cast<KeygenAes*>(keygen)) {
+                if(kg_aes_cast->pkState()) kg = kg_aes_cast->pkDerive("0000");
+                else kg = kg_aes_cast->pkDerive(kg_aes_cast->key());
+            }
+            else kg = keygen->keygenCpy();
+
+            m_cipher->encryptFile(path, kg, encoding);
+            delete kg;
 
             emit proceed(progress+1);
         }
@@ -210,6 +208,7 @@ void Cipher::encryptFile(vector<string> paths, AbstractKeygen* keygen, const Enc
 void Cipher::decryptFile(vector<string> paths, AbstractKeygen* keygen)
 {
     try {
+        AbstractKeygen* kg;
         size_t size = paths.size(), progress;
         for(progress = 0; progress < size && m_run; progress++) {
             const string path = paths[progress];
@@ -227,27 +226,22 @@ void Cipher::decryptFile(vector<string> paths, AbstractKeygen* keygen)
 
             cipherDetect(refs);
             m_cipher->setDecfname(refs[5]);
+            keygen->setEncoding(encoding);
 
             StringSource(
-                (CryptoPP::byte*)&refs[XKRYPT_REF_SIZE_UNIT],
+                (CryptoPP::byte*)&refs[XKRYPT_REF_UNIT_SIZE],
                 XKRYPT_SALT_SIZE, true,
                 new ArraySink(keygen->salt(), keygen->salt().size())
             );
 
-//            if(auto kg_aes_cast = dynamic_cast<KeygenAes*>(keygen)) {
-//                StringSource(
-//                    (CryptoPP::byte*)&refs[XKRYPT_REF_SIZE_UNIT + XKRYPT_SALT_SIZE],
-//                    XKRYPT_IV_SIZE, true,
-//                    new ArraySink(kg_aes_cast->Iv(), kg_aes_cast->Iv().size())
-//                    );
+            if(auto kg_aes_cast = dynamic_cast<KeygenAes*>(keygen)) {
+                if(kg_aes_cast->pkState()) kg = kg_aes_cast->pkDerive("0000", false);
+                else kg = kg_aes_cast->pkDerive(kg_aes_cast->key(), false);
+            }
+            else kg = keygen->keygenCpy();
 
-//                kg_aes_cast->pkDerive("0000", false);
-//                KeygenAes keygenPk(*kg_aes_cast);
-//                keygenPk.setKey(kg_aes_cast->pk());
-//                m_cipher->decryptFile(path, &keygenPk, encoding);
-//            }
-//            else
-            m_cipher->decryptFile(path, keygen, encoding);
+            m_cipher->decryptFile(path, kg, encoding);
+            delete kg;
 
             emit autoDetect(m_cipher->algName(), m_cipher->modeName(), encoding, refs[5]);
             emit proceed(progress+1);
@@ -262,4 +256,31 @@ void Cipher::decryptFile(vector<string> paths, AbstractKeygen* keygen)
         emit error(e.what());
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

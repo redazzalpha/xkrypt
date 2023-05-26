@@ -13,6 +13,7 @@ KeygenRsa::KeygenRsa(const KeygenRsa &a): AbstractKeygen(a.m_keysize)
     m_private = new CryptoPP::RSA::PrivateKey(*a.m_private);
     m_public = new CryptoPP::RSA::PublicKey(*a.m_public);
     m_encoding = a.m_encoding;
+    m_salt = a.m_salt;
 }
 
 KeygenRsa &KeygenRsa::operator=(const KeygenRsa &a)
@@ -22,6 +23,7 @@ KeygenRsa &KeygenRsa::operator=(const KeygenRsa &a)
         m_public = new CryptoPP::RSA::PublicKey(*a.m_public);
         m_keysize = a.m_keysize;
         m_encoding = a.m_encoding;
+        m_salt = a.m_salt;
     }
     return *this;
 }
@@ -45,11 +47,7 @@ void KeygenRsa::generateKey(size_t keysize, Encoding encoding)
 {
     m_keysize = keysize;
     m_encoding = encoding;
-
-    flush();
-    m_private = new CryptoPP::RSA::PrivateKey;
-    m_private->GenerateRandomWithKeySize(m_prng, static_cast<size_t>(m_keysize));
-    m_public = new CryptoPP::RSA::PublicKey(*m_private);
+    generateKey();
 }
 bool KeygenRsa::isReady() const
 {

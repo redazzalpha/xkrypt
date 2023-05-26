@@ -1,9 +1,12 @@
+#include "defines.h"
 #include "enums.h"
 #include "keygenaes.h"
 #include <cryptopp/scrypt.h>
+#include <base64.h>
 #include <iostream>
 
 using namespace CryptoPP;
+using namespace std;
 
 // constructors
 KeygenAes::KeygenAes(size_t keysize): AbstractKeygen(keysize)
@@ -69,15 +72,9 @@ void KeygenAes::generateKey()
 }
 void KeygenAes::generateKey(size_t keysize, Encoding encoding)
 {
-    flush();
     m_keysize = keysize;
     m_encoding = encoding;
-    if(m_keysize >= static_cast<size_t>(Aes::KeySize::LENGTH_DEFAULT)) {
-        m_key.CleanNew(static_cast<size_t>(m_keysize));
-        m_iv.CleanNew(static_cast<size_t>(Aes::IvSize::LENGTH_DEFAULT));
-        m_prng.GenerateBlock(m_key, m_key.size());
-        m_prng.GenerateBlock(m_iv, m_iv.size());
-    }
+    generateKey();
 }
 bool KeygenAes::isReady() const
 {
@@ -138,19 +135,60 @@ bool KeygenAes::pkState() const
 
 KeygenAes* KeygenAes::pkDerive(const std::string &password, const bool create)
 {
-    int iterations = 0, coast = 1024, blocksize = 8, parallelization = 16;
-    CryptoPP::Scrypt scrypt;
-    if(create) {
-        m_pk.CleanNew(static_cast<size_t>(Aes::KeySize::LENGTH_32));
-        m_pkiv.CleanNew(static_cast<size_t>(Aes::IvSize::LENGTH_DEFAULT));
-        genSalt();
-        genPkIv();
-    }
+    KeygenAes* pk = new KeygenAes(*this);
+    Scrypt scrypt;
 
-    iterations = scrypt.DeriveKey(m_pk, m_pk.size(), (CryptoPP::byte*)password.data(), password.size(), m_salt, m_salt.size(), coast, blocksize, parallelization);
-    std::cout << "iterations performed: " << iterations << std::endl;
+    if(create) pk->genSalt();
+    pk->m_key.CleanNew(static_cast<size_t>(Aes::KeySize::LENGTH_32));
+    pk->m_iv.CleanNew(static_cast<size_t>(Aes::IvSize::LENGTH_DEFAULT));
 
-    return this;
+    scrypt.DeriveKey(
+        pk->m_key, pk->m_key.size(),
+        (CryptoPP::byte*)password.data(), password.size(),
+        pk->m_salt, pk->m_salt.size(),
+        SCRYPT_COAST,
+        SCRYPT_BLOCKSIZE,
+        SCRYPT_PARALLELIZATION
+    );
+    scrypt.DeriveKey(
+        pk->m_iv, pk->m_iv.size(),
+        pk->m_key, pk->m_key.size(),
+        pk->m_salt, pk->m_salt.size(),
+        SCRYPT_COAST,
+        SCRYPT_BLOCKSIZE,
+        SCRYPT_PARALLELIZATION
+    );
+
+    return pk;
+}
+
+KeygenAes *KeygenAes::pkDerive(const CryptoPP::SecByteBlock &key, const bool create)
+{
+    KeygenAes* pk = new KeygenAes(*this);
+    Scrypt scrypt;
+
+    if(create) pk->genSalt();
+    pk->m_key.CleanNew(key.size());
+    pk->m_iv.CleanNew(static_cast<size_t>(Aes::IvSize::LENGTH_DEFAULT));
+
+    scrypt.DeriveKey(
+        pk->m_key, pk->m_key.size(),
+        key, key.size(),
+        pk->m_salt, pk->m_salt.size(),
+        SCRYPT_COAST,
+        SCRYPT_BLOCKSIZE,
+        SCRYPT_PARALLELIZATION
+        );
+    scrypt.DeriveKey(
+        pk->m_iv, pk->m_iv.size(),
+        pk->m_key, pk->m_key.size(),
+        pk->m_salt, pk->m_salt.size(),
+        SCRYPT_COAST,
+        SCRYPT_BLOCKSIZE,
+        SCRYPT_PARALLELIZATION
+    );
+
+    return pk;
 }
 SecByteBlock& KeygenAes::genPkIv()
 {
@@ -160,4 +198,10 @@ SecByteBlock& KeygenAes::genPkIv()
     return m_pkiv;
 
 }
+
+
+
+
+
+
 

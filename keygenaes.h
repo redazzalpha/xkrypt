@@ -40,6 +40,7 @@ public:
     bool pkState() const;
 
     KeygenAes* pkDerive(const std::string& password, const bool create = true);
+    KeygenAes* pkDerive(const CryptoPP::SecByteBlock&  key, const bool create = true);
     CryptoPP::SecByteBlock& genPkIv();
 
 };

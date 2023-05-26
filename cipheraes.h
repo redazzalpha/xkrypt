@@ -21,8 +21,8 @@ public:
 
     // methods
     virtual std::string algName() const final;
-    virtual std::string modeName() const override = 0 ;
     virtual Algorithms algId() const final;
+    virtual std::string modeName() const override = 0 ;
     virtual Mode modeId() const override = 0;
     virtual std::string encryptText(const std::string& plain, AbstractKeygen* keygen, const Encoding encoding) override = 0;
     virtual std::string decryptText(const std::string& cipher, AbstractKeygen* keygen, const Encoding encoding) override = 0;

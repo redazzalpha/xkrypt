@@ -60,28 +60,24 @@ void AbstractCipher::injectRefs(FileSink* fs, AbstractKeygen* keygen)
         (CryptoPP::byte)m_encfname,
     };
 
-//    SecByteBlock salt = keygen->salt();
-//    for(size_t i = 0; i < XKRYPT_SALT_SIZE; i++)
-//        xkrypt_refs.push_back(salt[i]);
-
-//    if(auto kg_aes_cast = dynamic_cast<KeygenAes*>(keygen)) {
-//        SecByteBlock iv = kg_aes_cast->Iv();
-//        for(size_t i = 0; i < XKRYPT_IV_SIZE; i++)
-//            xkrypt_refs.push_back(iv[i]);
-//    }
+    SecByteBlock salt = keygen->salt();
+    for(size_t i = 0; i < XKRYPT_SALT_SIZE; i++)
+        xkrypt_refs.push_back(salt[i]);
 
     StringSource refsSource(&xkrypt_refs[0], xkrypt_refs.size(), true, new Base64Encoder(new Redirector(*fs)));
 }
 int AbstractCipher::afterRefs(FileSource* fs)
 {
     string sink;
+    size_t size;
     int count = 0;
     fs->Attach(new StringSink(sink));
-    do { fs->Pump(1); count++;} while(sink[sink.size()-1] != '\n' && sink[sink.size()-1] != '\0' && sink[sink.size()-1] != '=');
+    do { fs->Pump(1); count++; size = sink.size() - 1;}
+    while(sink[size] != '\n' &&
+        sink[size] != '\0' &&
+        sink[size] != '='
+    );
     fs->Detach();
-
-    std::cout << "sink : " << sink << std::endl;
-
     return count;
 }
 string AbstractCipher::checkRefs(const std::string &path)
@@ -91,7 +87,6 @@ string AbstractCipher::checkRefs(const std::string &path)
     if((refs[0] < XKRYPT_REF_VERSION)) throw VersionException();
     if((refs[1] != XKRYPT_REF_MODEL)) throw ModelException();
     if(!(refs[5] == XKRYPT_REF_DECFNAME || refs[5] == XKRYPT_REF_NOTDECFNAME)) throw DecFnameRefsException();
-//    if(refs.size() - XKRYPT_REF_SIZE_UNIT != XKRYPT_SALT_SIZE + XKRYPT_IV_SIZE) throw SaltRefsException();
     return refs;
 }
 

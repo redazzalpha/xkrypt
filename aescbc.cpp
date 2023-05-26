@@ -73,10 +73,10 @@ string AesCBC::decryptText(const string& cipher, AbstractKeygen* keygen, const E
 }
 void AesCBC::encryptFile(const string& path, AbstractKeygen* keygen, const Encoding encoding)
 {
-    KeygenAes* keygen_aes = (KeygenAes*)keygen;
+    KeygenAes* kg_aes = (KeygenAes*)keygen;
     string filename, output;
-    const SecByteBlock& key = keygen_aes->key();
-    const SecByteBlock& iv = keygen_aes->Iv();
+    const SecByteBlock& key = kg_aes->key();
+    const SecByteBlock& iv = kg_aes->Iv();
     CBC_Mode<CryptoPP::AES>::Encryption encryptor;
     DirFname dirfname = extractFname(path);
 

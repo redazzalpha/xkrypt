@@ -471,7 +471,7 @@ string MainWindow::refsToString()
     refs.resize(XKRYPT_REF_SIZE);
     refs[0] = XKRYPT_REF_VERSION;
     refs[1] = XKRYPT_REF_MODEL;
-    refs[2] = (CryptoPP::byte)encodingFrom(ui->m_encTabTextEncodings);
+    refs[2] = (CryptoPP::byte)m_keygen->encoding();
     refs[3] = (CryptoPP::byte)m_cipher.algId();
     refs[4] = (CryptoPP::byte)m_cipher.modeId();
     refs[5] = (CryptoPP::byte)m_cipher.encfname();
@@ -649,7 +649,10 @@ void MainWindow::on_m_encTabFileEncrypt_clicked()
         m_cipher.cipherNew(alg, mode);
         m_cipher.setEncfname(encFname);
 
-//        if(ui->m_keyMPk->isChecked()) ((KeygenAes*)m_keygen)->pkDerive("0000");
+        m_keygen->genSalt();
+        if(auto kg_aes_cast = dynamic_cast<KeygenAes*>(m_keygen))
+            kg_aes_cast->setPkState(ui->m_keyMPk->isChecked());
+
         m_processBar.setMax(size);
         m_threadCipher.start();
         emit startEncFile(paths, m_keygen, encoding);
@@ -666,15 +669,9 @@ void MainWindow::on_m_decTabFileDecrypt_clicked()
         size_t size = paths.size();
         if(size < 1) throw FileSelectedException("-- error no file selected");
 
-        /*
-         * useless cause of detect fields function
-         * and refs system
-        */
-//      string alg = ui->m_decTabFileAlgs->currentText().toStdString();
-//      string mode = ui->m_decTabFileModes->currentText().toStdString();
-//      Encoding encoding = encodingFrom(ui->m_decTabFileEncodings);
+        if(auto kg_aes_cast = dynamic_cast<KeygenAes*>(m_keygen))
+            kg_aes_cast->setPkState(ui->m_keyMPk->isChecked());
 
-//        if(ui->m_keyMPk->isChecked()) ((KeygenAes*)m_keygen)->setPkState(true);
         m_processBar.setMax(size);
         m_threadCipher.start();
         emit startDecFile(paths, m_keygen);
@@ -888,6 +885,7 @@ void MainWindow::cipherText(const std::string &cipherText)
                 throw FileSelectedException("-- error: wrong path file<br />Encrypted filename already exists");
             }
             std::ofstream file(m_path, std::ios::out | std::ios::trunc);
+            m_keygen->setEncoding(encodingFrom(ui->m_encTabTextEncodings));
             file << m_cipher.encodeText(refsToString(), Encoding::BASE64);;
             file << cipherText;
             file.close();
