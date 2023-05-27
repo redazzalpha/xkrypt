@@ -44,6 +44,7 @@ public:
     DirFname extractFname(const std::string &path) const;
     std::string pumpRefs(const std::string &path);
     void injectRefs(CryptoPP::FileSink *fs, AbstractKeygen *keygen);
+    std::string stringRefs(AbstractKeygen* keygen);
     int afterRefs(CryptoPP::FileSource *fs);
     std::string checkRefs(const std::string& path);
 };

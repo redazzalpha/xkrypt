@@ -27,10 +27,10 @@ bool Keygen_serial::deserialize(ifstream* file, KeygenAes* keygen) const noexcep
         FileSource fs(*file, false);
 
         fs.Attach(new StringSink(refs));
-        fs.Pump(XKRYPT_KEY_REF_SIZE);
+        fs.Pump(XREF_SIZE_KEY);
 
-        if((refs[0] < XKRYPT_REF_VERSION)) throw VersionException();
-        if( (refs[1] != XKRYPT_REF_MODEL)) throw ModelException();
+        if((refs[0] < XREF_VERSION)) throw VersionException();
+        if( (refs[1] != XREF_MODEL)) throw ModelException();
 
         switch(refs[2]) {
         case Encoding::BASE64 : fs.Detach(new Base64Decoder); break;
@@ -76,8 +76,8 @@ void Keygen_serial::serialize(const string& path, KeygenAes* keygen) const
     size_t keySize = keygen->key().size();
     size_t keyIvSize = ivSize + keySize;
     std::vector<CryptoPP::byte> xkrypt_refs {
-        XKRYPT_REF_VERSION,
-        XKRYPT_REF_MODEL,
+        XREF_VERSION,
+        XREF_MODEL,
         (CryptoPP::byte)keygen->encoding(),
     };
     CryptoPP::byte* keyIv = new CryptoPP::byte[keyIvSize];

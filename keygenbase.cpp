@@ -4,7 +4,7 @@
 using namespace CryptoPP;
 
 // constructors
-AbstractKeygen::AbstractKeygen(size_t keysize): m_keysize(keysize), m_salt(XKRYPT_SALT_SIZE) {}
+AbstractKeygen::AbstractKeygen(size_t keysize): m_keysize(keysize), m_salt(SALT_SIZE) {}
 
 // destructor
 AbstractKeygen::~AbstractKeygen() {}
@@ -38,7 +38,7 @@ SecByteBlock& AbstractKeygen::salt()
 SecByteBlock& AbstractKeygen::genSalt()
 {
     AutoSeededX917RNG<CryptoPP::AES> prng;
-    m_salt.CleanNew(XKRYPT_SALT_SIZE);
+    m_salt.CleanNew(SALT_SIZE);
     prng.GenerateBlock(m_salt, m_salt.size());
     return m_salt;
 }

@@ -137,7 +137,6 @@ private:
     void keyLoadedSelectable(const Qt::TextInteractionFlags flags) const;
 
     bool isRunningThread();
-    std::string refsToString();
     void closeEvent(QCloseEvent* event) override;
     void importFile(FileImporter& fimporter, const std::string &caption);
     void layoutLoop(QHBoxLayout *layout, bool checked);

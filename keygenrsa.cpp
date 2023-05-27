@@ -39,9 +39,12 @@ KeygenRsa::~KeygenRsa()
 void KeygenRsa::generateKey()
 {
     flush();
-    m_private = new CryptoPP::RSA::PrivateKey();
-    m_private->GenerateRandomWithKeySize(m_prng, static_cast<size_t>(m_keysize));
-    m_public = new CryptoPP::RSA::PublicKey(*m_private);
+    if(m_keysize >= static_cast<size_t>(Rsa::KeySize::LENGTH_1024)) {
+        m_private = new CryptoPP::RSA::PrivateKey();
+        m_private->GenerateRandomWithKeySize(m_prng, static_cast<size_t>(m_keysize));
+        m_public = new CryptoPP::RSA::PublicKey(*m_private);
+        genSalt();
+    }
 }
 void KeygenRsa::generateKey(size_t keysize, Encoding encoding)
 {

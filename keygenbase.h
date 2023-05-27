@@ -27,12 +27,12 @@ public:
 
     void setKeysize(size_t keysize);
     void setEncoding(Encoding newEncoding);
+    void setSalt(const CryptoPP::SecByteBlock &newSalt);
     size_t keysize() const;
     Encoding encoding() const;
     CryptoPP::SecByteBlock& salt();
 
     CryptoPP::SecByteBlock& genSalt();
-    void setSalt(const CryptoPP::SecByteBlock &newSalt);
 };
 
 #endif // KEYGENBASE_H

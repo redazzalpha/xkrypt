@@ -1,10 +1,10 @@
 #include "cipherbase.h"
 #include "defines.h"
 #include "except.h"
-#include "keygenaes.h"
 #include <base64.h>
 #include <fstream>
 #include <hex.h>
+#include <sstream>
 
 using namespace CryptoPP;
 using namespace std;
@@ -51,20 +51,39 @@ string AbstractCipher::pumpRefs(const  string &path)
 }
 void AbstractCipher::injectRefs(FileSink* fs, AbstractKeygen* keygen)
 {
-    std::vector<CryptoPP::byte> xkrypt_refs {
-        XKRYPT_REF_VERSION,
-        XKRYPT_REF_MODEL,
+    SecByteBlock salt = keygen->salt();
+    std::vector<CryptoPP::byte> xrefs {
+        XREF_VERSION,
+        XREF_MODEL,
         (CryptoPP::byte)keygen->encoding(),
         (CryptoPP::byte)algId(),
         (CryptoPP::byte)modeId(),
         (CryptoPP::byte)m_encfname,
     };
 
-    SecByteBlock salt = keygen->salt();
-    for(size_t i = 0; i < XKRYPT_SALT_SIZE; i++)
-        xkrypt_refs.push_back(salt[i]);
+    for(size_t i = 0; i < SALT_SIZE; i++)
+        xrefs.push_back(salt[i]);
 
-    StringSource refsSource(&xkrypt_refs[0], xkrypt_refs.size(), true, new Base64Encoder(new Redirector(*fs)));
+    StringSource refsSource(&xrefs[0], xrefs.size(), true, new Base64Encoder(new Redirector(*fs)));
+}
+string AbstractCipher::stringRefs(AbstractKeygen* keygen)
+{
+    SecByteBlock salt = keygen->salt();
+    int count = 0;
+    string xrefs;
+    xrefs.resize(XREF_SIZE);
+
+    xrefs[count++] = XREF_VERSION;
+    xrefs[count++] = XREF_MODEL;
+    xrefs[count++] = (CryptoPP::byte)keygen->encoding();
+    xrefs[count++] = (CryptoPP::byte)algId();
+    xrefs[count++] = (CryptoPP::byte)modeId();
+    xrefs[count++] = (CryptoPP::byte)encfname();
+
+    for(size_t i = 0; i < SALT_SIZE; i++)
+        xrefs[count++] = salt[i];
+
+    return xrefs;
 }
 int AbstractCipher::afterRefs(FileSource* fs)
 {
@@ -83,10 +102,11 @@ int AbstractCipher::afterRefs(FileSource* fs)
 string AbstractCipher::checkRefs(const std::string &path)
 {
     string refs = pumpRefs(path);
-    if(refs.size() != XKRYPT_REF_SIZE) throw InvalidRefsException();
-    if((refs[0] < XKRYPT_REF_VERSION)) throw VersionException();
-    if((refs[1] != XKRYPT_REF_MODEL)) throw ModelException();
-    if(!(refs[5] == XKRYPT_REF_DECFNAME || refs[5] == XKRYPT_REF_NOTDECFNAME)) throw DecFnameRefsException();
+    if(refs.size() != XREF_SIZE) throw InvalidRefsException();
+    if((refs[0] < XREF_VERSION)) throw VersionException();
+    if((refs[1] != XREF_MODEL)) throw ModelException();
+    if(!(refs[5] == XREF_DECFNAME || refs[5] == XREF_NOTDECFNAME)) throw DecFnameRefsException();
     return refs;
 }
+
 

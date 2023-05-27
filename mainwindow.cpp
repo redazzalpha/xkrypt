@@ -465,19 +465,6 @@ bool MainWindow::isRunningThread()
 {
     return m_threadCipher.isRunning();
 }
-string MainWindow::refsToString()
-{
-    string refs;
-    refs.resize(XKRYPT_REF_SIZE);
-    refs[0] = XKRYPT_REF_VERSION;
-    refs[1] = XKRYPT_REF_MODEL;
-    refs[2] = (CryptoPP::byte)m_keygen->encoding();
-    refs[3] = (CryptoPP::byte)m_cipher.algId();
-    refs[4] = (CryptoPP::byte)m_cipher.modeId();
-    refs[5] = (CryptoPP::byte)m_cipher.encfname();
-
-    return refs;
-}
 void MainWindow::closeEvent(QCloseEvent*)
 {
     QMainWindow::close();
@@ -586,6 +573,9 @@ void MainWindow::on_m_encTabTextEncrypt_clicked()
 
         m_cipher.cipherNew(alg, mode);
         m_cipher.setEncfname(false);
+
+        if(auto kg_aes_cast = dynamic_cast<KeygenAes*>(m_keygen))
+            kg_aes_cast->setPkState(ui->m_keyMPk->isChecked());
 
         m_processBar.setMax();
         m_threadCipher.start();
@@ -876,7 +866,7 @@ void MainWindow::cipherText(const std::string &cipherText)
         if(ui->m_encTabTextSaveOnF->isChecked() && !dialogSave(this).empty()) {
             if(ui->m_encTabTextEncFname->isChecked()) {
                 m_cipher.setEncfname(true);
-                m_path = m_dir + DELIMITOR + m_cipher.encryptText(m_fname, m_keygen, Encoding::HEX);
+                m_path = m_dir + DELIMITOR + m_cipher.encryptTextFn(m_fname, m_keygen, Encoding::HEX);
             }
             if(isFileExist(m_path)){
                 description = "-- This error has been occured cause the file you're trying to create using \"Encrypt filename\" mode already exists.\n\n"\
@@ -885,8 +875,8 @@ void MainWindow::cipherText(const std::string &cipherText)
                 throw FileSelectedException("-- error: wrong path file<br />Encrypted filename already exists");
             }
             std::ofstream file(m_path, std::ios::out | std::ios::trunc);
-            m_keygen->setEncoding(encodingFrom(ui->m_encTabTextEncodings));
-            file << m_cipher.encodeText(refsToString(), Encoding::BASE64);;
+            m_keygen->setEncoding(encodingFrom2(ui->m_encTabTextEncodings));
+            file << m_cipher.encodeText(m_cipher.stringRefs(m_keygen), Encoding::BASE64);
             file << cipherText;
             file.close();
             dialogSuccess(m_cipher.successMsg() + "at " + m_path);
@@ -900,12 +890,12 @@ void MainWindow::cipherText(const std::string &cipherText)
 }
 void MainWindow::recoverFile(const string& success)
 {
-    Encoding encoding = encodingFrom(ui->m_decTabFileEncodings);
+    Encoding encoding = encodingFrom2(ui->m_decTabFileEncodings);
     dialogSuccess(success + " Encoding: " + m_kserial.serializeEncoding(encoding));
 }
 void MainWindow::cipherFile(const string& success)
 {
-    Encoding encoding = encodingFrom(ui->m_encTabFileEncodings);
+    Encoding encoding = encodingFrom2(ui->m_encTabFileEncodings);
     dialogSuccess(success + " Encoding: " + m_kserial.serializeEncoding(encoding));
 }
 void MainWindow::cipherError(const std::string& error)

@@ -37,7 +37,7 @@ string AesCCM::encryptText(const string& plain, AbstractKeygen* keygen, const En
     const SecByteBlock& key = keygen_aes->key();
     const SecByteBlock& iv = keygen_aes->Iv();
     StringSink* ss = new StringSink(cipher);
-    CryptoPP::CCM<CryptoPP::AES, XKRYPT_TAG_SIZE>::Encryption encryptor;
+    CryptoPP::CCM<CryptoPP::AES, TAG_SIZE>::Encryption encryptor;
     encryptor.SetKeyWithIV(key, key.size(), iv);
     encryptor.SpecifyDataLengths(0, plain.size(), 0);
     AuthenticatedEncryptionFilter* textFilter = new AuthenticatedEncryptionFilter(encryptor);
@@ -71,7 +71,7 @@ string AesCCM::decryptText(const string& cipher, AbstractKeygen* keygen, const E
     const SecByteBlock& key = keygen_aes->key();
     const SecByteBlock& iv = keygen_aes->Iv();
     StringSink* ss = new StringSink(recover);
-    CryptoPP::CCM<CryptoPP::AES, XKRYPT_TAG_SIZE>::Decryption decryptor;
+    CryptoPP::CCM<CryptoPP::AES, TAG_SIZE>::Decryption decryptor;
     BufferedTransformation* decoder;
 
     switch(encoding) {
@@ -90,14 +90,14 @@ string AesCCM::decryptText(const string& cipher, AbstractKeygen* keygen, const E
     if(decoder) {
         decoder->PutMessageEnd((CryptoPP::byte*)cipher.c_str(), cipher.size());
         decryptor.SetKeyWithIV(key, key.size(), iv);
-        decryptor.SpecifyDataLengths(0, decoder->MaxRetrievable()-XKRYPT_TAG_SIZE, 0);
+        decryptor.SpecifyDataLengths(0, decoder->MaxRetrievable() - TAG_SIZE, 0);
         AuthenticatedDecryptionFilter* textFilter = new AuthenticatedDecryptionFilter(decryptor, ss);
         decoder->Attach(textFilter);
         StringSource(cipher, true, decoder);
     }
     else {
         decryptor.SetKeyWithIV(key, key.size(), iv);
-        decryptor.SpecifyDataLengths(0, cipher.size()-XKRYPT_TAG_SIZE, 0);
+        decryptor.SpecifyDataLengths(0, cipher.size() - TAG_SIZE, 0);
         AuthenticatedDecryptionFilter* textFilter = new AuthenticatedDecryptionFilter(decryptor, ss);
         StringSource(cipher, true, textFilter);
     }
@@ -110,7 +110,7 @@ void AesCCM::encryptFile(const string& path, AbstractKeygen* keygen, const Encod
     string filename, output;
     const SecByteBlock& key = keygen_aes->key();
     const SecByteBlock& iv = keygen_aes->Iv();
-    CryptoPP::CCM<CryptoPP::AES, XKRYPT_TAG_SIZE>::Encryption encryptor;
+    CryptoPP::CCM<CryptoPP::AES, TAG_SIZE>::Encryption encryptor;
     DirFname dirfname = extractFname(path);
 
     if(m_encfname) {
@@ -152,14 +152,14 @@ void AesCCM::decryptFile(const string& path, AbstractKeygen* keygen, const Encod
     string filename, output;
     const SecByteBlock& key = keygen_aes->key();
     const SecByteBlock& iv = keygen_aes->Iv();
-    CryptoPP::CCM<CryptoPP::AES, XKRYPT_TAG_SIZE>::Decryption decryptor;
+    CryptoPP::CCM<CryptoPP::AES, TAG_SIZE>::Decryption decryptor;
     DirFname dirfname = extractFname(path);
 
     if(m_decfname) {
         HexDecoder* decoder = new HexDecoder;
         decoder->PutMessageEnd((CryptoPP::byte*)dirfname.m_fname.c_str(), dirfname.m_fname.size());
         decryptor.SetKeyWithIV(key, key.size(), iv);
-        decryptor.SpecifyDataLengths(0, decoder->MaxRetrievable()-XKRYPT_TAG_SIZE, 0 );
+        decryptor.SpecifyDataLengths(0, decoder->MaxRetrievable() - TAG_SIZE, 0 );
         AuthenticatedDecryptionFilter* filenameFilter  = new AuthenticatedDecryptionFilter(decryptor, new StringSink(filename));
         decoder->Attach(filenameFilter);
         StringSource(dirfname.m_fname, true, decoder);
@@ -189,14 +189,14 @@ void AesCCM::decryptFile(const string& path, AbstractKeygen* keygen, const Encod
     if(decoder) {
         decoder->PutMessageEnd((CryptoPP::byte*)&bytes[refsCount], bytes.size()-refsCount);
         decryptor.SetKeyWithIV(key, key.size(), iv);
-        decryptor.SpecifyDataLengths(0, decoder->MaxRetrievable()-XKRYPT_TAG_SIZE, 0 );
+        decryptor.SpecifyDataLengths(0, decoder->MaxRetrievable() - TAG_SIZE, 0 );
         AuthenticatedDecryptionFilter* fileFilter = new AuthenticatedDecryptionFilter(decryptor, fs);
         decoder->Attach(fileFilter);
         source.Attach(decoder);
     }
     else {
         decryptor.SetKeyWithIV(key, key.size(), iv);
-        decryptor.SpecifyDataLengths(0, bytes.size()-XKRYPT_TAG_SIZE-refsCount, 0 );
+        decryptor.SpecifyDataLengths(0, bytes.size() - TAG_SIZE - refsCount, 0 );
         AuthenticatedDecryptionFilter* fileFilter = new AuthenticatedDecryptionFilter(decryptor, fs);
         source.Attach(fileFilter);
     }
