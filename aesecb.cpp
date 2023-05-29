@@ -31,48 +31,67 @@ Mode AesECB::modeId() const
 }
 string AesECB::encryptText(const string& plain, AbstractKeygen* keygen, const Encoding encoding) noexcept(false)
 {
-    KeygenAes* keygen_aes = (KeygenAes*)keygen;
+    KeygenAes* kg_aes = (KeygenAes*)keygen;
     std::string cipher = "";
-    const SecByteBlock& key = keygen_aes->key();
+    const SecByteBlock& key = kg_aes->key();
     StringSink* ss = new StringSink(cipher);
     ECB_Mode<CryptoPP::AES>::Encryption encryptor;
     encryptor.SetKey(key, key.size());
     StreamTransformationFilter* textFilter = new StreamTransformationFilter(encryptor);
+    SecByteBlock salt = keygen->salt();
 
+    BufferedTransformation* bt;
     switch(encoding) {
-    case Encoding::BASE64 : textFilter->Attach(new Base64Encoder(ss)); break;
-    case Encoding::HEX : textFilter->Attach(new HexEncoder(ss)); break;
-    case Encoding::NONE : textFilter->Attach(ss); break;
+    case Encoding::BASE64 :
+        bt = new Base64Encoder(new Redirector(*ss));
+        textFilter->Attach(new Base64Encoder);
+        break;
+    case Encoding::HEX :
+        bt = new HexEncoder(new Redirector(*ss));
+        textFilter->Attach(new HexEncoder);
+        break;
+    case Encoding::NONE :
+        bt = new StringSink(cipher);
+        break;
     default : throw EncodingException();
     }
 
+    if(!m_encfname) StringSource(salt, salt.size(), true, bt);
+    else if(bt) delete bt;
+
+    textFilter->Attach(ss);
     StringSource(plain, true, textFilter);
+
     return cipher;
 }
 string AesECB::decryptText(const string& cipher, AbstractKeygen* keygen, const Encoding encoding) noexcept(false)
 {
-    KeygenAes* keygen_aes = (KeygenAes*)keygen;
+    KeygenAes* kg_aes = (KeygenAes*)keygen;
     std::string recover;
-    const SecByteBlock& key = keygen_aes->key();
+    const SecByteBlock& key = kg_aes->key();
     StringSink* ss = new StringSink(recover);
     ECB_Mode<CryptoPP::AES>::Decryption decryptor;
     decryptor.SetKey(key, key.size());
     StreamTransformationFilter* textFilter = new StreamTransformationFilter(decryptor, ss);
+    StringSource source(cipher, false);
 
     switch(encoding) {
-    case Encoding::BASE64 : StringSource(cipher, true, new Base64Decoder(textFilter)); break;
-    case Encoding::HEX : StringSource(cipher, true, new HexDecoder(textFilter)); break;
-    case Encoding::NONE : StringSource(cipher, true, textFilter); break;
+    case Encoding::BASE64 : source.Attach(new Base64Decoder); break;
+    case Encoding::HEX : source.Attach(new HexDecoder); break;
+    case Encoding::NONE : break;
     default : throw EncodingException();
     }
+
+    source.Attach(textFilter);
+    source.PumpAll();
 
     return recover;
 }
 void AesECB::encryptFile(const string& path, AbstractKeygen* keygen, const Encoding encoding)
 {
-    KeygenAes* keygen_aes = (KeygenAes*)keygen;
+    KeygenAes* kg_aes = (KeygenAes*)keygen;
     string filename, output;
-    const SecByteBlock& key = keygen_aes->key();
+    const SecByteBlock& key = kg_aes->key();
     ECB_Mode<CryptoPP::AES>::Encryption encryptor;
     DirFname dirfname = extractFname(path);
 
@@ -89,13 +108,14 @@ void AesECB::encryptFile(const string& path, AbstractKeygen* keygen, const Encod
 
     injectRefs(fs, keygen);
     switch(encoding) {
-    case Encoding::BASE64 : fileFilter->Attach(new Base64Encoder(fs)); break;
-    case Encoding::HEX : fileFilter->Attach(new HexEncoder(fs)); break;
-    case Encoding::NONE : fileFilter->Attach(fs); break;
+    case Encoding::BASE64 : fileFilter->Attach(new Base64Encoder); break;
+    case Encoding::HEX : fileFilter->Attach(new HexEncoder); break;
+    case Encoding::NONE :  break;
     default : throw EncodingException();
     }
 
-    FileSource source(path.c_str(), true, new Redirector(*fileFilter));
+    fileFilter->Attach(new Redirector(*fs));
+    FileSource source(path.c_str(), true, fileFilter);
 
     remove(path.c_str());
     if(!m_encfname) {
@@ -125,12 +145,13 @@ void AesECB::decryptFile(const string& path, AbstractKeygen* keygen, const Encod
 
     afterRefs(&source);
     switch(encoding) {
-    case Encoding::BASE64 : source.Attach(new Base64Decoder(fileFilter)); break;
-    case Encoding::HEX : source.Attach(new HexDecoder(fileFilter)); break;
-    case Encoding::NONE : source.Attach(fileFilter); break;
+    case Encoding::BASE64 : source.Attach(new Base64Decoder); break;
+    case Encoding::HEX : source.Attach(new HexDecoder); break;
+    case Encoding::NONE : break;
     default : throw EncodingException();
     }
 
+    source.Attach(fileFilter);
     source.PumpAll();
 
     remove(path.c_str());

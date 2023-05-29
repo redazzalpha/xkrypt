@@ -1,4 +1,5 @@
 #include "keygenrsa.h"
+#include "defines.h"
 #include <iostream>
 #include <hex.h>
 #include <integer.h>
@@ -45,7 +46,8 @@ void KeygenRsa::generateKey()
         m_private = new CryptoPP::RSA::PrivateKey();
         m_private->GenerateRandomWithKeySize(m_prng, static_cast<size_t>(m_keysize));
         m_public = new CryptoPP::RSA::PublicKey(*m_private);
-        genSalt();
+        m_salt.CleanNew(SALT_SIZE);
+        m_prng.GenerateBlock(m_salt, m_salt.size());
     }
 }
 void KeygenRsa::generateKey(size_t keysize, Encoding encoding)

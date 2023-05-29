@@ -13,7 +13,6 @@ private:
 public:
     // constructors
     KeygenAes(size_t keysize = static_cast<size_t>(Aes::KeySize::LENGTH_DEFAULT));
-    KeygenAes(size_t keysize, size_t ivsize);
     KeygenAes(const KeygenAes& a);
 
     // operators

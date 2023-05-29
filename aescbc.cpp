@@ -46,15 +46,14 @@ string AesCBC::encryptText(const string& plain, AbstractKeygen* keygen, const En
     switch(encoding) {
     case Encoding::BASE64 :
         bt = new Base64Encoder(new Redirector(*ss));
-        textFilter->Attach(new Base64Encoder(ss));
+        textFilter->Attach(new Base64Encoder);
         break;
     case Encoding::HEX :
         bt = new HexEncoder(new Redirector(*ss));
-        textFilter->Attach(new HexEncoder(ss));
+        textFilter->Attach(new HexEncoder);
         break;
     case Encoding::NONE :
         bt = new StringSink(cipher);
-        textFilter->Attach(ss);
         break;
     default : throw EncodingException();
     }
@@ -62,6 +61,7 @@ string AesCBC::encryptText(const string& plain, AbstractKeygen* keygen, const En
     if(!m_encfname) StringSource(salt, salt.size(), true, bt);
     else if(bt) delete bt;
 
+    textFilter->Attach(ss);
     StringSource(plain, true, textFilter);
 
     return cipher;
@@ -129,10 +129,10 @@ void AesCBC::encryptFile(const string& path, AbstractKeygen* keygen, const Encod
 }
 void AesCBC::decryptFile(const string& path, AbstractKeygen* keygen, const Encoding encoding)
 {
-    KeygenAes* keygen_aes = (KeygenAes*)keygen;
+    KeygenAes* kg_aes = (KeygenAes*)keygen;
     string filename, output;
-    const SecByteBlock& key = keygen_aes->key();
-    const SecByteBlock& iv = keygen_aes->Iv();
+    const SecByteBlock& key = kg_aes->key();
+    const SecByteBlock& iv = kg_aes->Iv();
     CBC_Mode<CryptoPP::AES>::Decryption decryptor;
     DirFname dirfname = extractFname(path);
 

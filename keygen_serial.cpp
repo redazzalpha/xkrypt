@@ -67,6 +67,7 @@ bool Keygen_serial::deserialize(ifstream* file, KeygenRsa* keygen) const noexcep
         }
         keygen->setPublic(pvk);
         keygen->setKeysize(pvk->MaxImage().ByteCount() * 8);
+        keygen->genSalt();
         imported = true;
     }
     return imported;
@@ -141,7 +142,8 @@ string Keygen_serial::serialize(KeygenAes* keygen) const
 
     stringstream ss;
     ss << "-- Symmetric key:\n";
-    ss << key;
+    ss << "key size: " << std::to_string(keygen->keysize()) + " bits\n";
+    ss << "key: " <<  key;
     return ss.str();
 }
 string Keygen_serial::serialize(KeygenRsa* keygen) const

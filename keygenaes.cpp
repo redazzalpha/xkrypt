@@ -11,16 +11,8 @@ using namespace std;
 // constructors
 KeygenAes::KeygenAes(size_t keysize): AbstractKeygen(keysize)
 {
-    m_key.CleanNew(m_keysize);
-    m_iv.CleanNew(static_cast<size_t>(Aes::IvSize::LENGTH_DEFAULT));
 }
-
-KeygenAes::KeygenAes(size_t keysize, size_t ivsize): AbstractKeygen(keysize)
-{
-    m_key.CleanNew(m_keysize);
-    m_iv.CleanNew(ivsize);
-}
-KeygenAes::KeygenAes(const KeygenAes &a) : KeygenAes(a.m_key.size(), a.m_iv.size())
+KeygenAes::KeygenAes(const KeygenAes &a) : AbstractKeygen(a.m_key.size())
 {
     m_key.CleanNew(a.m_key.size());
     m_iv.CleanNew(a.m_iv.size());
@@ -73,7 +65,10 @@ void KeygenAes::generateKey(size_t keysize, Encoding encoding)
 }
 bool KeygenAes::isReady() const
 {
-    return !m_key.empty() && !m_iv.empty();
+    return
+        (!m_key.empty() && !m_iv.empty()) &&
+        (m_key.size() == m_keysize) &&
+        (m_iv.size() == static_cast<size_t>(Aes::IvSize::LENGTH_DEFAULT));
 }
 void KeygenAes::flush()
 {

@@ -30,20 +30,32 @@ Mode RsaOAEP::modeId() const
 }
 string RsaOAEP::encryptText(const string& plain, AbstractKeygen* keygen, const Encoding encoding) noexcept(false)
 {
-    KeygenRsa* keygen_rsa = (KeygenRsa*)keygen;
-    CryptoPP::RSA::PrivateKey* pvk = keygen_rsa->getPrivate();
+    KeygenRsa* kg_rsa = (KeygenRsa*)keygen;
+    CryptoPP::RSA::PrivateKey* pvk = kg_rsa->getPrivate();
     AutoSeededX917RNG<CryptoPP::AES> prng;
     RSAES<OAEP<SHA512>>::Encryptor encryptor(*pvk);
     PK_EncryptorFilter* textFilter = new PK_EncryptorFilter(prng, encryptor);
     string cipher;
+    StringSink* ss = new StringSink(cipher);
+
+    SecByteBlock salt = keygen->salt();
+    BufferedTransformation* bt;
 
     switch(encoding) {
-    case Encoding::BASE64 : textFilter->Attach(new Base64Encoder(new StringSink(cipher))); break;
-    case Encoding::HEX : textFilter->Attach(new HexEncoder(new StringSink(cipher))); break;
-    case Encoding::NONE : textFilter->Attach(new StringSink(cipher)); break;
+    case Encoding::BASE64 :
+        bt = new Base64Encoder(new Redirector(*ss));
+        textFilter->Attach(new Base64Encoder); break;
+    case Encoding::HEX :
+        bt = new HexEncoder(new Redirector(*ss));
+        textFilter->Attach(new HexEncoder); break;
+    case Encoding::NONE :
+        bt = new StringSink(cipher);
+        break;
     default : throw EncodingException();
     }
 
+    StringSource(salt, salt.size(), true, bt);
+    textFilter->Attach(ss);
     StringSource source(plain, true, textFilter);
     return cipher;
 }

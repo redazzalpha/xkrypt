@@ -212,14 +212,14 @@ string Cipher::decryptText(const string& cipher, AbstractKeygen* keygen, const E
 void Cipher::encryptFile(vector<string> paths, AbstractKeygen* keygen, const Encoding encoding)
 {
     try {
-        AbstractKeygen* pk;
+        keygen->setEncoding(encoding);
         size_t size = paths.size(), progress;
+
+        AbstractKeygen* pk;
         for(progress = 0; progress < size && m_run; progress++) {
             const string path = paths[progress];
             DirFname dirfname = m_cipher->extractFname(path);
             emit processing(dirfname.m_fname);
-
-            keygen->setEncoding(encoding);
 
             if(auto kg_aes_cast = dynamic_cast<KeygenAes*>(keygen)) {
                 if(kg_aes_cast->pkState()) pk = kg_aes_cast->pkDerive(keygen->password());

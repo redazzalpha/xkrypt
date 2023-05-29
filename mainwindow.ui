@@ -56,7 +56,7 @@
        <item>
         <widget class="QCheckBox" name="m_keyMPk">
          <property name="text">
-          <string>Use password key</string>
+          <string>Use password</string>
          </property>
         </widget>
        </item>

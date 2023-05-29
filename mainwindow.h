@@ -167,8 +167,9 @@ private slots:
     void on_m_keyMImport_clicked();
     void on_m_keyMDisable_toggled(bool checked);
     
-    void setTypeKey(const QString & type);
-    void setTypeMode(const QString& alg);
+    void setTypes(const QString & type);
+    void setTypeKeysize(const QString & type);
+    void setTypeModes(const QString& alg);
     void setTypeCipher(const std::string &alg, bool checked);
     void hideKey(const bool isChecked);
     void flushKey();

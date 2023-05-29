@@ -32,44 +32,47 @@ Mode AesCCM::modeId() const
 }
 string AesCCM::encryptText(const string& plain, AbstractKeygen* keygen, const Encoding encoding) noexcept(false)
 {
-    KeygenAes* keygen_aes = (KeygenAes*)keygen;
+    KeygenAes* kg_aes = (KeygenAes*)keygen;
     std::string cipher = "";
-    const SecByteBlock& key = keygen_aes->key();
-    const SecByteBlock& iv = keygen_aes->Iv();
+    const SecByteBlock& key = kg_aes->key();
+    const SecByteBlock& iv = kg_aes->Iv();
     StringSink* ss = new StringSink(cipher);
     CryptoPP::CCM<CryptoPP::AES, TAG_SIZE>::Encryption encryptor;
     encryptor.SetKeyWithIV(key, key.size(), iv);
     encryptor.SpecifyDataLengths(0, plain.size(), 0);
     AuthenticatedEncryptionFilter* textFilter = new AuthenticatedEncryptionFilter(encryptor);
-    BufferedTransformation* encoder;
+    SecByteBlock salt = keygen->salt();
 
+    BufferedTransformation* bt;
     switch(encoding) {
     case Encoding::BASE64 :
-        encoder = new Base64Encoder;
-        encoder->Attach(ss);
-        textFilter->Attach(encoder);
+        bt = new Base64Encoder(new Redirector(*ss));
+        textFilter->Attach(new Base64Encoder);
         break;
     case Encoding::HEX :
-        encoder = new HexEncoder;
-        encoder->Attach(ss);
-        textFilter->Attach(encoder);
+        bt = new HexEncoder(new Redirector(*ss));
+        textFilter->Attach(new HexEncoder);
         break;
     case Encoding::NONE :
-        encoder = nullptr;
-        textFilter->Attach(ss);
+        bt = new StringSink(cipher);
         break;
     default : throw EncodingException();
     }
 
+    if(!m_encfname) StringSource(salt, salt.size(), true, bt);
+    else if(bt) delete bt;
+
+    textFilter->Attach(ss);
     StringSource(plain, true, textFilter);
+
     return cipher;
 }
 string AesCCM::decryptText(const string& cipher, AbstractKeygen* keygen, const Encoding encoding) noexcept(false)
 {
-    KeygenAes* keygen_aes = (KeygenAes*)keygen;
+    KeygenAes* kg_aes = (KeygenAes*)keygen;
     std::string recover;
-    const SecByteBlock& key = keygen_aes->key();
-    const SecByteBlock& iv = keygen_aes->Iv();
+    const SecByteBlock& key = kg_aes->key();
+    const SecByteBlock& iv = kg_aes->Iv();
     StringSink* ss = new StringSink(recover);
     CryptoPP::CCM<CryptoPP::AES, TAG_SIZE>::Decryption decryptor;
     BufferedTransformation* decoder;
@@ -106,10 +109,10 @@ string AesCCM::decryptText(const string& cipher, AbstractKeygen* keygen, const E
 }
 void AesCCM::encryptFile(const string& path, AbstractKeygen* keygen, const Encoding encoding)
 {
-    KeygenAes* keygen_aes = (KeygenAes*)keygen;
+    KeygenAes* kg_aes = (KeygenAes*)keygen;
     string filename, output;
-    const SecByteBlock& key = keygen_aes->key();
-    const SecByteBlock& iv = keygen_aes->Iv();
+    const SecByteBlock& key = kg_aes->key();
+    const SecByteBlock& iv = kg_aes->Iv();
     CryptoPP::CCM<CryptoPP::AES, TAG_SIZE>::Encryption encryptor;
     DirFname dirfname = extractFname(path);
 
@@ -132,12 +135,13 @@ void AesCCM::encryptFile(const string& path, AbstractKeygen* keygen, const Encod
 
     injectRefs(fs, keygen);
     switch(encoding) {
-    case Encoding::BASE64 : fileFilter->Attach(new Base64Encoder(fs)); break;
-    case Encoding::HEX : fileFilter->Attach(new HexEncoder(fs)); break;
-    case Encoding::NONE : fileFilter->Attach(fs); break;
+    case Encoding::BASE64 : fileFilter->Attach(new Base64Encoder); break;
+    case Encoding::HEX : fileFilter->Attach(new HexEncoder); break;
+    case Encoding::NONE :  break;
     default : throw EncodingException();
     }
 
+    fileFilter->Attach(new Redirector(*fs));
     FileSource source(path.c_str(), true, fileFilter);
 
     remove(path.c_str());
@@ -147,11 +151,11 @@ void AesCCM::encryptFile(const string& path, AbstractKeygen* keygen, const Encod
     }
 }
 void AesCCM::decryptFile(const string& path, AbstractKeygen* keygen, const Encoding encoding)
-{
-    KeygenAes* keygen_aes = (KeygenAes*)keygen;
+{   
+    KeygenAes* kg_aes = (KeygenAes*)keygen;
     string filename, output;
-    const SecByteBlock& key = keygen_aes->key();
-    const SecByteBlock& iv = keygen_aes->Iv();
+    const SecByteBlock& key = kg_aes->key();
+    const SecByteBlock& iv = kg_aes->Iv();
     CryptoPP::CCM<CryptoPP::AES, TAG_SIZE>::Decryption decryptor;
     DirFname dirfname = extractFname(path);
 
