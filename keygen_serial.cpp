@@ -44,6 +44,7 @@ bool Keygen_serial::deserialize(ifstream* file, KeygenAes* keygen) const noexcep
 
         keygen->setIv(SecByteBlock((uchar*) &keyiv[0], ivsize));
         keygen->setKey(SecByteBlock((uchar*) &keyiv[ivsize], keyiv.size() - ivsize));
+        keygen->genSalt();
 
         imported = true;
     }

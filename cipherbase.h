@@ -42,11 +42,15 @@ public:
     bool decfname() const;
 
     DirFname extractFname(const std::string &path) const;
-    std::string pumpRefs(const std::string &path);
+    std::string pumpSalt(CryptoPP::StringSource* cipher);
+    std::string pumpRefs(CryptoPP::FileSource* source);
+    std::string checkRefs(const std::string& path);
+    std::string checkRefs(CryptoPP::FileSource *source);
+    int afterRefs(const std::string &path);
+    int afterRefs(CryptoPP::FileSource *fs);
+    int afterRefs(CryptoPP::StringSource *ss);
     void injectRefs(CryptoPP::FileSink *fs, AbstractKeygen *keygen);
     std::string stringRefs(AbstractKeygen* keygen);
-    int afterRefs(CryptoPP::FileSource *fs);
-    std::string checkRefs(const std::string& path);
 };
 
 #endif // CIPHERBASE_H

@@ -312,6 +312,26 @@ bool MainWindow::dialogInsertFilename(const string& message) {
 
     return isFnameInserted;
 }
+bool MainWindow::dialogPassword(const std::string &message)
+{
+    string text = MESSAGE_PASSWORD_START + message + MESSAGE_PASSWORD_END;
+    QInputDialog input(this);
+    bool isInserted = false;
+    m_fname = "";
+
+    input.setWindowTitle("xKrypt - insert");
+    input.setWindowIcon(QIcon(QPixmap(ICON_PASSWORD)));
+    input.setLabelText(QString::fromStdString(text));
+    input.setFixedSize(500, 200);
+    input.setModal(true);
+    input.setTextEchoMode(QLineEdit::Password);
+    if(input.exec()) {
+        m_keygen->setPassword(input.textValue().toStdString());
+        isInserted = true;
+    }
+
+    return isInserted;
+}
 bool MainWindow::dialogConfirm(const string& message, const string& description)
 {
     bool isConfirmed = true;
@@ -574,12 +594,19 @@ void MainWindow::on_m_encTabTextEncrypt_clicked()
         m_cipher.cipherNew(alg, mode);
         m_cipher.setEncfname(false);
 
-        if(auto kg_aes_cast = dynamic_cast<KeygenAes*>(m_keygen))
-            kg_aes_cast->setPkState(ui->m_keyMPk->isChecked());
+        bool isProcess = true;
+        if(auto kg_aes_cast = dynamic_cast<KeygenAes*>(m_keygen)) {
+            bool pkState = ui->m_keyMPk->isChecked();
+            kg_aes_cast->setPkState(pkState);
+            if(pkState)
+                isProcess = dialogPassword("Please insert password for encryption");
+        }
 
-        m_processBar.setMax();
-        m_threadCipher.start();
-        emit startEncText(plainText, m_keygen, encoding);
+        if(isProcess) {
+            m_processBar.setMax();
+            m_threadCipher.start();
+            emit startEncText(plainText, m_keygen, encoding);
+        }
     }
     catch(exception& e) {
         dialogError(e.what());
@@ -598,9 +625,19 @@ void MainWindow::on_m_decTabTextDecrypt_clicked()
         
         m_cipher.cipherNew(alg, mode);
 
-        m_processBar.setMax();
-        m_threadCipher.start();
-        emit startDecText(cipherText, m_keygen, encoding);
+        bool isProcess = true;
+        if(auto kg_aes_cast = dynamic_cast<KeygenAes*>(m_keygen)) {
+            bool pkState = ui->m_keyMPk->isChecked();
+            kg_aes_cast->setPkState(pkState);
+            if(pkState)
+                isProcess = dialogPassword("Please insert password for decryption");
+        }
+
+        if(isProcess) {
+            m_processBar.setMax();
+            m_threadCipher.start();
+            emit startDecText(cipherText, m_keygen, encoding);
+        }
     }
     catch(exception& e) {
         dialogError(e.what());
@@ -640,13 +677,19 @@ void MainWindow::on_m_encTabFileEncrypt_clicked()
         m_cipher.setEncfname(encFname);
 
         m_keygen->genSalt();
-        if(auto kg_aes_cast = dynamic_cast<KeygenAes*>(m_keygen))
-            kg_aes_cast->setPkState(ui->m_keyMPk->isChecked());
+        bool isProcess = true;
+        if(auto kg_aes_cast = dynamic_cast<KeygenAes*>(m_keygen)) {
+            bool pkState = ui->m_keyMPk->isChecked();
+            kg_aes_cast->setPkState(pkState);
+            if(pkState)
+                isProcess = dialogPassword("Please insert password for encryption");
+        }
 
-        m_processBar.setMax(size);
-        m_threadCipher.start();
-        emit startEncFile(paths, m_keygen, encoding);
-
+        if(isProcess) {
+            m_processBar.setMax(size);
+            m_threadCipher.start();
+            emit startEncFile(paths, m_keygen, encoding);
+        }
     }
     catch (std::exception& e) {
         dialogError(e.what());
@@ -659,12 +702,19 @@ void MainWindow::on_m_decTabFileDecrypt_clicked()
         size_t size = paths.size();
         if(size < 1) throw FileSelectedException("-- error no file selected");
 
-        if(auto kg_aes_cast = dynamic_cast<KeygenAes*>(m_keygen))
-            kg_aes_cast->setPkState(ui->m_keyMPk->isChecked());
+        bool isProcess = true;
+        if(auto kg_aes_cast = dynamic_cast<KeygenAes*>(m_keygen)) {
+            bool pkState = ui->m_keyMPk->isChecked();
+            kg_aes_cast->setPkState(pkState);
+            if(pkState)
+                isProcess = dialogPassword("Please insert password for decryption");
+        }
 
-        m_processBar.setMax(size);
-        m_threadCipher.start();
-        emit startDecFile(paths, m_keygen);
+        if(isProcess) {
+            m_processBar.setMax(size);
+            m_threadCipher.start();
+            emit startDecFile(paths, m_keygen);
+        }
     }
     catch (std::exception& e) {
         dialogError(e.what());
@@ -866,7 +916,7 @@ void MainWindow::cipherText(const std::string &cipherText)
         if(ui->m_encTabTextSaveOnF->isChecked() && !dialogSave(this).empty()) {
             if(ui->m_encTabTextEncFname->isChecked()) {
                 m_cipher.setEncfname(true);
-                m_path = m_dir + DELIMITOR + m_cipher.encryptTextFn(m_fname, m_keygen, Encoding::HEX);
+                m_path = m_dir + DELIMITOR + m_cipher.encryptText(m_fname, m_keygen, Encoding::HEX);
             }
             if(isFileExist(m_path)){
                 description = "-- This error has been occured cause the file you're trying to create using \"Encrypt filename\" mode already exists.\n\n"\
@@ -876,8 +926,9 @@ void MainWindow::cipherText(const std::string &cipherText)
             }
             std::ofstream file(m_path, std::ios::out | std::ios::trunc);
             m_keygen->setEncoding(encodingFrom2(ui->m_encTabTextEncodings));
+
             file << m_cipher.encodeText(m_cipher.stringRefs(m_keygen), Encoding::BASE64);
-            file << cipherText;
+            file << cipherText.substr(cipherText.find("\n")+1);
             file.close();
             dialogSuccess(m_cipher.successMsg() + "at " + m_path);
         }

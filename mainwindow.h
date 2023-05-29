@@ -124,6 +124,7 @@ private:
     bool isFileExist(const std::string& path) const;
     QMessageBox::ButtonRole dialogFileExists(const std::string& message);
     bool dialogInsertFilename(const std::string& message);
+    bool dialogPassword(const std::string& message);
     bool dialogConfirm(const std::string& message, const std::string& description = "");
     void dialogNoKeyMessage(const std::string& action, const std::string& description = "");
     void dialogSuccess(const std::string& message, const std::string &description = "");

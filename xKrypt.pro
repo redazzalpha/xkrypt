@@ -73,6 +73,9 @@ HEADERS += \
     rsaoaep.h \
     structures.h
 
+RESOURCES += \
+    ressources.qrc
+
 FORMS += \
     mainwindow.ui
 
@@ -87,5 +90,3 @@ qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
-RESOURCES += \
-    ressources.qrc

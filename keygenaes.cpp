@@ -29,6 +29,7 @@ KeygenAes::KeygenAes(const KeygenAes &a) : KeygenAes(a.m_key.size(), a.m_iv.size
     m_iv = a.m_iv;
     m_salt = a.m_salt;
     m_encoding = a.m_encoding;
+    m_password = a.m_password;
 }
 
 // operators
@@ -43,6 +44,7 @@ KeygenAes &KeygenAes::operator=(const KeygenAes &a)
         m_salt = a.m_salt;
         m_keysize = a.m_keysize;
         m_encoding = a.m_encoding;
+        m_password = a.m_password;
     }
     return *this;
 }
@@ -54,9 +56,13 @@ void KeygenAes::generateKey()
     if(m_keysize >= static_cast<size_t>(Aes::KeySize::LENGTH_DEFAULT)) {
         m_key.CleanNew(m_keysize);
         m_iv.CleanNew(static_cast<size_t>(Aes::IvSize::LENGTH_DEFAULT));
+        m_salt.CleanNew(SALT_SIZE);
         m_prng.GenerateBlock(m_key, m_key.size());
         m_prng.GenerateBlock(m_iv, m_iv.size());
-        genSalt();
+        m_prng.GenerateBlock(m_salt, m_salt.size());
+
+//        string s = "11111111111111111111111111111111";
+//        m_salt = SecByteBlock((CryptoPP::byte*)s.data(), s.size());
     }
 }
 void KeygenAes::generateKey(size_t keysize, Encoding encoding)

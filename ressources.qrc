@@ -25,5 +25,7 @@
         <file>assets/decrypt_selected.png</file>
         <file>assets/encrypt_selected.png</file>
         <file>assets/key_selected.png</file>
+        <file>assets/password.ico</file>
+        <file>assets/password.png</file>
     </qresource>
 </RCC>

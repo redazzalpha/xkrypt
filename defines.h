@@ -54,7 +54,9 @@
 #define MESSAGE_FILE_EXISTS_START "<td><img src=:/assets/warning.png width=50 height=50/></td><td valign=middle>"
 #define MESSAGE_FILE_EXISTS_END MESSAGE_END
 #define MESSAGE_INSERT_FNAME_START "<td><img src=:/assets/file.png width=50 height=50/></td><td valign=middle>"
+#define MESSAGE_PASSWORD_START "<td><img src=:/assets/password.png width=50 height=50/></td><td valign=middle>"
 #define MESSAGE_INSERT_FNAME_END MESSAGE_END
+#define MESSAGE_PASSWORD_END MESSAGE_END
 #define MESSAGE_CONFIRM_START "<td><img src=:/assets/warning.png width=50 height=50/></td><td valign=middle>"
 #define MESSAGE_CONFIRM_END MESSAGE_END
 
@@ -66,6 +68,7 @@
 #define ICON_DECRYPT_MANAGER ":/assets/decrypt.ico"
 #define ICON_QUIT ":/assets/quit.ico"
 #define ICON_FILE ":/assets/file.ico"
+#define ICON_PASSWORD ":/assets/password.ico"
 #define ICON_WINDOW_APP ":/assets/icon.ico"
 
 #define IMG_SELECTED_SUFFIX "_selected.png"

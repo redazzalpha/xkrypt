@@ -159,12 +159,12 @@ string Cipher::encryptText(const string& plain, AbstractKeygen* keygen, const En
 
         AbstractKeygen* pk;
         if(auto kg_aes_cast = dynamic_cast<KeygenAes*>(keygen)) {
-            if(kg_aes_cast->pkState()) pk = kg_aes_cast->pkDerive("0000");
-            else pk = kg_aes_cast->pkDerive(kg_aes_cast->key());
+            if(kg_aes_cast->pkState()) pk = kg_aes_cast->pkDerive(keygen->password(), !m_cipher->encfname());
+            else pk = kg_aes_cast->pkDerive(kg_aes_cast->key(), !m_cipher->encfname());
+            keygen->salt() = pk->salt();
         }
         else pk = keygen->keygenCpy();
 
-        keygen->salt() = pk->salt();
         cipher = m_cipher->encryptText(plain, pk, encoding);
         delete pk;
 
@@ -177,27 +177,27 @@ string Cipher::encryptText(const string& plain, AbstractKeygen* keygen, const En
     }
     return cipher;
 }
-string Cipher::encryptTextFn(const std::string &plain, AbstractKeygen *keygen, const Encoding encoding)
-{
-    if(auto kg_aes_cast = dynamic_cast<KeygenAes*>(keygen))
-        return m_cipher->encryptText(plain, kg_aes_cast->pkDerive(kg_aes_cast->key(), false), encoding);
-    else return "";
-}
 string Cipher::decryptText(const string& cipher, AbstractKeygen* keygen, const Encoding encoding) noexcept(false)
 {
-    string recover;
+    std::string recover = "";
     try {
         keygen->setEncoding(encoding);
+        StringSource cipherSource(cipher, false);
+        string salt = m_cipher->pumpSalt(&cipherSource);
+        keygen->salt() = SecByteBlock((CryptoPP::byte*)salt.data(), salt.size());
 
         AbstractKeygen* pk;
         if(auto kg_aes_cast = dynamic_cast<KeygenAes*>(keygen)) {
-            if(kg_aes_cast->pkState()) pk = kg_aes_cast->pkDerive("0000", false);
+            if(kg_aes_cast->pkState()) pk = kg_aes_cast->pkDerive(keygen->password(), false);
             else pk = kg_aes_cast->pkDerive(kg_aes_cast->key(), false);
         }
         else pk = keygen->keygenCpy();
 
-        keygen->salt() = pk->salt();
-        recover = m_cipher->decryptText(cipher, pk, encoding);
+        string cipherSink;
+        cipherSource.Attach(new StringSink(cipherSink));
+        cipherSource.PumpAll();
+
+        recover = m_cipher->decryptText(cipherSink, pk, encoding);
         delete pk;
 
         emit proceed();
@@ -208,10 +208,6 @@ string Cipher::decryptText(const string& cipher, AbstractKeygen* keygen, const E
         emit error(e.what());
     }
     return recover;
-}
-string Cipher::decryptTextFn(const std::string &cipher, AbstractKeygen *keygen, const Encoding encoding)
-{
-    return m_cipher->encryptText(cipher, keygen, encoding);
 }
 void Cipher::encryptFile(vector<string> paths, AbstractKeygen* keygen, const Encoding encoding)
 {
@@ -226,8 +222,9 @@ void Cipher::encryptFile(vector<string> paths, AbstractKeygen* keygen, const Enc
             keygen->setEncoding(encoding);
 
             if(auto kg_aes_cast = dynamic_cast<KeygenAes*>(keygen)) {
-                if(kg_aes_cast->pkState()) pk = kg_aes_cast->pkDerive("0000");
+                if(kg_aes_cast->pkState()) pk = kg_aes_cast->pkDerive(keygen->password());
                 else pk = kg_aes_cast->pkDerive(kg_aes_cast->key());
+                keygen->salt() = pk->salt();
             }
             else pk = keygen->keygenCpy();
 
@@ -272,7 +269,7 @@ void Cipher::decryptFile(vector<string> paths, AbstractKeygen* keygen)
             );
 
             if(auto kg_aes_cast = dynamic_cast<KeygenAes*>(keygen)) {
-                if(kg_aes_cast->pkState()) pk = kg_aes_cast->pkDerive("0000", false);
+                if(kg_aes_cast->pkState()) pk = kg_aes_cast->pkDerive(keygen->password(), false);
                 else pk = kg_aes_cast->pkDerive(kg_aes_cast->key(), false);
             }
             else pk = keygen->keygenCpy();

@@ -37,9 +37,7 @@ public:
 
 public slots:
     std::string encryptText(const std::string& plain, AbstractKeygen* keygen, const Encoding encoding);
-    std::string encryptTextFn(const std::string& plain, AbstractKeygen* keygen, const Encoding encoding);
     std::string decryptText(const std::string& cipher, AbstractKeygen* keygen, const Encoding encoding);
-    std::string decryptTextFn(const std::string& cipher, AbstractKeygen* keygen, const Encoding encoding);
     void encryptFile(std::vector<std::string> paths, AbstractKeygen* keygen, const Encoding encoding);
     void decryptFile(std::vector<std::string> paths, AbstractKeygen* keygen);
 
