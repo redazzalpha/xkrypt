@@ -27,6 +27,10 @@ void AbstractKeygen::setPassword(const std::string &newPassword)
 {
     m_password = newPassword;
 }
+void AbstractKeygen::setPkState(bool newPkState)
+{
+    m_pkState = newPkState;
+}
 size_t AbstractKeygen::keysize() const
 {
     return m_keysize;
@@ -39,19 +43,18 @@ SecByteBlock& AbstractKeygen::salt()
 {
     return m_salt;
 }
-std::string AbstractKeygen::password() const
+std::string& AbstractKeygen::password()
 {
     return m_password;
+}
+bool AbstractKeygen::pkState() const
+{
+    return m_pkState;
 }
 
 SecByteBlock& AbstractKeygen::genSalt()
 {
-    AutoSeededX917RNG<CryptoPP::AES> prng;
     m_salt.CleanNew(SALT_SIZE);
-    prng.GenerateBlock(m_salt, m_salt.size());
-
-//    string s = "11111111111111111111111111111111";
-//    m_salt = SecByteBlock((CryptoPP::byte*)s.data(), s.size());
-
+    m_prng.GenerateBlock(m_salt, m_salt.size());
     return m_salt;
 }

@@ -27,6 +27,8 @@ public:
     virtual bool isReady() const override;
     virtual void flush() override;
     virtual KeygenRsa* keygenCpy() override;
+    virtual bool pkState() const override;
+
 
     void setPrivate(CryptoPP::RSA::PrivateKey *newPrivate);
     void setPublic(CryptoPP::RSA::PrivateKey *privateKey);

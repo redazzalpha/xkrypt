@@ -10,7 +10,7 @@ using namespace CryptoPP;
 using namespace std;
 
 // constructors
-AbstractCipher::AbstractCipher(){}
+AbstractCipher::AbstractCipher() {}
 
 // destructor
 AbstractCipher::~AbstractCipher(){}
@@ -24,6 +24,10 @@ void AbstractCipher::setDecfname(bool newDecfname)
 {
     m_decfname = newDecfname;
 }
+void AbstractCipher::setIsContentEnc(bool newCipherRefs)
+{
+    m_isContentEnc = newCipherRefs;
+}
 bool AbstractCipher::encfname() const
 {
     return m_encfname;
@@ -32,6 +36,10 @@ bool AbstractCipher::decfname() const
 {
     return m_decfname;
 }
+bool AbstractCipher::isContentEnc() const
+{
+    return m_isContentEnc;
+}
 
 DirFname AbstractCipher::extractFname(const std::string& path) const {
     int pos = path.find_last_of(DELIMITOR);
@@ -39,123 +47,128 @@ DirFname AbstractCipher::extractFname(const std::string& path) const {
     string fname = path.substr(pos+1, path.size() - pos);
     return DirFname(dir, fname);
 }
-string AbstractCipher::pumpSalt(CryptoPP::StringSource* cipher)
+std::vector<CryptoPP::byte> &AbstractCipher::vector_xrefs(AbstractKeygen *keygen)
 {
-    string salt, decodedSalt;
-    cipher->Detach(new StringSink(salt));
-    do {
-        cipher->Pump(1);
-    } while(salt[salt.size()-1] != '\n' && salt[salt.size()-1] != '\0' && salt[salt.size()-1] != '=');
-    StringSource(salt.c_str(), true, new Base64Decoder(new CryptoPP::StringSink(decodedSalt)));
-    cipher->Detach();
-    return decodedSalt;
+    SecByteBlock salt = keygen->salt();
+
+    m_xrefs.clear();
+    m_xrefs.push_back(XREF_VERSION);
+    m_xrefs.push_back(XREF_MODEL);
+    m_xrefs.push_back(keygen->encoding());
+    m_xrefs.push_back(algId());
+    m_xrefs.push_back(modeId());
+    m_xrefs.push_back(m_encfname);
+    m_xrefs.push_back(keygen->pkState());
+
+    for(size_t i = 0; i < SALT_SIZE; i++) m_xrefs.push_back(salt[i]);
+
+    return m_xrefs;
 }
-string AbstractCipher::pumpRefs(FileSource* source)
+
+void AbstractCipher::injectRefs(Sink *sink, AbstractKeygen *keygen)
+{
+    auto v_xrefs = (CryptoPP::byte *)&vector_xrefs(keygen)[0];
+    StringSource(v_xrefs, m_xrefs.size(), true,new Base64Encoder(new Redirector(*sink)));
+
+
+/*
+ * SECOND VERSION OF
+ * REFS INJECTION WITH NO END LINE AND
+ * EQUAL SIGN AT THE END
+ *
+ *  auto v_xrefs = (CryptoPP::byte *)&vector_xrefs(keygen)[0];
+ *  string encodedRefs;
+ *  Base64Encoder encoder;
+ *  encoder.PutMessageEnd(v_xrefs, m_xrefs.size());
+ *  encodedRefs.resize(encoder.MaxRetrievable());
+ *  encoder.Get((CryptoPP::byte*)encodedRefs.data(), encodedRefs.size());
+ *
+ *  int eqSignIndex = 0, endLineIndex = 0;
+ *  eqSignIndex = encodedRefs.find("=");
+ *  endLineIndex = encodedRefs.find("\n");
+ *
+ *  if(eqSignIndex > 0) encodedRefs = encodedRefs.substr(0, encodedRefs.size()-1);
+ *  else encodedRefs = encodedRefs.replace(endLineIndex, 1, "=");
+ *
+ *  StringSource(encodedRefs, true, new Redirector(*sink));
+ *
+*/
+
+}
+void AbstractCipher::injectRefs(string &sink, AbstractKeygen *keygen)
+{
+    StringSink ssink(sink);
+    injectRefs(&ssink, keygen);
+}
+
+string AbstractCipher::pumpRefs(Source *source)
 {
     string refs, decodedRefs;
     source->Attach(new StringSink(refs));
-    do {
-        source->Pump(1);
-    } while(refs[refs.size()-1] != '\n' && refs[refs.size()-1] != '\0' && refs[refs.size()-1] != '=');
+
+    do source->Pump(1);
+    while(
+        refs[refs.size()-1] != '\n' &&
+        refs[refs.size()-1] != '\0' &&
+        refs[refs.size()-1] != '='
+    );
+
     StringSource(refs.c_str(), true, new Base64Decoder(new CryptoPP::StringSink(decodedRefs)));
     source->Detach();
     return decodedRefs;
 }
-string AbstractCipher::checkRefs(const std::string &path)
+string AbstractCipher::pumpRefs(const string& cipherText)
 {
-    string refs = pumpRefs(new FileSource(path.data(), false));
-    if(refs.size() != XREF_SIZE) throw InvalidRefsException();
-    if((refs[0] < XREF_VERSION)) throw VersionException();
-    if((refs[1] != XREF_MODEL)) throw ModelException();
-    if(!(refs[5] == XREF_DECFNAME || refs[5] == XREF_NOTDECFNAME)) throw DecFnameRefsException();
-    return refs;
+    StringSource source(cipherText, false);
+    return pumpRefs(&source);
 }
-string AbstractCipher::checkRefs(FileSource* source)
+
+string AbstractCipher::checkRefs(CryptoPP::Source *source)
 {
     string refs = pumpRefs(source);
+
     if(refs.size() != XREF_SIZE) throw InvalidRefsException();
     if((refs[0] < XREF_VERSION)) throw VersionException();
     if((refs[1] != XREF_MODEL)) throw ModelException();
     if(!(refs[5] == XREF_DECFNAME || refs[5] == XREF_NOTDECFNAME)) throw DecFnameRefsException();
+    if(!(refs[6] == XREF_PK_ON || refs[6] == XREF_PK_OFF)) throw PkRefsException();
+
     return refs;
 }
-int AbstractCipher::afterRefs(const std::string &path)
+string AbstractCipher::checkRefs(const std::string& path)
 {
-    string sink;
-    size_t size;
-    int count = 0;
-    FileSource source(path.data(), false, new StringSink(sink));
-    do { source.Pump(1); count++; size = sink.size() - 1;}
-    while(sink[size] != '\n' &&
-           sink[size] != '\0' &&
-           sink[size] != '='
-           );
-    source.Detach();
-    return count;
+    FileSource fsource(path.data(), false);
+    return checkRefs(&fsource);
 }
-int AbstractCipher::afterRefs(FileSource* fs)
-{
-    string sink;
-    size_t size;
-    int count = 0;
-    fs->Attach(new StringSink(sink));
-    do { fs->Pump(1); count++; size = sink.size() - 1;}
-    while(sink[size] != '\n' &&
-           sink[size] != '\0' &&
-           sink[size] != '='
-           );
-    fs->Detach();
-    return count;
-}
-int AbstractCipher::afterRefs(StringSource* ss)
-{
-    string sink;
-    size_t size;
-    int count = 0;
-    ss->Attach(new StringSink(sink));
-    do { ss->Pump(1); count++; size = sink.size() - 1;}
-    while(sink[size] != '\n' &&
-           sink[size] != '\0' &&
-           sink[size] != '='
-           );
-    ss->Detach();
-    return count;
-}
-void AbstractCipher::injectRefs(FileSink* fs, AbstractKeygen* keygen)
-{
-    SecByteBlock salt = keygen->salt();
-    std::vector<CryptoPP::byte> xrefs {
-        XREF_VERSION,
-        XREF_MODEL,
-        (CryptoPP::byte)keygen->encoding(),
-        (CryptoPP::byte)algId(),
-        (CryptoPP::byte)modeId(),
-        (CryptoPP::byte)m_encfname,
-    };
 
-    for(size_t i = 0; i < SALT_SIZE; i++)
-        xrefs.push_back(salt[i]);
-
-    StringSource refsSource(&xrefs[0], xrefs.size(), true, new Base64Encoder(new Redirector(*fs)));
-}
 string AbstractCipher::stringRefs(AbstractKeygen* keygen)
 {
-    SecByteBlock salt = keygen->salt();
-    int count = 0;
+    auto v_xrefs = vector_xrefs(keygen);
     string xrefs;
-    xrefs.resize(XREF_SIZE);
+    xrefs.resize(v_xrefs.size());
+    int count = 0;
 
-    xrefs[count++] = XREF_VERSION;
-    xrefs[count++] = XREF_MODEL;
-    xrefs[count++] = (CryptoPP::byte)keygen->encoding();
-    xrefs[count++] = (CryptoPP::byte)algId();
-    xrefs[count++] = (CryptoPP::byte)modeId();
-    xrefs[count++] = (CryptoPP::byte)encfname();
-
-    for(size_t i = 0; i < SALT_SIZE; i++)
-        xrefs[count++] = salt[i];
+    for(CryptoPP::byte data : v_xrefs) xrefs[count++] = data;
 
     return xrefs;
 }
+int AbstractCipher::afterRefs(CryptoPP::Source *source)
+{
+    string sink;
+    size_t size;
+    int count = 0;
+    source->Attach(new StringSink(sink));
+
+    do { source->Pump(1); count++; size = sink.size() - 1; }
+    while(
+        sink[size] != '\n' &&
+        sink[size] != '\0' &&
+        sink[size] != '='
+    );
+
+    source->Detach();
+    return count;
+}
+
 
 

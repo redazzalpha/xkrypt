@@ -39,6 +39,7 @@ private:
     QThread m_threadCipher;
     ProcessBar m_processBar;
     AbstractKeygen* m_keygen = new KeygenAes;
+    AbstractKeygen* m_kg_cpy = m_keygen->keygenCpy();
     Keygen_serial m_kserial;
     AbstractAction* m_currentAction;
     FileImporter m_fimporterEnc;
@@ -47,6 +48,7 @@ private:
     std::string m_path;
     std::string m_dir;
     std::string m_fname;
+    bool m_pkState = false;
     std::vector<std::string> m_algorithms = {
         AbstractCipherAes::AlgName,
         AbstractCipherRsa::AlgName,
@@ -140,7 +142,10 @@ private:
     bool isRunningThread();
     void closeEvent(QCloseEvent* event) override;
     void importFile(FileImporter& fimporter, const std::string &caption);
-    void layoutLoop(QHBoxLayout *layout, bool checked);
+    void toogleCombos(QHBoxLayout *layout, bool disable);
+    bool handlePk(const std::string &action);
+    void keygenCopy();
+    void keygenUpdate();
 
     template <class T>
     void generateKey();
@@ -152,27 +157,27 @@ private:
 private slots:
     void on_m_encTabTextEncrypt_clicked();
     void on_m_decTabTextDecrypt_clicked();
-    void on_m_encTabTextReset_clicked();
-    void on_m_decTabTextReset_clicked();
-
-    void on_m_encTabFileImport_clicked();
-    void on_m_decTabFileImport_clicked();
-
     void on_m_encTabFileEncrypt_clicked();
     void on_m_decTabFileDecrypt_clicked();
-    void on_m_encTabFileClear_clicked();
-    void on_m_decTabFileClear_clicked();
 
     void on_m_keyMGenerate_clicked();
     void on_m_keyMImport_clicked();
     void on_m_keyMDisable_toggled(bool checked);
+
+    void on_m_encTabTextReset_clicked();
+    void on_m_decTabTextReset_clicked();
+    void on_m_encTabFileImport_clicked();
+    void on_m_decTabFileImport_clicked();
+    void on_m_encTabFileClear_clicked();
+    void on_m_decTabFileClear_clicked();
     
     void setTypes(const QString & type);
     void setTypeKeysize(const QString & type);
     void setTypeModes(const QString& alg);
-    void setTypeCipher(const std::string &alg, bool checked);
+    void setTypeCipher(const std::string &alg, bool disable);
     void hideKey(const bool isChecked);
     void flushKey();
+    void restoreKeyLoaded();
     void colorKeyLoaded();
     void colorFilesLoaded();
     void autoEncfname();
@@ -190,12 +195,13 @@ private slots:
         const std::string& alg,
         const std::string& mode,
         const Encoding encoding,
-        const bool decfname
+        const bool decfnameChecked,
+        const std::string& detectType
     );
 
 signals:
     void startEncText(const std::string& plain, AbstractKeygen* keygen, const Encoding encoding);
-    void startDecText(const std::string& cipher, AbstractKeygen* keygen, const Encoding encoding);
+    void startDecText(const std::string& cipher, AbstractKeygen* keygen);
     void startEncFile(std::vector<std::string> paths, AbstractKeygen* keygen, const Encoding encoding);
     void startDecFile(std::vector<std::string> paths, AbstractKeygen* keygen);
     void startProcess(const int progress = 0);

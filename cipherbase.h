@@ -18,6 +18,8 @@ class AbstractCipher {
 protected:
     bool m_encfname = true;
     bool m_decfname = true;
+    bool m_isContentEnc = false;
+    std::vector<CryptoPP::byte> m_xrefs;
 
 public:
     // constructors
@@ -42,15 +44,21 @@ public:
     bool decfname() const;
 
     DirFname extractFname(const std::string &path) const;
-    std::string pumpSalt(CryptoPP::StringSource* cipher);
-    std::string pumpRefs(CryptoPP::FileSource* source);
+    std::vector<CryptoPP::byte>& vector_xrefs(AbstractKeygen *keygen);
+
+    void injectRefs(CryptoPP::Sink* sink, AbstractKeygen *keygen);
+    void injectRefs(std::string& sink, AbstractKeygen *keygen);
+
+    std::string pumpRefs(CryptoPP::Source* source);
+    std::string pumpRefs(const std::string& cipherText);
+
+    std::string checkRefs(CryptoPP::Source *source);
     std::string checkRefs(const std::string& path);
-    std::string checkRefs(CryptoPP::FileSource *source);
-    int afterRefs(const std::string &path);
-    int afterRefs(CryptoPP::FileSource *fs);
-    int afterRefs(CryptoPP::StringSource *ss);
-    void injectRefs(CryptoPP::FileSink *fs, AbstractKeygen *keygen);
+
     std::string stringRefs(AbstractKeygen* keygen);
+    int afterRefs(CryptoPP::Source *source);
+    bool isContentEnc() const;
+    void setIsContentEnc(bool newCipherRefs);
 };
 
 #endif // CIPHERBASE_H

@@ -16,7 +16,7 @@ enum class KeySize {
     LENGTH_4096 = 4096,
     LENGTH_5120 = 5120,
     LENGTH_6144 = 6144,
-    LENGTH_DEFAULT = LENGTH_3072,
+    LENGTH_DEFAULT = LENGTH_1024,
     LENGTH_MIN = LENGTH_1024,
     LENGTH_MAX = LENGTH_6144
 };
@@ -25,7 +25,7 @@ enum class KeySize {
 namespace Aes {
 enum class KeySize {
     LENGTH_16 = 16,
-    LENGTH_32= 32,
+    LENGTH_32 = 32,
     LENGTH_64 = 64,
     LENGTH_128 = 128,
     LENGTH_256 = 256,
@@ -34,10 +34,12 @@ enum class KeySize {
     LENGTH_2048 = 2048,
     LENGTH_DEFAULT = LENGTH_16,
     LENGTH_MIN = LENGTH_16,
-    LENGTH_MAX = LENGTH_2048
+    LENGTH_MAX = LENGTH_32
 };
 enum class IvSize {
-    LENGTH_DEFAULT = CryptoPP::AES::BLOCKSIZE,
+    LENGTH_MIN = CryptoPP::AES::BLOCKSIZE,
+    LENGTH_MAX = CryptoPP::AES::BLOCKSIZE,
+    LENGTH_DEFAULT = LENGTH_MAX,
 };
 }
 enum Mode {
@@ -67,5 +69,11 @@ enum Page {
     encrypt,
     decrypt,
 };
+
+enum Pk {
+    on,
+    off ,
+};
+
 
 #endif // ENUMS_H

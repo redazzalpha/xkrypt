@@ -30,14 +30,16 @@ public:
     Mode modeId() const;
     std::string successMsg(const int succeed = 1, const bool mode = true);
     void cipherNew(const std::string& alg, const std::string& mode);
+    void setIsContentEnc(const bool state);
     void cipherDetect(const std::string &refs);
     void kill();
     std::string encodeText(const std::string& text, const Encoding encoding);
     std::string stringRefs(AbstractKeygen* keygen);
+    void checkLogic(AbstractKeygen *keygen);
 
 public slots:
     std::string encryptText(const std::string& plain, AbstractKeygen* keygen, const Encoding encoding);
-    std::string decryptText(const std::string& cipher, AbstractKeygen* keygen, const Encoding encoding);
+    std::string decryptText(const std::string& cipher, AbstractKeygen* keygen);
     void encryptFile(std::vector<std::string> paths, AbstractKeygen* keygen, const Encoding encoding);
     void decryptFile(std::vector<std::string> paths, AbstractKeygen* keygen);
 
@@ -51,7 +53,13 @@ signals:
     void cipherFile(const std::string& success);
     void recoverFile(const std::string& success);
     void processing(const std::string& filename);
-    void autoDetect(const std::string& alg, const std::string& mode, const Encoding encoding, const bool decfname);
+    void autoDetect(
+        const std::string& alg,
+        const std::string& mode,
+        const Encoding encoding,
+        const bool decfnameChecked,
+        const std::string& detectType
+    );
 };
 
 #endif // CIPHER_H

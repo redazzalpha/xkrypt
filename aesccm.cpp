@@ -36,35 +36,26 @@ string AesCCM::encryptText(const string& plain, AbstractKeygen* keygen, const En
     std::string cipher = "";
     const SecByteBlock& key = kg_aes->key();
     const SecByteBlock& iv = kg_aes->Iv();
-    StringSink* ss = new StringSink(cipher);
+    StringSink* ssink = new StringSink(cipher);
     CryptoPP::CCM<CryptoPP::AES, TAG_SIZE>::Encryption encryptor;
     encryptor.SetKeyWithIV(key, key.size(), iv);
     encryptor.SpecifyDataLengths(0, plain.size(), 0);
     AuthenticatedEncryptionFilter* textFilter = new AuthenticatedEncryptionFilter(encryptor);
-    SecByteBlock salt = keygen->salt();
+    string refsCipher;
 
-    BufferedTransformation* bt;
+    injectRefs(refsCipher, keygen);
     switch(encoding) {
-    case Encoding::BASE64 :
-        bt = new Base64Encoder(new Redirector(*ss));
-        textFilter->Attach(new Base64Encoder);
-        break;
-    case Encoding::HEX :
-        bt = new HexEncoder(new Redirector(*ss));
-        textFilter->Attach(new HexEncoder);
-        break;
-    case Encoding::NONE :
-        bt = new StringSink(cipher);
-        break;
+    case Encoding::BASE64 : textFilter->Attach(new Base64Encoder); break;
+    case Encoding::HEX : textFilter->Attach(new HexEncoder); break;
+    case Encoding::NONE : break;
     default : throw EncodingException();
     }
 
-    if(!m_encfname) StringSource(salt, salt.size(), true, bt);
-    else if(bt) delete bt;
-
-    textFilter->Attach(ss);
+    textFilter->Attach(ssink);
     StringSource(plain, true, textFilter);
-
+    refsCipher += cipher;
+    
+    if(m_isContentEnc) return refsCipher;
     return cipher;
 }
 string AesCCM::decryptText(const string& cipher, AbstractKeygen* keygen, const Encoding encoding) noexcept(false)
@@ -73,7 +64,7 @@ string AesCCM::decryptText(const string& cipher, AbstractKeygen* keygen, const E
     std::string recover;
     const SecByteBlock& key = kg_aes->key();
     const SecByteBlock& iv = kg_aes->Iv();
-    StringSink* ss = new StringSink(recover);
+    StringSink* ssink = new StringSink(recover);
     CryptoPP::CCM<CryptoPP::AES, TAG_SIZE>::Decryption decryptor;
     BufferedTransformation* decoder;
 
@@ -90,19 +81,22 @@ string AesCCM::decryptText(const string& cipher, AbstractKeygen* keygen, const E
     default : throw EncodingException();
     }
 
+    int count = afterRefs(new StringSource(cipher, false));
+    string bruteCipher = cipher.substr(count);
+
     if(decoder) {
-        decoder->PutMessageEnd((CryptoPP::byte*)cipher.c_str(), cipher.size());
+        decoder->PutMessageEnd((CryptoPP::byte*)bruteCipher.c_str(), bruteCipher.size());
         decryptor.SetKeyWithIV(key, key.size(), iv);
         decryptor.SpecifyDataLengths(0, decoder->MaxRetrievable() - TAG_SIZE, 0);
-        AuthenticatedDecryptionFilter* textFilter = new AuthenticatedDecryptionFilter(decryptor, ss);
+        AuthenticatedDecryptionFilter* textFilter = new AuthenticatedDecryptionFilter(decryptor, ssink);
         decoder->Attach(textFilter);
-        StringSource(cipher, true, decoder);
+        StringSource(bruteCipher, true, decoder);
     }
     else {
         decryptor.SetKeyWithIV(key, key.size(), iv);
-        decryptor.SpecifyDataLengths(0, cipher.size() - TAG_SIZE, 0);
-        AuthenticatedDecryptionFilter* textFilter = new AuthenticatedDecryptionFilter(decryptor, ss);
-        StringSource(cipher, true, textFilter);
+        decryptor.SpecifyDataLengths(0, bruteCipher.size() - TAG_SIZE, 0);
+        AuthenticatedDecryptionFilter* textFilter = new AuthenticatedDecryptionFilter(decryptor, ssink);
+        StringSource(bruteCipher, true, textFilter);
     }
 
     return recover;

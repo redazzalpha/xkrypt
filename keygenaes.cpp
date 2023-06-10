@@ -9,9 +9,7 @@ using namespace CryptoPP;
 using namespace std;
 
 // constructors
-KeygenAes::KeygenAes(size_t keysize): AbstractKeygen(keysize)
-{
-}
+KeygenAes::KeygenAes(size_t keysize): AbstractKeygen(keysize) {}
 KeygenAes::KeygenAes(const KeygenAes &a) : AbstractKeygen(a.m_key.size())
 {
     m_key.CleanNew(a.m_key.size());
@@ -22,6 +20,7 @@ KeygenAes::KeygenAes(const KeygenAes &a) : AbstractKeygen(a.m_key.size())
     m_salt = a.m_salt;
     m_encoding = a.m_encoding;
     m_password = a.m_password;
+    m_pkState = a.m_pkState;
 }
 
 // operators
@@ -37,6 +36,7 @@ KeygenAes &KeygenAes::operator=(const KeygenAes &a)
         m_keysize = a.m_keysize;
         m_encoding = a.m_encoding;
         m_password = a.m_password;
+        m_pkState = a.m_pkState;
     }
     return *this;
 }
@@ -52,9 +52,6 @@ void KeygenAes::generateKey()
         m_prng.GenerateBlock(m_key, m_key.size());
         m_prng.GenerateBlock(m_iv, m_iv.size());
         m_prng.GenerateBlock(m_salt, m_salt.size());
-
-//        string s = "11111111111111111111111111111111";
-//        m_salt = SecByteBlock((CryptoPP::byte*)s.data(), s.size());
     }
 }
 void KeygenAes::generateKey(size_t keysize, Encoding encoding)
@@ -74,6 +71,7 @@ void KeygenAes::flush()
 {
     m_key.CleanNew(0);
     m_iv.CleanNew(0);
+    m_salt.CleanNew(0);
 }
 KeygenAes* KeygenAes::keygenCpy()
 {
@@ -102,66 +100,59 @@ SecByteBlock& KeygenAes::Iv()
 {
     return m_iv;
 }
-bool KeygenAes::pkState() const
-{
-    return m_pkState;
-}
 
-KeygenAes* KeygenAes::pkDerive(const std::string &password, const bool create)
+KeygenAes* KeygenAes::pkDerive(const std::string &password, const bool isGenSalt)
 {
-    KeygenAes* pk = new KeygenAes(*this);
     Scrypt scrypt;
 
-    if(create) pk->genSalt();
-    pk->m_key.CleanNew(static_cast<size_t>(Aes::KeySize::LENGTH_32));
-    pk->m_iv.CleanNew(static_cast<size_t>(Aes::IvSize::LENGTH_DEFAULT));
+    if(isGenSalt) genSalt();
+    m_key.CleanNew(static_cast<size_t>(Aes::KeySize::LENGTH_MAX));
+    m_iv.CleanNew(static_cast<size_t>(Aes::IvSize::LENGTH_MAX));
 
     scrypt.DeriveKey(
-        pk->m_key, pk->m_key.size(),
+        m_key, m_key.size(),
         (CryptoPP::byte*)password.data(), password.size(),
-        pk->m_salt, pk->m_salt.size(),
+        m_salt, m_salt.size(),
         SCRYPT_COAST,
         SCRYPT_BLOCKSIZE,
         SCRYPT_PARALLELIZATION
     );
     scrypt.DeriveKey(
-        pk->m_iv, pk->m_iv.size(),
-        pk->m_key, pk->m_key.size(),
-        pk->m_salt, pk->m_salt.size(),
+        m_iv, m_iv.size(),
+        m_key, m_key.size(),
+        m_salt, m_salt.size(),
         SCRYPT_COAST,
         SCRYPT_BLOCKSIZE,
         SCRYPT_PARALLELIZATION
     );
 
-    return pk;
+    return this;
 }
-KeygenAes *KeygenAes::pkDerive(const SecByteBlock& key, const bool isGenSalt)
+KeygenAes *KeygenAes::pkDerive(const bool isGenSalt)
 {
-    KeygenAes* pk = new KeygenAes(*this);
     Scrypt scrypt;
 
-    if(isGenSalt) pk->genSalt();
-    pk->m_key.CleanNew(m_key.size());
-    pk->m_iv.CleanNew(static_cast<size_t>(Aes::IvSize::LENGTH_DEFAULT));
+    if(isGenSalt) genSalt();
+    m_iv.CleanNew(static_cast<size_t>(Aes::IvSize::LENGTH_MAX));
 
     scrypt.DeriveKey(
-        pk->m_key, pk->m_key.size(),
-        key, key.size(),
-        pk->m_salt, pk->m_salt.size(),
+        m_key, m_key.size(),
+        m_key, m_key.size(),
+        m_salt, m_salt.size(),
         SCRYPT_COAST,
         SCRYPT_BLOCKSIZE,
         SCRYPT_PARALLELIZATION
         );
     scrypt.DeriveKey(
-        pk->m_iv, pk->m_iv.size(),
-        pk->m_key, pk->m_key.size(),
-        pk->m_salt, pk->m_salt.size(),
+        m_iv, m_iv.size(),
+        m_key, m_key.size(),
+        m_salt, m_salt.size(),
         SCRYPT_COAST,
         SCRYPT_BLOCKSIZE,
         SCRYPT_PARALLELIZATION
     );
 
-    return pk;
+    return this;
 }
 
 

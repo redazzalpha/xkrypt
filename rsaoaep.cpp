@@ -31,49 +31,52 @@ Mode RsaOAEP::modeId() const
 string RsaOAEP::encryptText(const string& plain, AbstractKeygen* keygen, const Encoding encoding) noexcept(false)
 {
     KeygenRsa* kg_rsa = (KeygenRsa*)keygen;
+    string cipher = "";
     CryptoPP::RSA::PrivateKey* pvk = kg_rsa->getPrivate();
-    AutoSeededX917RNG<CryptoPP::AES> prng;
+    StringSink* ssink = new StringSink(cipher);
     RSAES<OAEP<SHA512>>::Encryptor encryptor(*pvk);
+    AutoSeededX917RNG<CryptoPP::AES> prng;
     PK_EncryptorFilter* textFilter = new PK_EncryptorFilter(prng, encryptor);
-    string cipher;
-    StringSink* ss = new StringSink(cipher);
 
-    SecByteBlock salt = keygen->salt();
-    BufferedTransformation* bt;
+    string refsCipher;
+    injectRefs(refsCipher, keygen);
 
     switch(encoding) {
-    case Encoding::BASE64 :
-        bt = new Base64Encoder(new Redirector(*ss));
-        textFilter->Attach(new Base64Encoder); break;
-    case Encoding::HEX :
-        bt = new HexEncoder(new Redirector(*ss));
-        textFilter->Attach(new HexEncoder); break;
-    case Encoding::NONE :
-        bt = new StringSink(cipher);
-        break;
+    case Encoding::BASE64 : textFilter->Attach(new Base64Encoder); break;
+    case Encoding::HEX : textFilter->Attach(new HexEncoder); break;
+    case Encoding::NONE : break;
     default : throw EncodingException();
     }
 
-    StringSource(salt, salt.size(), true, bt);
-    textFilter->Attach(ss);
-    StringSource source(plain, true, textFilter);
+    textFilter->Attach(ssink);
+    StringSource(plain, true, textFilter);
+    refsCipher += cipher;
+
+    if(m_isContentEnc) return refsCipher;
     return cipher;
 }
 string RsaOAEP::decryptText(const string& cipher, AbstractKeygen* keygen, const Encoding encoding) noexcept(false)
 {
     KeygenRsa* keygen_rsa = (KeygenRsa*)keygen;
-    CryptoPP::RSA::PrivateKey* pvk = keygen_rsa->getPrivate();
     string recover;
+    CryptoPP::RSA::PrivateKey* pvk = keygen_rsa->getPrivate();
+    StringSink* ssink = new StringSink(recover);
     AutoSeededX917RNG<CryptoPP::AES> prng;
     RSAES<OAEP<SHA512>>::Decryptor decryptor(*pvk);
-    PK_DecryptorFilter* textFilter = new PK_DecryptorFilter(prng, decryptor, new StringSink(recover));
+    PK_DecryptorFilter* textFilter = new PK_DecryptorFilter(prng, decryptor, ssink);
+    StringSource source(cipher, false);
+
+    afterRefs(&source);
 
     switch(encoding) {
-    case Encoding::BASE64 : StringSource(cipher, true, new Base64Decoder(textFilter)); break;
-    case Encoding::HEX : StringSource(cipher, true, new HexDecoder(textFilter)); break;
-    case Encoding::NONE : StringSource(cipher, true, textFilter); break;
+    case Encoding::BASE64 : source.Attach(new Base64Decoder); break;
+    case Encoding::HEX : source.Attach(new HexDecoder); break;
+    case Encoding::NONE : break;
     default : throw EncodingException();
     }
+
+    source.Attach(textFilter);
+    source.PumpAll();
 
     return recover;
 }
@@ -114,7 +117,7 @@ void RsaOAEP::encryptFile(const string& path, AbstractKeygen* keygen, const Enco
 }
 void RsaOAEP::decryptFile(const string& path, AbstractKeygen* keygen, const Encoding encoding)
 {
-    KeygenRsa* keygen_rsa= (KeygenRsa*)keygen;
+    KeygenRsa* keygen_rsa = (KeygenRsa*)keygen;
     CryptoPP::RSA::PrivateKey* pvk = keygen_rsa->getPrivate();
     AutoSeededX917RNG<CryptoPP::AES> prng;
     RSAES<OAEP<SHA512>>::Decryptor decryptor(*pvk);

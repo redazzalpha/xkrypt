@@ -17,13 +17,18 @@ using namespace std;
 Keygen_serial::Keygen_serial(){};
 
 // methods
+std::string Keygen_serial::current() const
+{
+
+    return m_current;
+}
 bool Keygen_serial::deserialize(ifstream* file, KeygenAes* keygen) const noexcept(false)
 {
     bool imported = false;
 
     if(file) {
         string refs, keyiv;
-        size_t ivsize = keygen->Iv().size();
+        size_t ivsize = static_cast<size_t>(Aes::IvSize::LENGTH_DEFAULT);
         FileSource fs(*file, false);
 
         fs.Attach(new StringSink(refs));
@@ -125,28 +130,41 @@ void Keygen_serial::serialize(const string& path, KeygenRsa* keygen) const
     default: throw EncodingException();
     }
 }
-string Keygen_serial::serialize(KeygenAes* keygen) const
+string Keygen_serial::serialize(KeygenAes* keygen)
 {
     StringSource keySource(keygen->key().BytePtr(), keygen->key().size(), false);
-    string key;
+    StringSource ivSource(keygen->Iv().BytePtr(), keygen->Iv().size(), false);
+    string key, iv, endline;
 
     switch(keygen->encoding()) {
-    case Encoding::BASE64 : keySource.Attach(new Base64Encoder); break;
-    case Encoding::HEX : keySource.Attach(new HexEncoder); break;
+    case Encoding::BASE64 :
+        keySource.Attach(new Base64Encoder);
+        ivSource.Attach(new Base64Encoder);
+        break;
+    case Encoding::HEX :
+        keySource.Attach(new HexEncoder);
+        ivSource.Attach(new HexEncoder);
+        endline = "\n";
+        break;
     case Encoding::NONE : break;
     default : throw EncodingException();
     }
 
     keySource.Attach(new StringSink(key));
+    ivSource.Attach(new StringSink(iv));
     keySource.PumpAll();
+    ivSource.PumpAll();
 
     stringstream ss;
     ss << "-- Symmetric key:\n";
+    ss << "key: " <<  key << endline;
+    ss << "iv: " <<  iv << endline;
     ss << "key size: " << std::to_string(keygen->keysize()) + " bits\n";
-    ss << "key: " <<  key;
+    ss << "iv size: " << std::to_string(keygen->Iv().size()) + " bits";
+    m_current = ss.str();
     return ss.str();
 }
-string Keygen_serial::serialize(KeygenRsa* keygen) const
+string Keygen_serial::serialize(KeygenRsa* keygen)
 {
     keygen->setKeysize(keygen->getPrivate()->MaxImage().ByteCount() * 8);
     InvertibleRSAFunction params = keygen->params();
@@ -158,7 +176,8 @@ string Keygen_serial::serialize(KeygenRsa* keygen) const
     ss << "prime1: " << truncateInteger(params.GetPrime1()) << "...\n";
     ss << "prime2: " << truncateInteger(params.GetPrime2()) << "...\n";
     ss << "public exponent: " << params.GetPublicExponent() << "\n";
-    ss << "private exponent: " << truncateInteger(params.GetPrivateExponent()) << "...\n";
+    ss << "private exponent: " << truncateInteger(params.GetPrivateExponent()) << "...";
+    m_current = ss.str();
 
     return ss.str();
 }

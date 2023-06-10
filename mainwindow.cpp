@@ -38,6 +38,7 @@ MainWindow::~MainWindow()
 {
     delete ui;
     delete m_keygen;
+    delete m_kg_cpy;
     delete m_algTypes;
     delete m_aesModes;
     delete m_rsaModes;
@@ -325,8 +326,9 @@ bool MainWindow::dialogPassword(const std::string &message)
     input.setFixedSize(500, 200);
     input.setModal(true);
     input.setTextEchoMode(QLineEdit::Password);
+    input.setFixedWidth(PASSWORD_BAR_WIDTH);
     if(input.exec()) {
-        m_keygen->setPassword(input.textValue().toStdString());
+        m_kg_cpy->setPassword(input.textValue().toStdString());
         isInserted = true;
     }
 
@@ -505,13 +507,47 @@ void MainWindow::importFile(FileImporter& fimporter, const string& caption)
     if(caption.find("decrypt") < caption.size())
         ui->m_decTabFileSelected->setPlainText(QString::fromStdString(ss.str()));
 }
-void MainWindow::layoutLoop(QHBoxLayout* layout, bool checked)
+void MainWindow::toogleCombos(QHBoxLayout* layout, bool disable)
 {
-    QWidget* keyMCombo;
+    QWidget* combo;
     for(int i = 0; i < layout->count(); i++) {
-        keyMCombo = layout->itemAt(i)->widget();
-        if(keyMCombo) keyMCombo->setDisabled(checked);
+        combo = layout->itemAt(i)->widget();
+        if(combo) combo->setDisabled(disable);
     }
+}
+void MainWindow::keygenCopy()
+{
+    delete m_kg_cpy;
+    m_kg_cpy = m_keygen->keygenCpy();
+}
+
+void MainWindow::keygenUpdate()
+{
+    SecByteBlock salt  = m_kg_cpy->salt();
+    string password = m_kg_cpy->password();
+    bool pkState = m_kg_cpy->pkState();
+    keygenCopy();
+    m_kg_cpy->salt() = salt;
+    m_kg_cpy->password() = password;
+    m_kg_cpy->setPkState(pkState);
+}
+bool MainWindow::handlePk(const string& action)
+{
+    bool isProcess = true;
+    keygenCopy();
+
+    if(m_pkState) {
+        isProcess = dialogPassword("Please insert password for " + action);
+        if(auto kg_aes_cast = dynamic_cast<KeygenAes*>(m_kg_cpy))
+            kg_aes_cast->setPkState(m_pkState);
+        else if (dynamic_cast<KeygenRsa*>(m_kg_cpy)) {
+            delete m_kg_cpy;
+            m_kg_cpy = new KeygenAes;
+            ((KeygenAes*)m_kg_cpy)->setPkState(m_pkState);
+        }
+    }
+
+    return isProcess;
 }
 
 template<class T>
@@ -576,7 +612,7 @@ void MainWindow::importKey(const string &caption)
 void MainWindow::on_m_encTabTextEncrypt_clicked()
 {
     try {
-        if(!m_keygen->isReady() && !ui->m_keyMPk->isChecked()) throw UnreadyKeyException();
+        if(!m_keygen->isReady() && !m_pkState) throw UnreadyKeyException();
         string plainText = ui->m_encTabTextField->toPlainText().toStdString();
 
         if(plainText.empty()) throw EmptyTextException();
@@ -585,19 +621,13 @@ void MainWindow::on_m_encTabTextEncrypt_clicked()
         Encoding encoding = encodingFrom2(ui->m_encTabTextEncodings);
 
         m_cipher.cipherNew(alg, mode);
-        m_cipher.setEncfname(false);
+        m_cipher.setIsContentEnc(true);
+        m_cipher.setEncfname(ui->m_encTabTextEncFname->isChecked());
 
-        bool isProcess = true;
-        if(auto kg_aes_cast = dynamic_cast<KeygenAes*>(m_keygen)) {
-            bool pkState = ui->m_keyMPk->isChecked();
-            kg_aes_cast->setPkState(pkState);
-            if(pkState) isProcess = dialogPassword("Please insert password for encryption");
-        }
-
-        if(isProcess) {
+        if(handlePk("encryption")) {
             m_processBar.setMax();
             m_threadCipher.start();
-            emit startEncText(plainText, m_keygen, encoding);
+            emit startEncText(plainText, m_kg_cpy, encoding);
         }
     }
     catch(exception& e) {
@@ -607,55 +637,28 @@ void MainWindow::on_m_encTabTextEncrypt_clicked()
 void MainWindow::on_m_decTabTextDecrypt_clicked()
 {
     try {
-        if(!m_keygen->isReady() && !ui->m_keyMPk->isChecked()) throw UnreadyKeyException();
+        if(!m_keygen->isReady() && !m_pkState) throw UnreadyKeyException();
         string cipherText = ui->m_decTabTextField->toPlainText().toStdString();
 
         if(cipherText.empty()) throw EmptyTextException();
         string alg = ui->m_decTabTextTypes->currentText().toStdString();
         string mode = ui->m_decTabTextModes->currentText().toStdString();
-        Encoding encoding = encodingFrom2(ui->m_decTabTextEncodings);
-        
         m_cipher.cipherNew(alg, mode);
 
-        bool isProcess = true;
-        if(auto kg_aes_cast = dynamic_cast<KeygenAes*>(m_keygen)) {
-            bool pkState = ui->m_keyMPk->isChecked();
-            kg_aes_cast->setPkState(pkState);
-            if(pkState) isProcess = dialogPassword("Please insert password for decryption");
-        }
-
-        if(isProcess) {
+        if(handlePk("decryption")) {
             m_processBar.setMax();
             m_threadCipher.start();
-            emit startDecText(cipherText, m_keygen, encoding);
+            emit startDecText(cipherText, m_kg_cpy);
         }
     }
     catch(exception& e) {
         dialogError(e.what());
     }
 }
-void MainWindow::on_m_encTabTextReset_clicked()
-{
-    ui->m_encTabTextField->setPlainText("");
-}
-void MainWindow::on_m_decTabTextReset_clicked()
-{
-    ui->m_decTabTextField->setPlainText("");
-}
-
-void MainWindow::on_m_encTabFileImport_clicked()
-{
-    importFile(m_fimporterEnc, "Select file(s) to encrypt");
-}
-void MainWindow::on_m_decTabFileImport_clicked()
-{
-    importFile(m_fimporterDec, "Select file(s) to decrypt");
-}
-
 void MainWindow::on_m_encTabFileEncrypt_clicked()
 {
     try {
-        if(!m_keygen->isReady() && !ui->m_keyMPk->isChecked()) throw UnreadyKeyException();
+        if(!m_keygen->isReady() && !m_pkState) throw UnreadyKeyException();
         vector<string> paths = m_fimporterEnc.getFilePaths();
         size_t size = paths.size();
         if(size < 1) throw FileSelectedException("-- error no file selected");
@@ -664,65 +667,41 @@ void MainWindow::on_m_encTabFileEncrypt_clicked()
         string mode = ui->m_encTabFileModes->currentText().toStdString();
         Encoding encoding = encodingFrom2(ui->m_encTabFileEncodings);
         bool encFname = ui->m_encTabFileEncFname->isChecked();
-        
+
         m_cipher.cipherNew(alg, mode);
         m_cipher.setEncfname(encFname);
 
-        bool isProcess = true;
-        if(auto kg_aes_cast = dynamic_cast<KeygenAes*>(m_keygen)) {
-            bool pkState = ui->m_keyMPk->isChecked();
-            kg_aes_cast->setPkState(pkState);
-            if(pkState) isProcess = dialogPassword("Please insert password for encryption");
-        }
-
-        if(isProcess) {
+        if(handlePk("encryption")) {
             m_processBar.setMax(size);
             m_threadCipher.start();
-            emit startEncFile(paths, m_keygen, encoding);
+            emit startEncFile(paths, m_kg_cpy, encoding);
         }
     }
-    catch (std::exception& e) {
+    catch (exception& e) {
         dialogError(e.what());
     }
 }
 void MainWindow::on_m_decTabFileDecrypt_clicked()
 {
     try {
-        if(!m_keygen->isReady() && !ui->m_keyMPk->isChecked()) throw UnreadyKeyException();
+        if(!m_keygen->isReady() && !m_pkState) throw UnreadyKeyException();
         vector<string> paths = m_fimporterDec.getFilePaths();
         size_t size = paths.size();
         if(size < 1) throw FileSelectedException("-- error no file selected");
 
-        bool isProcess = true;
-        if(auto kg_aes_cast = dynamic_cast<KeygenAes*>(m_keygen)) {
-            bool pkState = ui->m_keyMPk->isChecked();
-            kg_aes_cast->setPkState(pkState);
-            if(pkState) isProcess = dialogPassword("Please insert password for decryption");
-        }
-
-        if(isProcess) {
+        if(handlePk("decryption")) {
             m_processBar.setMax(size);
             m_threadCipher.start();
-            emit startDecFile(paths, m_keygen);
+            emit startDecFile(paths, m_kg_cpy);
         }
     }
     catch (std::exception& e) {
         dialogError(e.what());
     }
 }
-void MainWindow::on_m_encTabFileClear_clicked()
-{
-    m_fimporterEnc.clear();
-    ui->m_encTabFileSelected->setPlainText(NO_FILE_LOADED);
-}
-void MainWindow::on_m_decTabFileClear_clicked()
-{
-    m_fimporterDec.clear();
-    ui->m_decTabFileSelected->setPlainText(NO_FILE_LOADED);
-}
 
 void MainWindow::on_m_keyMGenerate_clicked()
-{    
+{
     if(ui->m_keyMTypesG->currentText() == QString::fromStdString(AbstractCipherAes::AlgName))
         generateKey<KeygenAes>();
     if(ui->m_keyMTypesG->currentText() == QString::fromStdString(AbstractCipherRsa::AlgName))
@@ -738,6 +717,33 @@ void MainWindow::on_m_keyMDisable_toggled(bool checked)
 {
     if(checked) m_warning = false;
     else m_warning = true;
+}
+
+void MainWindow::on_m_encTabTextReset_clicked()
+{
+    ui->m_encTabTextField->setPlainText("");
+}
+void MainWindow::on_m_decTabTextReset_clicked()
+{
+    ui->m_decTabTextField->setPlainText("");
+}
+void MainWindow::on_m_encTabFileImport_clicked()
+{
+    importFile(m_fimporterEnc, "Select file(s) to encrypt");
+}
+void MainWindow::on_m_decTabFileImport_clicked()
+{
+    importFile(m_fimporterDec, "Select file(s) to decrypt");
+}
+void MainWindow::on_m_encTabFileClear_clicked()
+{
+    m_fimporterEnc.clear();
+    ui->m_encTabFileSelected->setPlainText(NO_FILE_LOADED);
+}
+void MainWindow::on_m_decTabFileClear_clicked()
+{
+    m_fimporterDec.clear();
+    ui->m_decTabFileSelected->setPlainText(NO_FILE_LOADED);
 }
 
 void MainWindow::setTypes(const QString &type)
@@ -787,20 +793,23 @@ void MainWindow::setTypeModes(const QString& alg)
         mode->addItems(*m_rsaModes);
     autoEncfname();
 }
-void MainWindow::setTypeCipher(const string& alg, bool checked)
+void MainWindow::setTypeCipher(const string& alg, bool disable)
 {
     string pattern = "^m_.+Types.?$";
     auto list = QObject::findChildren<QComboBox*>(QRegularExpression(QString::fromStdString(pattern)));
-
     static QRegularExpression regex("m_keyMTypes.?");
+
+    if(disable) setKeyLoadedText("Using password key derivation (scrypt)");
+    else restoreKeyLoaded();
+
     for(QComboBox* combo : list) {
-        if(checked) {
+        if(disable) {
             combo->setCurrentText(QString::fromStdString(alg));
-            combo->setDisabled(checked);
+            combo->setDisabled(disable);
         }
-        else if(!checked) {
+        else if(!disable) {
             if(combo->objectName().contains(regex))
-                combo->setDisabled(checked);
+                combo->setDisabled(disable);
             if(dynamic_cast<KeygenRsa*>(m_keygen))
                 combo->setCurrentText(QString::fromStdString(AbstractCipherRsa::AlgName));
         }
@@ -824,6 +833,11 @@ void MainWindow::flushKey()
     m_keygen->flush();
     ui->m_keyMHide->setChecked(false);
     setKeyLoadedText(NO_KEY_LOADED);
+}
+void MainWindow::restoreKeyLoaded()
+{
+    if(m_keygen->isReady()) setKeyLoadedText(QString::fromStdString(m_kserial.current()));
+    else setKeyLoadedText(NO_KEY_LOADED);
 }
 void MainWindow::colorKeyLoaded()
 {
@@ -862,31 +876,23 @@ void MainWindow::autoEncfname()
     QCheckBox* checkboxEncf = parent->findChild<QCheckBox*>(QString::fromStdString(checkboxName));
     QCheckBox* checkboxSaveOnF = parent->findChild<QCheckBox*>(QString::fromStdString(checkboxSName));
     QComboBox* comboType = parent->findChild<QComboBox*>(QString::fromStdString(comboName));
-    bool checkedS = checkboxSaveOnF?checkboxSaveOnF->isChecked(): true;
+    bool type_aes = comboType->currentText() == QString::fromStdString(AbstractCipherAes::AlgName);
+    bool checked = checkboxSaveOnF?checkboxSaveOnF->isChecked(): true;
+    bool state = false;
 
     if(checkboxEncf) {
-        if(checkedS && comboType->currentText() == QString::fromStdString(AbstractCipherAes::AlgName)) {
-            checkboxEncf->setChecked(true);
-            checkboxEncf->setEnabled(true);
-        }
-        else if(checkedS && comboType->currentText() == QString::fromStdString(AbstractCipherRsa::AlgName)) {
-            checkboxEncf->setChecked(false);
-            checkboxEncf->setEnabled(false);
-        }
-        else if(checkedS) {
-            checkboxEncf->setChecked(false);
-            checkboxEncf->setEnabled(false);
-        }
+        if(type_aes && checked) state = true;
+        checkboxEncf->setChecked(state);
+        checkboxEncf->setEnabled(state);
     }
 }
 void MainWindow::usePassword(bool checked)
 {
+    m_pkState = checked;
     string pattern = "^m_keyM.+Layout\\d?$";
     auto list = QObject::findChildren<QHBoxLayout*>(QRegularExpression(QString::fromStdString(pattern))) ;
-    for(auto layout : list) {
-        layoutLoop(layout, checked);
-    }
 
+    for(auto layout : list) toogleCombos(layout, checked);
     setTypeCipher(AbstractCipherAes::AlgName, checked);
 }
 
@@ -911,9 +917,10 @@ void MainWindow::cipherText(const std::string &cipherText)
     string description;
     try {
         if(ui->m_encTabTextSaveOnF->isChecked() && !dialogSave(this).empty()) {
-            if(ui->m_encTabTextEncFname->isChecked()) {
-                m_cipher.setEncfname(true);
-                m_path = m_dir + DELIMITOR + m_cipher.encryptText(m_fname, m_keygen, Encoding::HEX);
+            if(m_cipher.encfname()) {
+                m_cipher.setIsContentEnc(false);
+                keygenUpdate();
+                m_path = m_dir + DELIMITOR + m_cipher.encryptText(m_fname, m_kg_cpy, Encoding::HEX);
             }
             if(isFileExist(m_path)){
                 description = "-- This error has been occured cause the file you're trying to create using \"Encrypt filename\" mode already exists.\n\n"\
@@ -924,8 +931,7 @@ void MainWindow::cipherText(const std::string &cipherText)
             std::ofstream file(m_path, std::ios::out | std::ios::trunc);
             m_keygen->setEncoding(encodingFrom2(ui->m_encTabTextEncodings));
 
-            file << m_cipher.encodeText(m_cipher.stringRefs(m_keygen), Encoding::BASE64);
-            file << cipherText.substr(cipherText.find("\n")+1);
+            file << cipherText;
             file.close();
             dialogSuccess(m_cipher.successMsg() + "at " + m_path);
         }
@@ -982,16 +988,25 @@ void MainWindow::detectFields(
     const string &alg,
     const string &mode,
     const Encoding encoding,
-    const bool decfname)
+    const bool decfnameChecked,
+    const string& detectType)
 {
-    QComboBox* combo = ui->m_decTabFileModes;
-    combo->clear();
-    if(alg == AbstractCipherAes::AlgName) combo->addItems(*m_aesModes);
-    if(alg == AbstractCipherRsa::AlgName) combo->addItems(*m_rsaModes);
-    ui->m_decTabFileTypes->setCurrentText(QString::fromStdString(alg));
-    ui->m_decTabFileModes->setCurrentText(QString::fromStdString(mode));
-    ui->m_decTabFileEncodings->setCurrentText(QString::fromStdString(m_kserial.serializeEncoding(encoding)));
-    ui->m_decTabFileDecFname->setChecked(decfname);
+    string type = "m_decTab";
+    type += detectType;
+    QComboBox* modes = ui->m_mainStack->findChild<QComboBox*>(QString::fromStdString(type + "Modes"));
+    QComboBox* types = ui->m_mainStack->findChild<QComboBox*>(QString::fromStdString(type + "Types"));
+    QComboBox* encodings = ui->m_mainStack->findChild<QComboBox*>(QString::fromStdString(type + "Encodings"));
+    QCheckBox* decFname = ui->m_mainStack->findChild<QCheckBox*>(QString::fromStdString(type + "DecFname"));
+
+    modes->clear();
+    if(alg == AbstractCipherAes::AlgName) modes->addItems(*m_aesModes);
+    if(alg == AbstractCipherRsa::AlgName) modes->addItems(*m_rsaModes);
+    types->setCurrentText(QString::fromStdString(alg));
+    modes->setCurrentText(QString::fromStdString(mode));
+    encodings->setCurrentText(QString::fromStdString(m_kserial.serializeEncoding(encoding)));
+
+    if(decFname)
+    decFname->setChecked(decfnameChecked);
 }
 
 

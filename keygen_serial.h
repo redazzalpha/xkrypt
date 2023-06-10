@@ -9,17 +9,21 @@
 #include <QMainWindow>
 
 class Keygen_serial final {
+private:
+    std::string m_current;
+
 public:
     // constructor
     Keygen_serial();
 
     // methods
+    std::string current() const;
     bool deserialize(std::ifstream* file, KeygenAes* keygen) const noexcept(false);
     bool deserialize(std::ifstream* file, KeygenRsa* keygen) const noexcept(false);
     void serialize(const std::string& path, KeygenAes* keygen) const;
     void serialize(const std::string& path, KeygenRsa* keygen) const;
-    std::string serialize(KeygenAes* keygen) const;
-    std::string serialize(KeygenRsa* keygen) const;
+    std::string serialize(KeygenAes* keygen);
+    std::string serialize(KeygenRsa* keygen);
     std::string serializeEncoding(const Encoding encoding) const;
 
     template<class T>

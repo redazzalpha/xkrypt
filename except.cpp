@@ -108,6 +108,15 @@ const char*  DecFnameRefsException::what() const noexcept
     return m_message;
 }
 
+PkRefsException::PkRefsException(const char* message)
+{
+    m_message = message;
+}
+const char*  PkRefsException::what() const noexcept
+{
+    return m_message;
+}
+
 SaltRefsException::SaltRefsException(const char* message)
 {
     m_message = message;
@@ -158,6 +167,24 @@ CipherException::CipherException(const char* message)
     m_message = message;
 }
 const char*  CipherException::what() const noexcept
+{
+    return m_message;
+}
+
+LogicException::LogicException(const char* message)
+{
+    m_message = message;
+}
+const char*  LogicException::what() const noexcept
+{
+    return m_message;
+}
+
+PkStateException::PkStateException(const char* message)
+{
+    m_message = message;
+}
+const char*  PkStateException::what() const noexcept
 {
     return m_message;
 }

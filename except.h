@@ -102,6 +102,17 @@ public:
     // methods
     virtual const char* what() const noexcept;
 };
+class PkRefsException : public std::exception {
+private:
+    const char* m_message;
+
+public:
+    // constructors
+    PkRefsException(const char* message = "-- error: Invalid use password refs<br />file is corrupt or unknown");
+
+    // methods
+    virtual const char* what() const noexcept;
+};
 class SaltRefsException : public std::exception {
 private:
     const char* m_message;
@@ -197,6 +208,28 @@ private:
 public:
     // constructors
     CipherException(const char* message = "-- error: bad file(s)");
+
+    // methods
+    virtual const char* what() const noexcept;
+};
+class LogicException : public std::exception {
+private:
+    const char* m_message;
+
+public:
+    // constructors
+    LogicException(const char* message = "-- error: Invalid logic between cipher and keygen");
+
+    // methods
+    virtual const char* what() const noexcept;
+};
+class PkStateException : public std::exception {
+private:
+    const char* m_message;
+
+public:
+    // constructors
+    PkStateException(const char* message = "-- error: Invalid password key use");
 
     // methods
     virtual const char* what() const noexcept;

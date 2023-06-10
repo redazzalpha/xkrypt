@@ -36,34 +36,26 @@ string AesCFB::encryptText(const string& plain, AbstractKeygen* keygen, const En
     std::string cipher = "";
     const SecByteBlock& key = kg_aes->key();
     const SecByteBlock& iv = kg_aes->Iv();
-    StringSink* ss = new StringSink(cipher);
+    StringSink* ssink = new StringSink(cipher);
     CFB_Mode<CryptoPP::AES>::Encryption encryptor;
     encryptor.SetKeyWithIV(key, key.size(), iv);
     StreamTransformationFilter* textFilter = new StreamTransformationFilter(encryptor);
-    SecByteBlock salt = keygen->salt();
 
-    BufferedTransformation* bt;
+    string refsCipher;
+    injectRefs(refsCipher, keygen);
+
     switch(encoding) {
-    case Encoding::BASE64 :
-        bt = new Base64Encoder(new Redirector(*ss));
-        textFilter->Attach(new Base64Encoder);
-        break;
-    case Encoding::HEX :
-        bt = new HexEncoder(new Redirector(*ss));
-        textFilter->Attach(new HexEncoder);
-        break;
-    case Encoding::NONE :
-        bt = new StringSink(cipher);
-        break;
+    case Encoding::BASE64 : textFilter->Attach(new Base64Encoder); break;
+    case Encoding::HEX : textFilter->Attach(new HexEncoder); break;
+    case Encoding::NONE : break;
     default : throw EncodingException();
     }
 
-    if(!m_encfname) StringSource(salt, salt.size(), true, bt);
-    else if(bt) delete bt;
-
-    textFilter->Attach(ss);
+    textFilter->Attach(ssink);
     StringSource(plain, true, textFilter);
+    refsCipher += cipher;
 
+    if(m_isContentEnc) return refsCipher;
     return cipher;
 }
 string AesCFB::decryptText(const string& cipher, AbstractKeygen* keygen, const Encoding encoding) noexcept(false)
@@ -72,11 +64,13 @@ string AesCFB::decryptText(const string& cipher, AbstractKeygen* keygen, const E
     std::string recover;
     const SecByteBlock& key = kg_aes->key();
     const SecByteBlock& iv = kg_aes->Iv();
-    StringSink* ss = new StringSink(recover);
+    StringSink* ssink = new StringSink(recover);
     CFB_Mode<CryptoPP::AES>::Decryption decryptor;
     decryptor.SetKeyWithIV(key, key.size(), iv);
-    StreamTransformationFilter* textFilter = new StreamTransformationFilter(decryptor, ss);
+    StreamTransformationFilter* textFilter = new StreamTransformationFilter(decryptor, ssink);
     StringSource source(cipher, false);
+
+    afterRefs(&source);
 
     switch(encoding) {
     case Encoding::BASE64 : source.Attach(new Base64Decoder); break;

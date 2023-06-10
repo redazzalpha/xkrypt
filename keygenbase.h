@@ -7,10 +7,11 @@
 class AbstractKeygen {
 protected:
     CryptoPP::AutoSeededX917RNG<CryptoPP::AES> m_prng;
-    size_t m_keysize;
+    size_t m_keysize = 0;
     Encoding m_encoding = Encoding::NONE;
     CryptoPP::SecByteBlock m_salt {0};
-    std::string m_password;
+    std::string m_password = "";
+    bool m_pkState = false;
 
 public:
     // constructors
@@ -25,15 +26,17 @@ public:
     virtual bool isReady() const = 0;
     virtual void flush() = 0;
     virtual AbstractKeygen* keygenCpy() = 0;
+    virtual bool pkState() const;
 
     void setKeysize(size_t keysize);
     void setEncoding(Encoding newEncoding);
     void setSalt(const CryptoPP::SecByteBlock &newSalt);
-    std::string password() const;
+    void setPassword(const std::string &newPassword);
+    void setPkState(bool newPkState);
     size_t keysize() const;
     Encoding encoding() const;
     CryptoPP::SecByteBlock& salt();
-    void setPassword(const std::string &newPassword);
+    std::string &password();
 
     CryptoPP::SecByteBlock& genSalt();
 };

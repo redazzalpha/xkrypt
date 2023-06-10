@@ -14,6 +14,7 @@
 #include "defines.h"
 #include "except.h"
 #include "keygenaes.h"
+#include "keygenrsa.h"
 #include <QFile>
 #include <base64.h>
 #include <files.h>
@@ -99,6 +100,11 @@ void Cipher::cipherNew(const string& alg, const string& mode)
     }
     else throw AlgException();
 }
+
+void Cipher::setIsContentEnc(const bool state)
+{
+    m_cipher->setIsContentEnc(state);
+}
 void Cipher::cipherDetect(const string& refs)
 {
     string alg;
@@ -149,6 +155,14 @@ string Cipher::stringRefs(AbstractKeygen* keygen)
 {
     return m_cipher->stringRefs(keygen);
 }
+void Cipher::checkLogic(AbstractKeygen* keygen)
+{
+    string alg = m_cipher->algName();
+    if(alg == AbstractCipherAes::AlgName)
+        if(!dynamic_cast<KeygenAes*>(keygen)) throw LogicException();
+    if(alg == AbstractCipherRsa::AlgName)
+        if(!dynamic_cast<KeygenRsa*>(keygen)) throw LogicException();
+}
 
 // slots
 string Cipher::encryptText(const string& plain, AbstractKeygen* keygen, const Encoding encoding) noexcept(false)
@@ -157,19 +171,15 @@ string Cipher::encryptText(const string& plain, AbstractKeygen* keygen, const En
     try {
         keygen->setEncoding(encoding);
 
-        AbstractKeygen* pk;
         if(auto kg_aes_cast = dynamic_cast<KeygenAes*>(keygen)) {
-            if(kg_aes_cast->pkState()) pk = kg_aes_cast->pkDerive(keygen->password(), !m_cipher->encfname());
-            else pk = kg_aes_cast->pkDerive(kg_aes_cast->key(), !m_cipher->encfname());
-            keygen->salt() = pk->salt();
+            if(kg_aes_cast->pkState()) kg_aes_cast->pkDerive(keygen->password(), m_cipher->isContentEnc());
+            else kg_aes_cast->pkDerive(m_cipher->isContentEnc());
         }
-        else pk = keygen->keygenCpy();
 
-        cipher = m_cipher->encryptText(plain, pk, encoding);
-        delete pk;
+        cipher = m_cipher->encryptText(plain, keygen, encoding);
 
         emit proceed();
-        if(!m_cipher->encfname()) emit cipherText(cipher);
+        if(m_cipher->isContentEnc()) emit cipherText(cipher);
         return cipher;
     }
     catch(exception& e) {
@@ -177,32 +187,64 @@ string Cipher::encryptText(const string& plain, AbstractKeygen* keygen, const En
     }
     return cipher;
 }
-string Cipher::decryptText(const string& cipher, AbstractKeygen* keygen, const Encoding encoding) noexcept(false)
+string Cipher::decryptText(const string& cipher, AbstractKeygen* keygen) noexcept(false)
 {
-    std::string recover = "";
+    string refs;
+    string recover = "";
     try {
-        keygen->setEncoding(encoding);
+        checkLogic(keygen);
         StringSource cipherSource(cipher, false);
-        string salt = m_cipher->pumpSalt(&cipherSource);
-        keygen->salt() = SecByteBlock((CryptoPP::byte*)salt.data(), salt.size());
 
-        AbstractKeygen* pk;
-        if(auto kg_aes_cast = dynamic_cast<KeygenAes*>(keygen)) {
-            if(kg_aes_cast->pkState()) pk = kg_aes_cast->pkDerive(keygen->password(), false);
-            else pk = kg_aes_cast->pkDerive(kg_aes_cast->key(), false);
+        refs = m_cipher->checkRefs(&cipherSource);
+        if(refs[6] != keygen->pkState()) throw PkStateException();
+        keygen->salt() = SecByteBlock((CryptoPP::byte*)&refs[XREF_SIZE_UNIT], SALT_SIZE);
+
+        Encoding encoding;
+        switch(static_cast<Encoding>(refs[2])) {
+        case Encoding::BASE64 : encoding = Encoding::BASE64; break;
+        case Encoding::HEX : encoding = Encoding::HEX; break;
+        case Encoding::NONE : encoding = Encoding::NONE; break;
+        default: throw EncodingRefsException();
         }
-        else pk = keygen->keygenCpy();
 
-        string cipherSink;
-        cipherSource.Attach(new StringSink(cipherSink));
-        cipherSource.PumpAll();
+        cipherDetect(refs);
+        m_cipher->setDecfname(refs[5]);
+        keygen->setEncoding(encoding);
 
-        recover = m_cipher->decryptText(cipherSink, pk, encoding);
-        delete pk;
+        if(auto kg_aes_cast = dynamic_cast<KeygenAes*>(keygen)) {
+            if(kg_aes_cast->pkState())kg_aes_cast->pkDerive(keygen->password(), false);
+            else kg_aes_cast->pkDerive(false);
+        }
 
+        recover = m_cipher->decryptText(cipher, keygen, encoding);
+
+        emit autoDetect(m_cipher->algName(), m_cipher->modeName(), encoding, refs[5], "Text");
         emit proceed();
         emit recoverText(recover);
         return recover;
+    }
+    catch(InvalidRefsException& e) {
+        emit error(e.what(), "-- It seems that you are trying to decrypt text\
+ that hasn't been encrypted by xkrypt or refs has been corrupt.");
+    }
+    catch(LogicException& e) {
+
+        string details =
+            "The key does not match with the current detected cipher.\n"
+            "Please try to import or re-import the proper key type.\n\n"
+            "-- type of used encryption: ";
+        details += m_cipher->algName();
+        emit error(e.what(), details);
+    }
+    catch(PkStateException& e) {
+        string details = "-- The text you are trying to decrypt has been encrypted using ";
+        details += (refs[6]? "\"password key\"":"\"symmetric key\"");
+        details += ".\n\nPlease ";
+        details += (refs[6]? "check ":"uncheck ");
+        details += "\"Use password\" in the key manager section ";
+        details += (!refs[6]? "import the proper key ":"");
+        details += " and retry.";
+        emit error(e.what(), details);
     }
     catch(exception& e) {
         emit error(e.what());
@@ -215,24 +257,21 @@ void Cipher::encryptFile(vector<string> paths, AbstractKeygen* keygen, const Enc
         keygen->setEncoding(encoding);
         size_t size = paths.size(), progress;
 
-        AbstractKeygen* pk;
         for(progress = 0; progress < size && m_run; progress++) {
             const string path = paths[progress];
             DirFname dirfname = m_cipher->extractFname(path);
             emit processing(dirfname.m_fname);
 
             if(auto kg_aes_cast = dynamic_cast<KeygenAes*>(keygen)) {
-                if(kg_aes_cast->pkState()) pk = kg_aes_cast->pkDerive(keygen->password());
-                else pk = kg_aes_cast->pkDerive(kg_aes_cast->key());
-                keygen->salt() = pk->salt();
+                if(kg_aes_cast->pkState()) kg_aes_cast->pkDerive(keygen->password());
+                else kg_aes_cast->pkDerive();
             }
-            else pk = keygen->keygenCpy();
 
-            m_cipher->encryptFile(path, pk, encoding);
-            delete pk;
+            m_cipher->encryptFile(path, keygen, encoding);
 
             emit proceed(progress+1);
         }
+
         emit cipherFile(successMsg(progress));
     }
     catch(exception& e) {
@@ -241,15 +280,20 @@ void Cipher::encryptFile(vector<string> paths, AbstractKeygen* keygen, const Enc
 }
 void Cipher::decryptFile(vector<string> paths, AbstractKeygen* keygen)
 {
+    string refs;
     try {
-        AbstractKeygen* pk;
+        checkLogic(keygen);
         size_t size = paths.size(), progress;
+
         for(progress = 0; progress < size && m_run; progress++) {
             const string path = paths[progress];
             DirFname dirfname = m_cipher->extractFname(path);
             emit processing(dirfname.m_fname);
 
-            string refs = m_cipher->checkRefs(path);
+            refs = m_cipher->checkRefs(path);
+            if(refs[6] != keygen->pkState()) throw PkStateException();
+            keygen->salt() = SecByteBlock((CryptoPP::byte*)&refs[XREF_SIZE_UNIT], SALT_SIZE);
+
             Encoding encoding;
             switch(static_cast<Encoding>(refs[2])) {
             case Encoding::BASE64 : encoding = Encoding::BASE64; break;
@@ -262,29 +306,40 @@ void Cipher::decryptFile(vector<string> paths, AbstractKeygen* keygen)
             m_cipher->setDecfname(refs[5]);
             keygen->setEncoding(encoding);
 
-            StringSource(
-                (CryptoPP::byte*)&refs[XREF_UNIT_SIZE],
-                SALT_SIZE, true,
-                new ArraySink(keygen->salt(), keygen->salt().size())
-            );
-
             if(auto kg_aes_cast = dynamic_cast<KeygenAes*>(keygen)) {
-                if(kg_aes_cast->pkState()) pk = kg_aes_cast->pkDerive(keygen->password(), false);
-                else pk = kg_aes_cast->pkDerive(kg_aes_cast->key(), false);
+                if(kg_aes_cast->pkState()) kg_aes_cast->pkDerive(keygen->password(), false);
+                else kg_aes_cast->pkDerive(false);
             }
-            else pk = keygen->keygenCpy();
 
-            m_cipher->decryptFile(path, pk, encoding);
-            delete pk;
+            m_cipher->decryptFile(path, keygen, encoding);
 
-            emit autoDetect(m_cipher->algName(), m_cipher->modeName(), encoding, refs[5]);
+            emit autoDetect(m_cipher->algName(), m_cipher->modeName(), encoding, refs[5], "File");
             emit proceed(progress+1);
         }
+
         emit recoverFile(successMsg(progress, false));
     }
     catch(InvalidRefsException& e) {
         emit error(e.what(), "-- It seems that you are trying to decrypt file\
- that hasn't been encrypted by xkrypt or refs has been corrupt!!");
+ that hasn't been encrypted by xkrypt or refs has been corrupt.");
+    }
+    catch(LogicException& e) {
+        string details =
+            "The key does not match with the current detected cipher.\n"
+            "Please try to import or re-import the proper key type.\n\n"
+            "-- type of used encryption: ";
+        details += m_cipher->algName();
+        emit error(e.what(), details);
+    }
+    catch(PkStateException& e) {
+        string details = "-- The file(s) you are trying to decrypt has been encrypted using ";
+        details += (refs[6]? "\"password key\"":"\"symmetric key\"");
+        details += ".\n\nPlease ";
+        details += (refs[6]? "check ":"uncheck ");
+        details += "\"Use password\" in the key manager section ";
+        details += (!refs[6]? "import the proper key ":"");
+        details += " and retry.";
+        emit error(e.what(), details);
     }
     catch(exception& e) {
         emit error(e.what());
