@@ -49,6 +49,8 @@ private:
     std::string m_dir;
     std::string m_fname;
     bool m_pkState = false;
+    bool m_changeSDEnc = false;
+    bool m_changeSDDec = false;
     std::vector<std::string> m_algorithms = {
         AbstractCipherAes::AlgName,
         AbstractCipherRsa::AlgName,
@@ -132,6 +134,7 @@ private:
     void dialogSuccess(const std::string& message, const std::string &description = "");
     void dialogError(const std::string& message, const std::string& description = "");
     std::string dialogSave(QWidget* parent = nullptr, const std::string& caption = "Select saving directory", const std::string& openDir = "");
+    std::string dialogChangeDirectory(QWidget* parent = nullptr, const std::string& caption = "Select saving directory", const std::string& openDir = "");
 
     void setFilesLoadedStyle(const QString &style) const;
     void setKeyLoadedStyle(const QString &style) const;
@@ -191,6 +194,9 @@ private slots:
     void cipherError(const std::string &error);
     void cipherKill();
 
+    void changeSdEnc(const bool checked);
+    void changeSdDec(const bool checked);
+
     void actionSelected();
     void detectFields(
         const std::string& alg,
@@ -203,8 +209,8 @@ private slots:
 signals:
     void startEncText(const std::string& plain, AbstractKeygen* keygen, const Encoding encoding);
     void startDecText(const std::string& cipher, AbstractKeygen* keygen);
-    void startEncFile(std::vector<std::string> paths, AbstractKeygen* keygen, const Encoding encoding);
-    void startDecFile(std::vector<std::string> paths, AbstractKeygen* keygen);
+    void startEncFile(std::vector<std::string> paths, AbstractKeygen* keygen, const Encoding encoding, const std::string& newDir);
+    void startDecFile(std::vector<std::string> paths, AbstractKeygen* keygen, const std::string& newDir);
     void startProcess(const int progress = 0);
 };
 

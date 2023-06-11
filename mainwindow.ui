@@ -837,8 +837,27 @@
            </item>
            <item>
             <widget class="QLabel" name="label_7">
+             <property name="minimumSize">
+              <size>
+               <width>73</width>
+               <height>0</height>
+              </size>
+             </property>
              <property name="text">
               <string>Encoding</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="m_encTabFileEncFname">
+             <property name="text">
+              <string>Encrypt &amp;filename</string>
+             </property>
+             <property name="shortcut">
+              <string>Ctrl+F</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
              </property>
             </widget>
            </item>
@@ -898,15 +917,9 @@
             <widget class="QComboBox" name="m_encTabFileEncodings"/>
            </item>
            <item>
-            <widget class="QCheckBox" name="m_encTabFileEncFname">
+            <widget class="QCheckBox" name="m_encTabFileChangeSD">
              <property name="text">
-              <string>Encrypt &amp;filename</string>
-             </property>
-             <property name="shortcut">
-              <string>Ctrl+F</string>
-             </property>
-             <property name="checked">
-              <bool>true</bool>
+              <string>Change saving directory</string>
              </property>
             </widget>
            </item>
@@ -1463,8 +1476,30 @@
            </item>
            <item>
             <widget class="QLabel" name="label_20">
+             <property name="minimumSize">
+              <size>
+               <width>73</width>
+               <height>0</height>
+              </size>
+             </property>
              <property name="text">
               <string>Encoding</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="m_decTabFileDecFname">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <property name="text">
+              <string>Decrypt &amp;filename</string>
+             </property>
+             <property name="shortcut">
+              <string>Ctrl+F</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
              </property>
             </widget>
            </item>
@@ -1519,18 +1554,9 @@
             </widget>
            </item>
            <item>
-            <widget class="QCheckBox" name="m_decTabFileDecFname">
-             <property name="enabled">
-              <bool>false</bool>
-             </property>
+            <widget class="QCheckBox" name="m_decTabFileChangeSD">
              <property name="text">
-              <string>Decrypt &amp;filename</string>
-             </property>
-             <property name="shortcut">
-              <string>Ctrl+F</string>
-             </property>
-             <property name="checked">
-              <bool>true</bool>
+              <string>Change saving directory</string>
              </property>
             </widget>
            </item>

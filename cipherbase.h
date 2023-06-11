@@ -35,8 +35,8 @@ public:
     virtual Mode modeId() const = 0;
     virtual std::string encryptText(const std::string& plain, AbstractKeygen* keygen, const Encoding encoding) = 0;
     virtual std::string decryptText(const std::string& cipher, AbstractKeygen* keygen, const Encoding encoding) = 0;
-    virtual void encryptFile(const std::string& path, AbstractKeygen* keygen, const Encoding encoding) = 0;
-    virtual void decryptFile(const std::string& path, AbstractKeygen* keygen, const Encoding encoding) = 0;
+    virtual void encryptFile(const std::string& path, AbstractKeygen* keygen, const Encoding encoding, const std::string& newDir = "") = 0;
+    virtual void decryptFile(const std::string& path, AbstractKeygen* keygen, const Encoding encoding, const std::string& newDir = "") = 0;
 
     void setEncfname(bool newEncfname);
     void setDecfname(bool newDecfname);

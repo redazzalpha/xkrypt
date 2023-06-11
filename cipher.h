@@ -40,8 +40,8 @@ public:
 public slots:
     std::string encryptText(const std::string& plain, AbstractKeygen* keygen, const Encoding encoding);
     std::string decryptText(const std::string& cipher, AbstractKeygen* keygen);
-    void encryptFile(std::vector<std::string> paths, AbstractKeygen* keygen, const Encoding encoding);
-    void decryptFile(std::vector<std::string> paths, AbstractKeygen* keygen);
+    void encryptFile(std::vector<std::string> paths, AbstractKeygen* keygen, const Encoding encoding, const std::string& newDir);
+    void decryptFile(std::vector<std::string> paths, AbstractKeygen* keygen, const std::string& newDir);
 
 signals:
     void finished();

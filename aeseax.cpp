@@ -81,7 +81,7 @@ string AesEAX::decryptText(const string& cipher, AbstractKeygen* keygen, const E
 
     return recover;
 }
-void AesEAX::encryptFile(const string& path, AbstractKeygen* keygen, const Encoding encoding)
+void AesEAX::encryptFile(const string& path, AbstractKeygen* keygen, const Encoding encoding, const string& newDir)
 {
     KeygenAes* kg_aes = (KeygenAes*)keygen;
     string filename, output;
@@ -97,6 +97,7 @@ void AesEAX::encryptFile(const string& path, AbstractKeygen* keygen, const Encod
     }
     else filename += dirfname.m_fname + FILE_TEMP_SUFFIX;
 
+    if(!newDir.empty()) dirfname.m_dir = newDir;
     FileSink* fs = new FileSink((output = dirfname.m_dir + DELIMITOR + filename).c_str());
     encryptor.SetKeyWithIV(key, key.size(), iv);
     AuthenticatedEncryptionFilter* fileFilter = new AuthenticatedEncryptionFilter(encryptor);
@@ -118,7 +119,7 @@ void AesEAX::encryptFile(const string& path, AbstractKeygen* keygen, const Encod
         QFile(out).rename(QString::fromStdString(output.substr(0, output.size()-strlen(FILE_TEMP_SUFFIX))));
     }
 }
-void AesEAX::decryptFile(const string& path, AbstractKeygen* keygen, const Encoding encoding)
+void AesEAX::decryptFile(const string& path, AbstractKeygen* keygen, const Encoding encoding, const string& newDir)
 {
     KeygenAes* kg_aes = (KeygenAes*)keygen;
     string filename, output;
@@ -135,6 +136,7 @@ void AesEAX::decryptFile(const string& path, AbstractKeygen* keygen, const Encod
     }
     else filename += dirfname.m_fname + FILE_TEMP_SUFFIX;
 
+    if(!newDir.empty()) dirfname.m_dir = newDir;
     FileSink* fs = new FileSink((output = dirfname.m_dir + DELIMITOR + filename).c_str());
     decryptor.SetKeyWithIV(key, key.size(), iv);
     AuthenticatedDecryptionFilter* fileFilter = new AuthenticatedDecryptionFilter(decryptor, fs);

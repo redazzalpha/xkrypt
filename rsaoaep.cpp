@@ -80,7 +80,7 @@ string RsaOAEP::decryptText(const string& cipher, AbstractKeygen* keygen, const 
 
     return recover;
 }
-void RsaOAEP::encryptFile(const string& path, AbstractKeygen* keygen, const Encoding encoding)
+void RsaOAEP::encryptFile(const string& path, AbstractKeygen* keygen, const Encoding encoding, const string& newDir)
 {
     KeygenRsa* keygen_rsa = (KeygenRsa*)keygen;
     CryptoPP::RSA::PrivateKey* pvk = keygen_rsa->getPrivate();
@@ -96,6 +96,7 @@ void RsaOAEP::encryptFile(const string& path, AbstractKeygen* keygen, const Enco
     }
     else filename += dirfname.m_fname + FILE_TEMP_SUFFIX;
 
+    if(!newDir.empty()) dirfname.m_dir = newDir;
     FileSink* fs = new FileSink((output = dirfname.m_dir + DELIMITOR + filename).c_str());
     PK_EncryptorFilter* fileFilter = new PK_EncryptorFilter(prng, encryptor);
 
@@ -115,7 +116,7 @@ void RsaOAEP::encryptFile(const string& path, AbstractKeygen* keygen, const Enco
         QFile(out).rename(QString::fromStdString(output.substr(0, output.size()-strlen(FILE_TEMP_SUFFIX))));
     }
 }
-void RsaOAEP::decryptFile(const string& path, AbstractKeygen* keygen, const Encoding encoding)
+void RsaOAEP::decryptFile(const string& path, AbstractKeygen* keygen, const Encoding encoding, const string& newDir)
 {
     KeygenRsa* keygen_rsa = (KeygenRsa*)keygen;
     CryptoPP::RSA::PrivateKey* pvk = keygen_rsa->getPrivate();
@@ -131,6 +132,7 @@ void RsaOAEP::decryptFile(const string& path, AbstractKeygen* keygen, const Enco
     }
     else filename += dirfname.m_fname + FILE_TEMP_SUFFIX;
 
+    if(!newDir.empty()) dirfname.m_dir = newDir;
     FileSink* fs = new FileSink((output = dirfname.m_dir + DELIMITOR + filename).c_str());
     PK_DecryptorFilter* fileFilter = new PK_DecryptorFilter(prng, decryptor, fs);
     FileSource source(path.c_str(), false);

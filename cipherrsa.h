@@ -26,8 +26,8 @@ public:
     virtual Mode modeId() const override = 0;
     virtual std::string encryptText(const std::string& plain, AbstractKeygen* keygen, const Encoding encoding) override = 0;
     virtual std::string decryptText(const std::string& cipher, AbstractKeygen* keygen, const Encoding encoding) override = 0;
-    virtual void encryptFile(const std::string& path, AbstractKeygen* keygen, const Encoding encoding) override = 0;
-    virtual void decryptFile(const std::string& path, AbstractKeygen* keygen, const Encoding encoding) override = 0;
+    virtual void encryptFile(const std::string& path, AbstractKeygen* keygen, const Encoding encoding, const std::string& newDir = "") override = 0;
+    virtual void decryptFile(const std::string& path, AbstractKeygen* keygen, const Encoding encoding, const std::string& newDir = "") override = 0;
 };
 
 #endif // CIPHERRSA_H

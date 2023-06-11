@@ -251,7 +251,7 @@ string Cipher::decryptText(const string& cipher, AbstractKeygen* keygen) noexcep
     }
     return recover;
 }
-void Cipher::encryptFile(vector<string> paths, AbstractKeygen* keygen, const Encoding encoding)
+void Cipher::encryptFile(vector<string> paths, AbstractKeygen* keygen, const Encoding encoding, const string& newDir)
 {
     try {
         keygen->setEncoding(encoding);
@@ -267,7 +267,7 @@ void Cipher::encryptFile(vector<string> paths, AbstractKeygen* keygen, const Enc
                 else kg_aes_cast->pkDerive();
             }
 
-            m_cipher->encryptFile(path, keygen, encoding);
+            m_cipher->encryptFile(path, keygen, encoding, newDir);
 
             emit proceed(progress+1);
         }
@@ -278,7 +278,7 @@ void Cipher::encryptFile(vector<string> paths, AbstractKeygen* keygen, const Enc
         emit error(e.what());
     }
 }
-void Cipher::decryptFile(vector<string> paths, AbstractKeygen* keygen)
+void Cipher::decryptFile(vector<string> paths, AbstractKeygen* keygen, const string& newDir)
 {
     string refs;
     try {
@@ -311,7 +311,7 @@ void Cipher::decryptFile(vector<string> paths, AbstractKeygen* keygen)
                 else kg_aes_cast->pkDerive(false);
             }
 
-            m_cipher->decryptFile(path, keygen, encoding);
+            m_cipher->decryptFile(path, keygen, encoding, newDir);
 
             emit autoDetect(m_cipher->algName(), m_cipher->modeName(), encoding, refs[5], "File");
             emit proceed(progress+1);

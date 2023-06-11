@@ -84,7 +84,7 @@ string AesCFB::decryptText(const string& cipher, AbstractKeygen* keygen, const E
 
     return recover;
 }
-void AesCFB::encryptFile(const string& path, AbstractKeygen* keygen, const Encoding encoding)
+void AesCFB::encryptFile(const string& path, AbstractKeygen* keygen, const Encoding encoding, const string& newDir)
 {
     KeygenAes* kg_aes = (KeygenAes*)keygen;
     string filename, output;
@@ -121,7 +121,7 @@ void AesCFB::encryptFile(const string& path, AbstractKeygen* keygen, const Encod
         QFile(out).rename(QString::fromStdString(output.substr(0, output.size()-strlen(FILE_TEMP_SUFFIX))));
     }
 }
-void AesCFB::decryptFile(const string& path, AbstractKeygen* keygen, const Encoding encoding)
+void AesCFB::decryptFile(const string& path, AbstractKeygen* keygen, const Encoding encoding, const string& newDir)
 {
     KeygenAes* keygen_aes = (KeygenAes*)keygen;
     string filename, output;

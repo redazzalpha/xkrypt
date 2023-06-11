@@ -84,7 +84,7 @@ string AesOFB::decryptText(const string& cipher, AbstractKeygen* keygen, const E
 
     return recover;
 }
-void AesOFB::encryptFile(const string& path, AbstractKeygen* keygen, const Encoding encoding)
+void AesOFB::encryptFile(const string& path, AbstractKeygen* keygen, const Encoding encoding, const string& newDir)
 {
     KeygenAes* kg_aes = (KeygenAes*)keygen;
     string filename, output;
@@ -100,6 +100,7 @@ void AesOFB::encryptFile(const string& path, AbstractKeygen* keygen, const Encod
     }
     else filename += dirfname.m_fname + FILE_TEMP_SUFFIX;
 
+    if(!newDir.empty()) dirfname.m_dir = newDir;
     FileSink* fs = new FileSink((output = dirfname.m_dir + DELIMITOR + filename).c_str());
     encryptor.SetKeyWithIV(key, key.size(), iv);
     StreamTransformationFilter* fileFilter = new StreamTransformationFilter(encryptor);
@@ -121,7 +122,7 @@ void AesOFB::encryptFile(const string& path, AbstractKeygen* keygen, const Encod
         QFile(out).rename(QString::fromStdString(output.substr(0, output.size()-strlen(FILE_TEMP_SUFFIX))));
     }
 }
-void AesOFB::decryptFile(const string& path, AbstractKeygen* keygen, const Encoding encoding)
+void AesOFB::decryptFile(const string& path, AbstractKeygen* keygen, const Encoding encoding, const string& newDir)
 {
     KeygenAes* keygen_aes = (KeygenAes*)keygen;
     string filename, output;
@@ -137,6 +138,7 @@ void AesOFB::decryptFile(const string& path, AbstractKeygen* keygen, const Encod
     }
     else filename += dirfname.m_fname + FILE_TEMP_SUFFIX;
 
+    if(!newDir.empty()) dirfname.m_dir = newDir;
     FileSink* fs = new FileSink((output = dirfname.m_dir + DELIMITOR + filename).c_str());
     decryptor.SetKeyWithIV(key, key.size(), iv);
     StreamTransformationFilter* fileFilter  = new StreamTransformationFilter(decryptor, fs);

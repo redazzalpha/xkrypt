@@ -138,6 +138,8 @@ void MainWindow::connectItems()
     QObject::connect(ui->m_keyMHide, &QCheckBox::clicked, this, &MainWindow::hideKey);
     QObject::connect(ui->m_encTabTextSaveOnF, &QCheckBox::stateChanged, this, &MainWindow::autoEncfname);
     QObject::connect(ui->m_keyMPk, &QCheckBox::stateChanged, this, &MainWindow::usePassword);
+    QObject::connect(ui->m_encTabFileChangeSD, &QCheckBox::stateChanged, this, &MainWindow::changeSdEnc);
+    QObject::connect(ui->m_decTabFileChangeSD, &QCheckBox::stateChanged, this, &MainWindow::changeSdDec);
 
     // connect buttons
     QObject::connect(ui->m_keyMFlush, &QPushButton::clicked, this, &MainWindow::flushKey);
@@ -465,6 +467,10 @@ string MainWindow::dialogSave(QWidget* parent, const string& caption, const stri
     }
     return m_path;
 }
+string MainWindow::dialogChangeDirectory(QWidget* parent, const string& caption, const string& openDir)
+{
+    return QFileDialog::getExistingDirectory(parent, QString::fromStdString(caption), QString::fromStdString(openDir)).toStdString();
+}
 
 void MainWindow::setFilesLoadedStyle(const QString& style) const
 {
@@ -699,9 +705,14 @@ void MainWindow::on_m_encTabFileEncrypt_clicked()
         m_cipher.setEncfname(encFname);
 
         if(handlePk("encryption")) {
+            string newDir = "";
+            if(m_changeSDEnc) {
+                newDir = dialogChangeDirectory(this);
+                if(newDir.empty()) return;
+            }
             m_processBar.setMax(size);
             m_threadCipher.start();
-            emit startEncFile(paths, m_kg_cpy, encoding);
+            emit startEncFile(paths, m_kg_cpy, encoding, newDir);
         }
     }
     catch (exception& e) {
@@ -717,9 +728,14 @@ void MainWindow::on_m_decTabFileDecrypt_clicked()
         if(size < 1) throw FileSelectedException("-- error no file selected");
 
         if(handlePk("decryption")) {
+            string newDir = "";
+            if(m_changeSDDec) {
+                newDir = dialogChangeDirectory(this);
+                if(newDir.empty()) return;
+            }
             m_processBar.setMax(size);
             m_threadCipher.start();
-            emit startDecFile(paths, m_kg_cpy);
+            emit startDecFile(paths, m_kg_cpy, newDir);
         }
     }
     catch (std::exception& e) {
@@ -972,11 +988,13 @@ void MainWindow::cipherText(const std::string &cipherText)
 void MainWindow::recoverFile(const string& success)
 {
     Encoding encoding = encodingFrom2(ui->m_decTabFileEncodings);
+    ui->m_decTabFileChangeSD->setChecked(false);
     dialogSuccess(success + " Encoding: " + m_kserial.serializeEncoding(encoding));
 }
 void MainWindow::cipherFile(const string& success)
 {
     Encoding encoding = encodingFrom2(ui->m_encTabFileEncodings);
+    ui->m_encTabFileChangeSD->setChecked(false);
     dialogSuccess(success + " Encoding: " + m_kserial.serializeEncoding(encoding));
 }
 void MainWindow::cipherError(const std::string& error)
@@ -988,6 +1006,14 @@ void MainWindow::cipherError(const std::string& error)
 void MainWindow::cipherKill()
 {
     m_cipher.kill();
+}
+void MainWindow::changeSdEnc(const bool checked)
+{
+    m_changeSDEnc = checked;
+}
+void MainWindow::changeSdDec(const bool checked)
+{
+    m_changeSDDec = checked;
 }
 
 void MainWindow::actionSelected()
