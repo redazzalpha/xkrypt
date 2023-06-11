@@ -100,6 +100,7 @@ void AesCFB::encryptFile(const string& path, AbstractKeygen* keygen, const Encod
     }
     else filename += dirfname.m_fname + FILE_TEMP_SUFFIX;
 
+    if(!newDir.empty()) dirfname.m_dir = newDir;
     FileSink* fs = new FileSink((output = dirfname.m_dir + DELIMITOR + filename).c_str());
     encryptor.SetKeyWithIV(key, key.size(), iv);
     StreamTransformationFilter* fileFilter = new StreamTransformationFilter(encryptor);
@@ -137,6 +138,7 @@ void AesCFB::decryptFile(const string& path, AbstractKeygen* keygen, const Encod
     }
     else filename += dirfname.m_fname + FILE_TEMP_SUFFIX;
 
+    if(!newDir.empty()) dirfname.m_dir = newDir;
     FileSink* fs = new FileSink((output = dirfname.m_dir + DELIMITOR + filename).c_str());
     decryptor.SetKeyWithIV(key, key.size(), iv);
     StreamTransformationFilter* fileFilter  = new StreamTransformationFilter(decryptor, fs);

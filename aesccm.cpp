@@ -125,6 +125,7 @@ void AesCCM::encryptFile(const string& path, AbstractKeygen* keygen, const Encod
     encryptor.SetKeyWithIV(key, key.size(), iv);
     encryptor.SpecifyDataLengths(0, fsize, 0);
     AuthenticatedEncryptionFilter* fileFilter = new AuthenticatedEncryptionFilter(encryptor);
+    if(!newDir.empty()) dirfname.m_dir = newDir;
     FileSink* fs = new FileSink((output = dirfname.m_dir + DELIMITOR + filename).c_str());
 
     injectRefs(fs, keygen);
@@ -183,6 +184,7 @@ void AesCCM::decryptFile(const string& path, AbstractKeygen* keygen, const Encod
     FileSource source(path.c_str(), false);
     int refsCount = afterRefs(&source);
 
+    if(!newDir.empty()) dirfname.m_dir = newDir;
     FileSink* fs = new FileSink((output = dirfname.m_dir + DELIMITOR + filename).c_str());
     if(decoder) {
         decoder->PutMessageEnd((CryptoPP::byte*)&bytes[refsCount], bytes.size()-refsCount);
