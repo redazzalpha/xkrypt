@@ -327,11 +327,29 @@ bool MainWindow::dialogPassword(const std::string &message)
     input.setModal(true);
     input.setTextEchoMode(QLineEdit::Password);
     input.setFixedWidth(PASSWORD_BAR_WIDTH);
-    if(input.exec()) {
-        m_kg_cpy->setPassword(input.textValue().toStdString());
-        isInserted = true;
-    }
+    bool run = true;
 
+    while(run) {
+        if(input.exec()) {
+            string password = input.textValue().toStdString();
+            if(checkPassword(password)) {
+                m_kg_cpy->setPassword(input.textValue().toStdString());
+                isInserted = true;
+                run = false;
+            }
+            else input.setLabelText(
+                QString::fromStdString(
+                    text +
+                    "<span style='color: red;'>Invalid password</span><br />"
+                    "Password must contains at least:<br />"
+                    "8 characters, 1 uppercase<br />"
+                    "1 lowercase, 1 digit<br />"
+                    "1 special character, no space."
+                )
+            );
+        }
+        else run = false;
+    }
     return isInserted;
 }
 bool MainWindow::dialogConfirm(const string& message, const string& description)
@@ -515,22 +533,6 @@ void MainWindow::toogleCombos(QHBoxLayout* layout, bool disable)
         if(combo) combo->setDisabled(disable);
     }
 }
-void MainWindow::keygenCopy()
-{
-    delete m_kg_cpy;
-    m_kg_cpy = m_keygen->keygenCpy();
-}
-
-void MainWindow::keygenUpdate()
-{
-    SecByteBlock salt  = m_kg_cpy->salt();
-    string password = m_kg_cpy->password();
-    bool pkState = m_kg_cpy->pkState();
-    keygenCopy();
-    m_kg_cpy->salt() = salt;
-    m_kg_cpy->password() = password;
-    m_kg_cpy->setPkState(pkState);
-}
 bool MainWindow::handlePk(const string& action)
 {
     bool isProcess = true;
@@ -548,6 +550,31 @@ bool MainWindow::handlePk(const string& action)
     }
 
     return isProcess;
+}
+void MainWindow::keygenCopy()
+{
+    delete m_kg_cpy;
+    m_kg_cpy = m_keygen->keygenCpy();
+}
+void MainWindow::keygenUpdate()
+{
+    SecByteBlock salt  = m_kg_cpy->salt();
+    string password = m_kg_cpy->password();
+    bool pkState = m_kg_cpy->pkState();
+    keygenCopy();
+    m_kg_cpy->salt() = salt;
+    m_kg_cpy->password() = password;
+    m_kg_cpy->setPkState(pkState);
+}
+bool MainWindow::checkPassword(const std::string &password)
+{
+    bool isLength = password.size() >= 8;
+    bool isUpperCase = std::regex_search(password, std::regex("[A-Z](?=.*)"));
+    bool isLowerCase = std::regex_search(password, std::regex("[a-z](?=.*)"));
+    bool isDigit = std::regex_search(password, std::regex("\\d(?=.*)"));
+    bool isSpecChar = std::regex_search(password, std::regex("[-._!\"`'#%&,:;<>=@{}~\\$\(\\)\\*\\+\\/\\\?\[\\]\\^\\|](?=.*)"));
+    bool isNoSpace = !std::regex_search(password, std::regex("\\s(?=.*)"));
+    return isLength && isUpperCase && isLowerCase && isDigit && isSpecChar && isNoSpace;
 }
 
 template<class T>

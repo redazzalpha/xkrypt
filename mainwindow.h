@@ -146,6 +146,7 @@ private:
     bool handlePk(const std::string &action);
     void keygenCopy();
     void keygenUpdate();
+    bool checkPassword(const std::string& password);
 
     template <class T>
     void generateKey();
